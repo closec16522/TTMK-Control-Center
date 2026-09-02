@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <script>
         tailwind.config = {
@@ -19,12 +22,12 @@
                     },
                     colors: {
                         'ttmk-red': '#E4405F',
-                        'ttmk-dark': '#2D3142',
-                        'ttmk-light': '#F8F9FB',
+                        'ttmk-dark': '#1E293B',
+                        'ttmk-light': '#F8FAFC',
                     },
                     boxShadow: {
                         'soft': '0 10px 40px -10px rgba(0,0,0,0.05)',
-                        'floating': '0 20px 40px -10px rgba(228, 64, 95, 0.15)',
+                        'floating': '0 20px 40px -10px rgba(228, 64, 95, 0.18)',
                     }
                 }
             }
@@ -33,10 +36,11 @@
 
     <style>
         body {
-            background-color: #F3F5F8;
-            background-image: radial-gradient(circle at 100% 0%, #ffffff 0%, transparent 50%), 
-                              radial-gradient(circle at 0% 100%, #ffffff 0%, transparent 50%);
+            background-color: #F8FAFC;
+            background-image: radial-gradient(circle at 100% 0%, #FFFFFF 0%, transparent 60%), 
+                              radial-gradient(circle at 0% 100%, #F1F5F9 0%, transparent 60%);
             background-attachment: fixed;
+            color: #1E293B;
         }
         
         .tab-content { display: none; }
@@ -51,32 +55,62 @@
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(226, 232, 240, 0.8);
             border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            box-shadow: 0 8px 30px 0 rgba(15, 23, 42, 0.04);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .glass-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08);
+            box-shadow: 0 12px 35px 0 rgba(15, 23, 42, 0.08);
+            border-color: rgba(228, 64, 95, 0.2);
+        }
+
+        /* --- SIDEBAR CUSTOM CONTRAST STYLES --- */
+        aside.sidebar {
+            background-color: #FFFFFF !important;
+            border-color: #E2E8F0 !important;
+        }
+
+        .sidebar-header h1 {
+            color: #0F172A !important; /* โหมดสว่าง: โลโก้ TTMK. สีดำเข้ม อ่านง่าย 100% */
+        }
+        body.dark-mode .sidebar-header h1 {
+            color: #FFFFFF !important; /* โหมดมืด: โลโก้ TTMK. สีขาวบริสุทธิ์ */
         }
 
         .sidebar-item {
-            transition: all 0.3s ease;
+            color: #0F172A !important; /* โหมดสว่าง: ตัวอักษรสีดำเข้ม อ่านง่ายชัดเจนที่สุด */
+            font-weight: 700 !important;
+            transition: all 0.25s ease;
             border-radius: 16px;
         }
+        .sidebar-item i {
+            color: #334155 !important; /* โหมดสว่าง: ไอคอนสีครามเข้ม */
+            font-size: 1.2rem;
+            width: 2rem;
+            text-align: center;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
         .sidebar-item.active {
-            background: linear-gradient(135deg, #FF6B6B 0%, #E4405F 100%);
-            color: white;
-            box-shadow: 0 10px 20px -5px rgba(228, 64, 95, 0.3);
+            background: linear-gradient(135deg, #FF527B 0%, #E4405F 100%) !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 10px 20px -5px rgba(228, 64, 95, 0.35);
+        }
+        .sidebar-item.active i {
+            color: #FFFFFF !important;
         }
         .sidebar-item:hover:not(.active) {
-            background-color: #FFF0F2;
-            color: #E4405F;
+            background-color: #FFF0F2 !important;
+            color: #E4405F !important;
             transform: translateX(4px);
+        }
+        .sidebar-item:hover:not(.active) i {
+            color: #E4405F !important;
+            transform: scale(1.1);
         }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -86,8 +120,9 @@
 
         .input-modern {
             background-color: #F8FAFC;
-            border: 2px solid transparent;
+            border: 2px solid #E2E8F0;
             border-radius: 12px;
+            color: #1E293B;
             transition: all 0.2s ease;
         }
         .input-modern:focus {
@@ -98,22 +133,12 @@
         }
 
         .text-gradient {
-            background: linear-gradient(135deg, #E4405F 0%, #FF8E53 100%);
+            background: linear-gradient(135deg, #E4405F 0%, #FF6B6B 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* เพิ่มขนาดและสไตล์ให้ Icon ใน Sidebar กลับมาสวยเหมือนเดิม */
-        .sidebar-item i {
-            font-size: 1.25rem; /* เทียบเท่า text-xl */
-            width: 2rem;       /* เทียบเท่า w-8 */
-            text-align: center;
-            transition: transform 0.2s ease;
-        }
-        .sidebar-item:hover i {
-            transform: scale(1.1); /* ขยายเวลากด */
-        }
-        /* --- Dark Mode Custom Styles --- */
+        /* --- DARK MODE CUSTOM STYLES --- */
         body.dark-mode {
             background-color: #0F172A !important;
             background-image: radial-gradient(circle at 100% 0%, #1E293B 0%, transparent 50%), 
@@ -122,8 +147,22 @@
         }
 
         body.dark-mode aside.sidebar {
-            background: rgba(30, 41, 59, 0.85) !important;
+            background-color: #1E293B !important;
             border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        body.dark-mode .sidebar-item:not(.active) {
+            color: #FFFFFF !important; /* โหมดมืด: ตัวอักษรสีขาว คมชัด */
+        }
+        body.dark-mode .sidebar-item:not(.active) i {
+            color: #CBD5E1 !important; /* โหมดมืด: ไอคอนสีเทาขาว */
+        }
+        body.dark-mode .sidebar-item:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: #FF758F !important;
+        }
+        body.dark-mode .sidebar-item:hover:not(.active) i {
+            color: #FF758F !important;
         }
 
         body.dark-mode .glass-card {
@@ -205,68 +244,37 @@
             th, td { border: 1px solid #ddd !important; padding: 8px !important; }
         }
 
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                bottom: 16px;
-                left: 16px;
-                right: 16px;
-                width: auto;
-                height: 70px;
-                flex-direction: row;
-                z-index: 50;
-                background: rgba(255, 255, 255, 0.9);
-                backdrop-filter: blur(10px);
-                border-radius: 24px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                border: 1px solid rgba(255,255,255,0.5);
-                overflow-x: auto;
-            }
+        @media (max-width: 1023px) {
             .main-content {
-                padding-bottom: 100px !important;
+                padding-bottom: 24px !important;
             }
-            .sidebar-header { display: none; }
-            .sidebar-nav {
-                display: flex;
-                flex-direction: row;
-                width: max-content;
-                padding: 0 8px;
-                align-items: center;
-                gap: 4px;
-            }
-            .sidebar-item {
-                padding: 8px 12px;
-                flex-direction: column;
-                font-size: 0.65rem;
-                justify-content: center;
-                align-items: center;
-                border-radius: 16px;
-                white-space: nowrap;
-            }
-            .sidebar-item.active {
-                transform: translateY(-4px);
-                box-shadow: 0 8px 15px rgba(228,64,95,0.3);
-            }
-            .sidebar-item i { margin-right: 0; margin-bottom: 4px; font-size: 1.2rem; width: auto; }
-            .sidebar-item span { display: block; font-weight: 600;}
         }
     </style>
 </head>
 <body class="text-gray-700 antialiased h-screen flex overflow-hidden">
 
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar w-64 bg-white/60 backdrop-blur-xl flex-shrink-0 h-full flex flex-col transition-all duration-300 md:relative absolute z-40 md:m-4 md:rounded-3xl md:h-[calc(100vh-32px)] md:shadow-soft md:border md:border-white">
-        <div class="sidebar-header p-8 flex flex-col items-center justify-center relative">
-            <div class="w-16 h-16 bg-gradient-to-tr from-ttmk-red to-orange-400 rounded-2xl flex items-center justify-center mb-4 shadow-floating">
-                <i class="fas fa-truck-fast text-white text-3xl"></i>
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar(false)" class="hidden fixed inset-0 bg-gray-900/50 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300"></div>
+
+    <!-- Sidebar Navigation (Collapsible Drawer on Mobile/iPad < 1024px, Fixed on Desktop >= 1024px) -->
+    <aside class="sidebar fixed lg:relative top-0 left-0 bottom-0 z-50 w-64 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl flex flex-col justify-between transition-transform duration-300 ease-in-out -translate-x-full lg:translate-x-0 lg:m-4 lg:rounded-3xl lg:h-[calc(100vh-32px)] lg:shadow-soft lg:border lg:border-white/80 no-print flex-shrink-0 shadow-2xl lg:shadow-none">
+        <!-- Sidebar Header (Enterprise Modern) -->
+        <div class="sidebar-header px-6 py-5 flex items-center justify-between relative border-b border-gray-100 dark:border-slate-700/80">
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="w-10 h-10 bg-gradient-to-tr from-ttmk-red to-orange-400 rounded-xl flex items-center justify-center shadow-floating flex-shrink-0">
+                    <i class="fas fa-truck-fast text-white text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="text-lg font-black text-gray-900 dark:text-white tracking-tight leading-none">TTMK.</h1>
+                    <p class="text-[10px] text-gray-500 dark:text-slate-400 font-bold mt-1 truncate">หจก.ทั่วไทยขนส่งมงคล</p>
+                </div>
             </div>
-            <div class="text-center">
-                <h1 class="text-2xl font-extrabold text-ttmk-dark tracking-tight">TTMK.</h1>
-                <p class="text-xs text-gradient font-bold mt-1 uppercase tracking-wider">Control Center</p>
-            </div>
+            <button onclick="toggleMobileSidebar(false)" class="lg:hidden w-8 h-8 bg-gray-100 dark:bg-slate-700 text-gray-500 rounded-full flex items-center justify-center hover:text-red-500 transition">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         
-        <nav class="sidebar-nav flex-1 px-4 py-2 space-y-2 overflow-y-auto">
+        <nav class="sidebar-nav flex-1 px-4 py-3 space-y-2 overflow-y-auto">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active w-full flex items-center px-4 py-3.5 text-sm font-medium">
                 <i class="fas fa-chart-pie"></i>
                 <span class="ml-2">ภาพรวม (Overview)</span>
@@ -295,29 +303,112 @@
                 <i class="fas fa-user-group"></i>
                 <span class="ml-2">พนักงาน / เบิกจ่าย</span>
             </button>
-            <button onclick="toggleDarkMode()" id="theme-toggle-btn-mobile" class="sidebar-item w-full flex items-center px-4 py-3.5 text-sm font-medium border-t border-gray-100 mt-2">
+            <button onclick="switchTab('settings')" id="nav-settings" class="sidebar-item w-full flex items-center px-4 py-3.5 text-sm font-medium">
+                <i class="fas fa-gear"></i>
+                <span class="ml-2">ตั้งค่าระบบ</span>
+            </button>
+            <button onclick="toggleDarkMode()" id="theme-toggle-btn-mobile" class="sidebar-item w-full flex items-center px-4 py-3.5 text-sm font-medium border-t border-gray-100 dark:border-slate-700/80 mt-2">
                 <i id="theme-toggle-icon-mobile" class="fas fa-moon"></i>
                 <span class="ml-2 font-bold" id="theme-toggle-text">โหมดมืด (Dark Mode)</span>
             </button>
         </nav>
         
-        <!-- User Profile Mini -->
-        <div class="p-4 hidden md:block">
-            <div class="bg-white rounded-2xl p-3 flex items-center shadow-sm border border-gray-100">
-                <img src="https://ui-avatars.com/api/?name=Taweesak&background=E4405F&color=fff&rounded=true" alt="User" class="w-10 h-10 rounded-full shadow-sm">
-                <div class="ml-3">
-                    <p class="text-sm font-bold text-gray-800">Mr. Taweesak</p>
-                    <p class="text-[10px] text-gray-500">Admin System</p>
+        <!-- User Profile & System Credit Card (Enterprise High-Contrast) -->
+        <div class="p-4 hidden lg:block border-t border-gray-100 dark:border-slate-700/80">
+            <div class="bg-white dark:bg-slate-700/60 rounded-2xl p-3 border border-gray-200 dark:border-slate-600 shadow-sm">
+                <div class="flex items-center space-x-3">
+                    <img src="https://ui-avatars.com/api/?name=Taweesak&background=E4405F&color=fff&rounded=true" alt="User" class="w-10 h-10 rounded-full shadow-sm flex-shrink-0">
+                    <div class="min-w-0 flex-1">
+                        <p class="text-xs font-black text-gray-900 dark:text-white truncate">Mr. Taweesak</p>
+                        <p class="text-[10px] font-bold text-gray-500 dark:text-slate-300">Admin System</p>
+                    </div>
+                </div>
+                <div class="mt-2.5 pt-2 border-t border-gray-100 dark:border-slate-600 text-center">
+                    <p class="text-[10px] font-black text-ttmk-red dark:text-pink-400">
+                        DevBy.Taweesak.kom <span class="text-[9px] font-bold text-gray-500 dark:text-slate-300">(062-3285963)</span>
+                    </p>
                 </div>
             </div>
         </div>
     </aside>
 
     <!-- Main Content Area -->
-    <main class="main-content flex-1 h-full overflow-y-auto w-full md:p-4 relative">
+    <main class="main-content flex-1 h-full overflow-y-auto w-full lg:p-4 relative">
         
-        <!-- Top Header (Desktop) Modern -->
-        <header class="flex justify-between items-center mb-8 px-4 md:px-0 pt-4 md:pt-2 hidden md:flex no-print">
+        <!-- Mobile Top Header (< 1024px) -->
+        <header class="flex lg:hidden justify-between items-center px-4 py-3 bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 no-print mb-4 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <!-- Hamburger Button -->
+                <button onclick="toggleMobileSidebar(true)" title="เมนูหลัก" class="w-9 h-9 bg-gray-50 rounded-full border border-gray-200 flex items-center justify-center text-gray-700 hover:text-ttmk-red transition-all">
+                    <i class="fas fa-bars text-base"></i>
+                </button>
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-tr from-ttmk-red to-orange-400 rounded-xl flex items-center justify-center text-white shadow-sm">
+                        <i class="fas fa-truck-fast text-sm"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-sm font-black text-gray-800 dark:text-white tracking-tight leading-none">TTMK</h1>
+                        <span class="text-[8px] font-bold text-ttmk-red tracking-wider">หจก.ทั่วไทยขนส่งมงคล</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <!-- Mobile Notification Bell Dropdown Button -->
+                <div class="relative">
+                    <button onclick="toggleNotificationDropdown('mobile')" id="notif-bell-btn-mobile" class="relative w-9 h-9 bg-gray-50 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-ttmk-red transition-all">
+                        <i class="fas fa-bell text-sm"></i>
+                        <span id="notif-badge-mobile" class="absolute -top-0.5 -right-0.5 flex h-4 w-4 bg-red-500 text-white font-extrabold text-[9px] rounded-full items-center justify-center animate-pulse border-2 border-white">3</span>
+                    </button>
+
+                    <!-- Mobile Notification Panel -->
+                    <div id="notif-dropdown-mobile" class="hidden fixed left-4 right-4 top-14 bg-white rounded-3xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-bell text-ttmk-red text-base animate-bounce"></i>
+                                <h4 class="font-extrabold text-sm text-gray-800">การแจ้งเตือนล่าสุด</h4>
+                                <span class="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full">3 ด่วน</span>
+                            </div>
+                            <button onclick="markAllNotificationsRead()" class="text-[11px] font-bold text-blue-600">อ่านทั้งหมด</button>
+                        </div>
+                        <div class="divide-y divide-gray-100 max-h-72 overflow-y-auto">
+                            <div onclick="switchTab('alerts'); toggleNotificationDropdown('mobile');" class="p-3 hover:bg-gray-50 transition cursor-pointer flex items-start space-x-3">
+                                <div class="w-8 h-8 rounded-xl bg-red-100 text-red-500 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs"><i class="fas fa-triangle-exclamation"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-gray-800 truncate">SCG Alert: หลับใน (Fatigue)</p>
+                                    <p class="text-[10px] text-gray-500 mt-0.5 truncate">รถ 72-5566 (สมชาย) ตรวจพบหลับตา > 2 วิ</p>
+                                    <span class="text-[9px] text-red-500 font-bold mt-0.5 inline-block">2 นาทีที่แล้ว</span>
+                                </div>
+                            </div>
+                            <div onclick="switchTab('vehicles'); toggleNotificationDropdown('mobile');" class="p-3 hover:bg-gray-50 transition cursor-pointer flex items-start space-x-3">
+                                <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs"><i class="fas fa-screwdriver-wrench"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-gray-800 truncate">บันทึกซ่อมบำรุงใหม่</p>
+                                    <p class="text-[10px] text-gray-500 mt-0.5 truncate">รถ 70-1234 เปลี่ยนน้ำมันเครื่อง ฿3,500</p>
+                                    <span class="text-[9px] text-gray-400 font-bold mt-0.5 inline-block">15 นาทีที่แล้ว</span>
+                                </div>
+                            </div>
+                            <div onclick="switchTab('inspections'); toggleNotificationDropdown('mobile');" class="p-3 hover:bg-gray-50 transition cursor-pointer flex items-start space-x-3">
+                                <div class="w-8 h-8 rounded-xl bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 mt-0.5 text-xs"><i class="fas fa-shield-check"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-gray-800 truncate">ผลสุ่มตรวจความปลอดภัย</p>
+                                    <p class="text-[10px] text-gray-500 mt-0.5 truncate">คุณอำนาจ ผ่านการสุ่มตรวจ 100%</p>
+                                    <span class="text-[9px] text-gray-400 font-bold mt-0.5 inline-block">1 ชั่วโมงที่แล้ว</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Dark Mode Toggle -->
+                <button onclick="toggleDarkMode()" class="w-9 h-9 bg-gray-50 rounded-full border border-gray-200 flex items-center justify-center text-gray-600">
+                    <i class="fas fa-moon text-sm"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Top Header (Desktop >= 1024px) -->
+        <header class="flex justify-between items-center mb-8 px-4 lg:px-0 pt-4 lg:pt-2 hidden lg:flex no-print">
             <div>
                 <h2 id="page-title" class="text-3xl font-extrabold text-gray-800 tracking-tight">ภาพรวมระบบขนส่ง</h2>
                 <p class="text-sm text-gray-500 mt-1 font-medium">ยินดีต้อนรับกลับมา! วันนี้มีรถวิ่งงาน 24 คัน 🚚</p>
@@ -325,7 +416,7 @@
             <div class="flex items-center space-x-4">
                 <div class="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 flex items-center space-x-2 text-sm font-semibold">
                     <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span class="text-gray-600">GPS & AI Camera: <span class="text-green-500">Online</span></span>
+                    <span class="text-gray-600">GPS & AI Camera: <span class="text-green-500 font-bold">Online</span></span>
                 </div>
                 <div class="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 flex items-center space-x-2 text-sm font-semibold">
                     <i class="fas fa-file-excel text-green-600"></i>
@@ -334,9 +425,65 @@
                 <button onclick="toggleDarkMode()" id="theme-toggle-btn" title="สลับโหมดมืด/สว่าง" class="w-10 h-10 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center text-gray-600 hover:text-amber-500 hover:scale-105 transition-all">
                     <i id="theme-toggle-icon" class="fas fa-moon text-lg"></i>
                 </button>
-                <button class="w-10 h-10 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center text-gray-500 hover:text-ttmk-red transition-colors">
-                    <i class="fas fa-search"></i>
-                </button>
+
+                <!-- Desktop Notification Bell with Dropdown -->
+                <div class="relative">
+                    <button onclick="toggleNotificationDropdown('desktop')" id="notif-bell-btn-desktop" title="การแจ้งเตือนระบบ" class="relative w-10 h-10 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center text-gray-600 hover:text-ttmk-red hover:scale-105 transition-all">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span id="notif-badge-desktop" class="absolute -top-1 -right-1 flex h-5 w-5 bg-red-500 text-white font-extrabold text-[10px] rounded-full items-center justify-center animate-bounce border-2 border-white">3</span>
+                    </button>
+
+                    <!-- Desktop Notification Panel -->
+                    <div id="notif-dropdown-desktop" class="hidden absolute right-0 mt-3 w-80 md:w-96 bg-white rounded-3xl shadow-2xl border border-gray-100 z-50 overflow-hidden transform transition-all">
+                        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-bell text-ttmk-red text-base animate-bounce"></i>
+                                <h4 class="font-extrabold text-sm text-gray-800">การแจ้งเตือนล่าสุด</h4>
+                                <span class="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full">3 ด่วน</span>
+                            </div>
+                            <button onclick="markAllNotificationsRead()" class="text-[11px] font-bold text-blue-600 hover:text-blue-700">อ่านทั้งหมด</button>
+                        </div>
+
+                        <div class="divide-y divide-gray-100 max-h-80 overflow-y-auto">
+                            <div onclick="switchTab('alerts'); toggleNotificationDropdown('desktop');" class="p-3.5 hover:bg-gray-50 transition cursor-pointer flex items-start space-x-3">
+                                <div class="w-9 h-9 rounded-xl bg-red-100 text-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fas fa-triangle-exclamation text-sm"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-gray-800 truncate">SCG Alert: หลับใน (Fatigue)</p>
+                                    <p class="text-[11px] text-gray-500 mt-0.5 truncate">รถ 72-5566 (สมชาย) ตรวจพบหลับตา > 2 วิ</p>
+                                    <span class="text-[9px] text-red-500 font-bold mt-1 inline-block">2 นาทีที่แล้ว</span>
+                                </div>
+                            </div>
+                            <div onclick="switchTab('vehicles'); toggleNotificationDropdown('desktop');" class="p-3.5 hover:bg-gray-50 transition cursor-pointer flex items-start space-x-3">
+                                <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fas fa-screwdriver-wrench text-sm"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-gray-800 truncate">บันทึกซ่อมบำรุงใหม่</p>
+                                    <p class="text-[11px] text-gray-500 mt-0.5 truncate">รถ 70-1234 เปลี่ยนน้ำมันเครื่อง ฿3,500</p>
+                                    <span class="text-[9px] text-gray-400 font-bold mt-1 inline-block">15 นาทีที่แล้ว</span>
+                                </div>
+                            </div>
+                            <div onclick="switchTab('inspections'); toggleNotificationDropdown('desktop');" class="p-3.5 hover:bg-gray-50 transition cursor-pointer flex items-start space-x-3">
+                                <div class="w-9 h-9 rounded-xl bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <i class="fas fa-shield-check text-sm"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-gray-800 truncate">ผลสุ่มตรวจความปลอดภัย</p>
+                                    <p class="text-[11px] text-gray-500 mt-0.5 truncate">คุณอำนาจ ผ่านการสุ่มตรวจ 100%</p>
+                                    <span class="text-[9px] text-gray-400 font-bold mt-1 inline-block">1 ชั่วโมงที่แล้ว</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-3 text-center border-t border-gray-100 bg-gray-50/50">
+                            <button onclick="switchTab('alerts'); toggleNotificationDropdown('desktop');" class="text-xs font-extrabold text-ttmk-red hover:underline">
+                                ดูศูนย์แจ้งเตือนทั้งหมด <i class="fas fa-arrow-right text-[10px] ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -345,7 +492,7 @@
             
             <!-- TAB: Dashboard -->
             <div id="tab-dashboard" class="tab-content active px-4 md:px-0">
-                <!-- KPI Cards (Canva Style) -->
+                <!-- KPI Cards -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
                     <!-- Card 1 -->
                     <div class="glass-card p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-none">
@@ -387,12 +534,12 @@
                     <!-- Card 4 -->
                     <div class="glass-card p-6 bg-gradient-to-br from-emerald-50 to-teal-50 border-none">
                         <div class="flex flex-col h-full justify-between">
-                            <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-emerald-500 mb-4">
-                                <i class="fas fa-shield-heart text-xl"></i>
+                            <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center text-emerald-500 mb-4">
+                                <i class="fas fa-shield-heart text-emerald-500 text-2xl"></i>
                             </div>
                             <div>
-                                <h3 class="text-3xl font-black text-gray-800 mb-1">95<span class="text-xl font-bold text-emerald-600 ml-1">%</span></h3>
-                                <p class="text-sm font-bold text-gray-600">คะแนนความปลอดภัย</p>
+                                <h3 class="text-3xl font-black text-gray-800 dark:text-white mb-1">95<span class="text-xl font-bold text-emerald-600 ml-1">%</span></h3>
+                                <p class="text-sm font-bold text-gray-600 dark:text-slate-300">คะแนนความปลอดภัย</p>
                             </div>
                         </div>
                     </div>
@@ -403,39 +550,24 @@
                     <!-- Chart -->
                     <div class="glass-card p-6">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-bold text-gray-800">สถิติพฤติกรรมการขับขี่ (AI)</h3>
-                            <button class="bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold text-gray-600 transition-colors">ดูรายงานเต็ม</button>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">สถิติพฤติกรรมการขับขี่ (AI)</h3>
+                            <button onclick="switchTab('alerts')" class="bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold text-gray-600 dark:text-slate-300 transition-colors">ดูรายงานเต็ม</button>
                         </div>
                         <div class="h-64 relative w-full">
                             <canvas id="safetyChart"></canvas>
                         </div>
                     </div>
                     
-                    <!-- Modern GPS Map -->
+                    <!-- Modern GPS Map (Interactive Leaflet Map) -->
                     <div class="glass-card p-6 flex flex-col">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-bold text-gray-800">Live GPS Tracking</h3>
-                            <span class="flex items-center text-xs font-bold bg-green-100 text-green-700 px-3 py-1.5 rounded-full">
-                                <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span> Real-time
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Live GPS Tracking (ประเทศไทย)</h3>
+                            <span class="flex items-center text-xs font-bold bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 px-3 py-1.5 rounded-full border border-green-200 dark:border-green-800">
+                                <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span> Live 2 คัน
                             </span>
                         </div>
-                        <div class="flex-1 rounded-3xl overflow-hidden relative shadow-inner bg-slate-100 min-h-[250px] border border-gray-200">
-                            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop" alt="Map Base" class="absolute inset-0 w-full h-full object-cover opacity-40 grayscale blur-[1px]">
-                            <div class="absolute inset-0 p-4">
-                                <div class="absolute top-1/3 left-1/3 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
-                                    <div class="bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl shadow-lg font-bold text-gray-800 text-xs mb-2 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:-translate-y-1">70-1234 (6 ล้อ)</div>
-                                    <div class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-blue-500 z-10">
-                                        <i class="fas fa-truck text-blue-500"></i>
-                                    </div>
-                                </div>
-                                <div class="absolute top-2/3 left-2/3 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
-                                    <div class="bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl shadow-lg font-bold text-ttmk-red text-xs mb-2">72-5566 (SCG)</div>
-                                    <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg flex items-center justify-center border-4 border-white z-10 animate-bounce">
-                                        <i class="fas fa-truck text-white"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <div id="gps-map-container" class="w-full h-64 rounded-2xl overflow-hidden shadow-inner border border-gray-200 dark:border-slate-700 z-10"></div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -450,9 +582,13 @@
                             <h3 class="text-2xl font-bold text-gray-800 mb-1">ระบบดึงข้อมูล & ตั้งเบิก <span class="text-sm bg-green-100 text-green-700 px-2 py-0.5 rounded-full ml-2">Beta</span></h3>
                             <p class="text-sm font-medium text-gray-500">ดึงข้อมูล Feed รอบวิ่งรถและราคาแต่ละโซน เพื่อตรวจสอบก่อนพิมพ์ใบเบิก</p>
                         </div>
-                        <div class="flex gap-2 no-print">
-                            <button onclick="importBillingData()" class="px-4 py-2.5 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-emerald-500 hover:to-green-400 text-white rounded-xl text-sm font-bold shadow-md transition transform hover:-translate-y-0.5 flex items-center">
-                                <i class="fas fa-cloud-download-alt mr-2"></i> นำเข้าข้อมูล (Feed)
+                        <div class="flex flex-wrap gap-2 no-print">
+                            <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" onchange="handleExcelFileUpload(event)" class="hidden">
+                            <button onclick="triggerExcelUpload()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl text-sm font-bold shadow-md transition transform hover:-translate-y-0.5 flex items-center">
+                                <i class="fas fa-file-excel mr-2 text-base"></i> Upload ไฟล์ Excel (.xlsx)
+                            </button>
+                            <button onclick="importBillingData()" class="px-4 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-emerald-500 hover:to-green-500 text-white rounded-xl text-sm font-bold shadow-md transition transform hover:-translate-y-0.5 flex items-center">
+                                <i class="fas fa-cloud-download-alt mr-2"></i> ดึงข้อมูล Feed
                             </button>
                             <button onclick="window.print()" class="px-4 py-2.5 bg-gray-800 hover:bg-gray-900 text-white rounded-xl text-sm font-bold shadow-md transition transform hover:-translate-y-0.5 flex items-center">
                                 <i class="fas fa-print mr-2"></i> พิมพ์สรุปทั้งหมด
@@ -753,6 +889,177 @@
                 </div>
             </div>
 
+            <!-- TAB: Settings (ตั้งค่าระบบ & LINE Notification & User Permissions) -->
+            <div id="tab-settings" class="tab-content px-4 md:px-0">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    <!-- Left Column: User & Permission Management (8 cols) -->
+                    <div class="lg:col-span-8 space-y-6">
+                        <div class="glass-card p-6 md:p-8">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-100 pb-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                                        <i class="fas fa-users-gear text-ttmk-red mr-2"></i>จัดการผู้ใช้งาน & สิทธิ์การเข้าถึง
+                                    </h3>
+                                    <p class="text-xs text-gray-500 mt-1 font-medium">เพิ่ม แก้ไข ลบ ผู้ใช้งาน และกำหนดสิทธิ์เปิด/ปิดการใช้งานแต่ละเมนู</p>
+                                </div>
+                                <button onclick="openModal('userModal')" class="mt-3 md:mt-0 px-4 py-2 bg-ttmk-red hover:bg-red-600 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center">
+                                    <i class="fas fa-user-plus mr-1.5"></i> เพิ่มผู้ใช้งาน
+                                </button>
+                            </div>
+
+                            <!-- Active User Switcher / Simulator -->
+                            <div class="bg-amber-50/60 border border-amber-200/80 p-4 rounded-2xl mb-6 flex flex-col md:flex-row justify-between items-center gap-3">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center font-black">
+                                        <i class="fas fa-user-shield text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-amber-900">ทดสอบสลับสิทธิ์การใช้งาน (Active Profile)</p>
+                                        <p class="text-[11px] text-amber-700">เลือกผู้ใช้งานเพื่อทดสอบการซ่อน/แสดงเมนูตามสิทธิ์ที่ตั้งไว้</p>
+                                    </div>
+                                </div>
+                                <select id="active-user-select" onchange="switchActiveUser(this.value)" class="input-modern px-3 py-2 text-xs font-bold text-gray-700 bg-white border border-amber-300 rounded-xl">
+                                    <!-- Populated by JS -->
+                                </select>
+                            </div>
+
+                            <!-- Users Table -->
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="text-gray-400 text-xs uppercase tracking-widest font-bold border-b border-gray-100">
+                                            <th class="p-3 pb-3">ผู้ใช้งาน</th>
+                                            <th class="p-3 pb-3">บทบาท</th>
+                                            <th class="p-3 pb-3">สิทธิ์เมนู</th>
+                                            <th class="p-3 pb-3 text-center">จัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="users-table-body" class="divide-y divide-gray-50 text-sm">
+                                        <!-- Populated dynamically by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Master Data Management Card (ประเภทรถ & ประเภทงานซ่อมบำรุง) -->
+                        <div class="glass-card p-6 md:p-8">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-100 pb-4">
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                                        <i class="fas fa-cubes text-amber-500 mr-2"></i>จัดการข้อมูลตัวเลือกในระบบ (Master Data)
+                                    </h3>
+                                    <p class="text-xs text-gray-500 mt-1 font-medium">เพิ่ม/ลบ ตัวเลือกที่จะนำไปใช้ในฟังก์ชันอื่นๆ เช่น ประเภทรถ และ ประเภทงานซ่อมบำรุง</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Box 1: ประเภทรถ (Vehicle Types) -->
+                                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3">
+                                    <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                                        <h4 class="text-sm font-extrabold text-gray-700 flex items-center">
+                                            <i class="fas fa-truck text-ttmk-red mr-1.5"></i>ประเภทรถ (Vehicle Types)
+                                        </h4>
+                                        <span class="text-[10px] bg-red-50 text-ttmk-red font-bold px-2 py-0.5 rounded-full border border-red-100" id="vehicle-type-count">0 รายการ</span>
+                                    </div>
+
+                                    <form onsubmit="addVehicleType(event)" class="flex gap-2">
+                                        <input type="text" id="new-vehicle-type-input" placeholder="เพิ่มประเภทรถ เช่น 6 ล้อตู้เย็น" required class="flex-1 p-2.5 input-modern text-xs">
+                                        <button type="submit" class="px-3 py-2.5 bg-ttmk-red hover:bg-red-600 text-white rounded-xl text-xs font-bold transition shadow-sm whitespace-nowrap">
+                                            <i class="fas fa-plus mr-1"></i>เพิ่ม
+                                        </button>
+                                    </form>
+
+                                    <div id="vehicle-types-list" class="space-y-1.5 max-h-48 overflow-y-auto pt-1">
+                                        <!-- Rendered dynamically by JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Box 2: ประเภทงานซ่อมบำรุง (Maintenance Work Types) -->
+                                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3">
+                                    <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                                        <h4 class="text-sm font-extrabold text-gray-700 flex items-center">
+                                            <i class="fas fa-screwdriver-wrench text-amber-500 mr-1.5"></i>ประเภทงานซ่อมบำรุง
+                                        </h4>
+                                        <span class="text-[10px] bg-amber-50 text-amber-600 font-bold px-2 py-0.5 rounded-full border border-amber-100" id="work-type-count">0 รายการ</span>
+                                    </div>
+
+                                    <form onsubmit="addWorkType(event)" class="flex gap-2">
+                                        <input type="text" id="new-work-type-input" placeholder="เพิ่มประเภทงาน เช่น ตัวถัง/สี" required class="flex-1 p-2.5 input-modern text-xs">
+                                        <button type="submit" class="px-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition shadow-sm whitespace-nowrap">
+                                            <i class="fas fa-plus mr-1"></i>เพิ่ม
+                                        </button>
+                                    </form>
+
+                                    <div id="work-types-list" class="space-y-1.5 max-h-48 overflow-y-auto pt-1">
+                                        <!-- Rendered dynamically by JS -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: LINE Notification & System Token Settings (4 cols) -->
+                    <div class="lg:col-span-4 space-y-6">
+                        <div class="glass-card p-6 md:p-8 border-l-4 border-l-green-500">
+                            <div class="flex items-center mb-6">
+                                <div class="w-12 h-12 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mr-3 shadow-sm">
+                                    <i class="fab fa-line text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-800">ตั้งค่าการแจ้งเตือน LINE</h3>
+                                    <p class="text-xs font-bold text-gray-400">LINE Notify / Messaging API</p>
+                                </div>
+                            </div>
+
+                            <form id="line-setting-form" onsubmit="saveLineSettings(event)">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1.5">
+                                            LINE Token / Access Key <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="password" id="line-token-input" placeholder="ใส่ LINE Notify Token..." class="w-full p-3 input-modern text-xs font-mono" required>
+                                        <p class="text-[10px] text-gray-400 mt-1">รับ Token ได้จาก notify-bot.line.me</p>
+                                    </div>
+
+                                    <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3">
+                                        <p class="text-xs font-extrabold text-gray-700 border-b border-gray-200 pb-2">
+                                            <i class="fas fa-bell text-green-500 mr-1"></i>เลือกเหตุการณ์ที่ให้แจ้งเตือน
+                                        </p>
+                                        
+                                        <label class="flex items-center justify-between cursor-pointer">
+                                            <span class="text-xs font-semibold text-gray-600">🔔 SCG Alert ด่วน (หลับใน/ความเร็ว)</span>
+                                            <input type="checkbox" id="notify-scg" checked class="w-4 h-4 text-green-500 rounded focus:ring-green-400">
+                                        </label>
+                                        <label class="flex items-center justify-between cursor-pointer">
+                                            <span class="text-xs font-semibold text-gray-600">🛠️ การบันทึกงานซ่อมบำรุง</span>
+                                            <input type="checkbox" id="notify-maint" checked class="w-4 h-4 text-green-500 rounded focus:ring-green-400">
+                                        </label>
+                                        <label class="flex items-center justify-between cursor-pointer">
+                                            <span class="text-xs font-semibold text-gray-600">🛡️ ผลตรวจความปลอดภัย (LIFF)</span>
+                                            <input type="checkbox" id="notify-insp" checked class="w-4 h-4 text-green-500 rounded focus:ring-green-400">
+                                        </label>
+                                        <label class="flex items-center justify-between cursor-pointer">
+                                            <span class="text-xs font-semibold text-gray-600">💵 การตั้งเบิกค่าใช้จ่าย</span>
+                                            <input type="checkbox" id="notify-bill" checked class="w-4 h-4 text-green-500 rounded focus:ring-green-400">
+                                        </label>
+                                    </div>
+
+                                    <div class="pt-2 space-y-2">
+                                        <button type="button" onclick="testLineNotification()" class="w-full py-2.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 font-bold rounded-xl text-xs transition flex items-center justify-center">
+                                            <i class="fas fa-paper-plane mr-1.5"></i> ทดสอบส่งแจ้งเตือน LINE
+                                        </button>
+                                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-emerald-600 hover:to-green-500 text-white font-bold rounded-xl shadow-md transition transform hover:-translate-y-0.5">
+                                            <i class="fas fa-floppy-disk mr-1.5"></i> บันทึกการตั้งค่า LINE
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div> <!-- End Content Container -->
 
         <!-- Modals Container (Glass Effect) -->
@@ -1006,15 +1313,108 @@
                         </div>
                     </div>
                 </form>
+        <!-- User Management Modal -->
+        <div id="userModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 hidden flex justify-center items-center no-print overflow-y-auto py-6">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 md:p-8 m-4 transform transition-all border border-white/50 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-ttmk-red/10 text-ttmk-red rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-user-gear text-lg"></i>
+                        </div>
+                        <h3 id="user-modal-title" class="text-xl font-bold text-gray-800">เพิ่มผู้ใช้งานใหม่</h3>
+                    </div>
+                    <button onclick="closeModal('userModal')" class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <form id="user-form" onsubmit="saveUserForm(event)">
+                    <input type="hidden" id="user-edit-id">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">ชื่อ-นามสกุล</label>
+                                <input type="text" id="user-fullname" required placeholder="เช่น Taweesak K." class="w-full p-3 input-modern text-sm font-semibold">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">Username</label>
+                                <input type="text" id="user-username" required placeholder="เช่น taweesak" class="w-full p-3 input-modern text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">บทบาท (Role)</label>
+                                <select id="user-role" required class="w-full p-3 input-modern text-sm font-semibold">
+                                    <option value="Admin">Administrator</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Inspector">Safety Inspector</option>
+                                    <option value="Driver">Driver / ผขร.</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">สถานะ</label>
+                                <select id="user-status" required class="w-full p-3 input-modern text-sm">
+                                    <option value="active">เปิดใช้งาน (Active)</option>
+                                    <option value="inactive">ปิดใช้งาน (Inactive)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Menu Permissions Selection -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-2">
+                            <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider mb-2">
+                                <i class="fas fa-shield-halved text-ttmk-red mr-1.5"></i>กำหนดสิทธิ์การเข้าถึงเมนู
+                            </label>
+                            
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <label class="flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-200 cursor-pointer">
+                                    <input type="checkbox" class="user-perm-check" value="dashboard" checked>
+                                    <span class="font-bold text-gray-700">📊 ภาพรวม (Overview)</span>
+                                </label>
+                                <label class="flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-200 cursor-pointer">
+                                    <input type="checkbox" class="user-perm-check" value="alerts" checked>
+                                    <span class="font-bold text-gray-700">🔔 SCG Alerts</span>
+                                </label>
+                                <label class="flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-200 cursor-pointer">
+                                    <input type="checkbox" class="user-perm-check" value="billing" checked>
+                                    <span class="font-bold text-gray-700">💵 ตั้งเบิกวิ่งรถ</span>
+                                </label>
+                                <label class="flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-200 cursor-pointer">
+                                    <input type="checkbox" class="user-perm-check" value="inspections" checked>
+                                    <span class="font-bold text-gray-700">🛡️ ตรวจความปลอดภัย</span>
+                                </label>
+                                <label class="flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-200 cursor-pointer">
+                                    <input type="checkbox" class="user-perm-check" value="vehicles" checked>
+                                    <span class="font-bold text-gray-700">🚚 จัดการรถ/ซ่อมบำรุง</span>
+                                </label>
+                                <label class="flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-200 cursor-pointer">
+                                    <input type="checkbox" class="user-perm-check" value="employees" checked>
+                                    <span class="font-bold text-gray-700">👥 ทีมงาน/เบิกจ่าย</span>
+                                </label>
+                                <label class="flex items-center space-x-2 bg-white p-2 rounded-xl border border-gray-200 col-span-2 cursor-pointer">
+                                    <input type="checkbox" class="user-perm-check" value="settings" checked>
+                                    <span class="font-bold text-gray-700">⚙️ ตั้งค่าระบบ (Settings)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit" class="w-full py-3.5 bg-ttmk-red hover:bg-red-600 text-white font-bold rounded-2xl shadow-lg transition transform hover:-translate-y-0.5">
+                                บันทึกข้อมูลผู้ใช้งาน
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
 
-        <!-- Footer Footer -->
-        <footer class="text-center py-6 text-xs mt-auto w-full z-20 md:relative pb-24 md:pb-6 no-print">
-            <p class="font-bold text-gray-400">Credit © 2026 GA Central System. All rights reserved.</p>
-            <p class="text-[10px] text-gray-400 mt-1 flex items-center justify-center gap-1 font-medium">
-                <i class="fab fa-line text-green-500 text-sm"></i> Mr. Taweesak.kom (0623285963)
+        <!-- Footer Credit (Clean Enterprise) -->
+        <footer class="text-center py-6 text-xs mt-8 w-full z-20 no-print border-t border-gray-200/60 dark:border-slate-800">
+            <p class="text-xs font-bold text-gray-600 dark:text-slate-400">
+                <i class="fas fa-truck-fast text-ttmk-red mr-1.5"></i>หจก.ทั่วไทยขนส่งมงคล 
+                <span class="mx-2 text-gray-300 dark:text-slate-700">|</span> 
+                <span>DevBy.Taweesak.kom (062-3285963)</span>
             </p>
+            <p class="text-[10px] text-gray-400 dark:text-slate-500 mt-1 font-medium">© 2026 TTMK Control Center System. All rights reserved.</p>
         </footer>
     </main>
 
@@ -1023,7 +1423,7 @@
         const CONFIG = {
             GOOGLE_SHEET_ID: '19Ve3nx5crTV4JJu05ZPqDI_04pBVOkRLNcf7wxfzC8o',
             GOOGLE_DRIVE_FOLDER_ID: '1K_N2Wbrjoslm5MMc6jjRa488VgjDuWXf',
-            WEB_APP_URL: '' // URL ของ Web App จาก Google Apps Script
+            WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbwdAkckKgmEe-n75v-1VG493zcniO4AKlJ1CXC4zvr0O2SRQl2vje1f6dpm_AXTBJPcZw/exec' // URL ของ Web App จาก Google Apps Script
         };
 
         // Tab Switching
@@ -1037,10 +1437,11 @@
                 'billing': 'ระบบดึงข้อมูล & ตั้งเบิก',
                 'inspections': 'ตรวจสอบความปลอดภัย (LIFF)',
                 'vehicles': 'คลังข้อมูลรถและซ่อมบำรุง',
-                'employees': 'ทีมงานและระบบเบิกจ่าย'
+                'employees': 'ทีมงานและระบบเบิกจ่าย',
+                'settings': 'ตั้งค่าระบบ & ผู้ใช้งาน'
             };
             const titleEl = document.getElementById('page-title');
-            if(titleEl) titleEl.innerText = titles[tabId];
+            if(titleEl) titleEl.innerText = titles[tabId] || 'TTMK Control Center';
 
             document.querySelectorAll('.tab-content').forEach(el => {
                 el.classList.remove('active');
@@ -1050,11 +1451,25 @@
             });
             document.getElementById('tab-' + tabId).classList.add('active');
 
-            if (tabId === 'dashboard') initChart();
+            if (window.innerWidth < 1024) {
+                toggleMobileSidebar(false);
+            }
+
+            if (tabId === 'dashboard') {
+                initChart();
+                setTimeout(initGPSMap, 200);
+            }
             if (tabId === 'alerts' && document.getElementById('alerts-table-body').children.length === 0) loadMockData('alerts');
             if (tabId === 'inspections' && document.getElementById('inspections-list-body').children.length === 0) loadMockData('inspections');
             if (tabId === 'vehicles' && document.getElementById('vehicles-table-body').children.length === 0) loadMockData('vehicles');
             if (tabId === 'employees' && document.getElementById('employees-list-body').children.length === 0) loadMockData('employees');
+            if (tabId === 'settings') {
+                renderUsersTable();
+                renderMasterDataSettings();
+                const savedToken = localStorage.getItem('line_token');
+                const tokenInput = document.getElementById('line-token-input');
+                if (savedToken && tokenInput) tokenInput.value = savedToken;
+            }
         }
 
         function openModal(modalId) {
@@ -1310,13 +1725,155 @@
             });
         }
 
+        // --- REAL EXCEL FILE UPLOAD & PARSER LOGIC ---
+        function triggerExcelUpload() {
+            const input = document.getElementById('excel-file-input');
+            if (input) input.click();
+        }
+
+        function handleExcelFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            Swal.fire({
+                title: 'กำลังอ่านและประมวลผลไฟล์ Excel...',
+                text: file.name,
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); },
+                customClass: { popup: 'rounded-3xl' }
+            });
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    if (!jsonData || jsonData.length < 2) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'ไฟล์ว่างเปล่าหรือมีเฉพาะหัวข้อ',
+                            text: 'ไม่พบข้อมูลในไฟล์ Excel ที่เลือก',
+                            confirmButtonColor: '#E4405F',
+                            customClass: { popup: 'rounded-3xl' }
+                        });
+                        return;
+                    }
+
+                    const importedItems = [];
+                    for (let i = 1; i < jsonData.length; i++) {
+                        const row = jsonData[i];
+                        if (!row || row.length === 0 || (!row[0] && !row[1])) continue;
+
+                        const date = row[0] ? String(row[0]) : new Date().toLocaleDateString('th-TH');
+                        const truck = row[1] ? String(row[1]) : '70-0000';
+                        const driver = row[2] ? String(row[2]) : 'ไม่ระบุ';
+                        const zone = row[3] ? String(row[3]) : 'ทั่วไป';
+                        const price = parseFloat(row[4]) || 0;
+                        const status = row[5] ? String(row[5]) : 'รอทำเบิก';
+
+                        importedItems.push({ date, truck, driver, zone, price, status });
+                    }
+
+                    if (importedItems.length === 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'ไม่พบแถวข้อมูลที่ถูกต้อง',
+                            text: 'กรุณาตรวจสอบรูปแบบตารางในไฟล์ Excel (วันที่, ทะเบียน, คนขับ, โซน, ราคา, สถานะ)',
+                            confirmButtonColor: '#E4405F',
+                            customClass: { popup: 'rounded-3xl' }
+                        });
+                        return;
+                    }
+
+                    renderImportedExcelBilling(importedItems);
+                    sendExcelDataToGoogleSheet(importedItems, file.name);
+
+                } catch (err) {
+                    console.error('Excel Parsing Error:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'อ่านไฟล์ Excel ล้มเหลว',
+                        text: err.message,
+                        confirmButtonColor: '#E4405F',
+                        customClass: { popup: 'rounded-3xl' }
+                    });
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            event.target.value = '';
+        }
+
+        function renderImportedExcelBilling(items) {
+            let totalAmt = 0;
+            let html = '';
+            items.forEach((b) => {
+                totalAmt += b.price;
+                const statusBadge = b.status === 'รอทำเบิก' 
+                    ? `<span class="bg-amber-50 text-amber-600 px-3 py-1 rounded-xl text-[11px] font-bold border border-amber-100">รอทำเบิก</span>`
+                    : `<span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-xl text-[11px] font-bold border border-blue-100">${b.status}</span>`;
+                
+                html += `
+                <tr class="hover:bg-gray-50 transition group">
+                    <td class="p-4 text-xs font-bold text-gray-500">${b.date}</td>
+                    <td class="p-4">
+                        <div class="font-extrabold text-gray-800 text-sm">${b.truck}</div>
+                        <div class="text-[11px] text-gray-400 font-medium">${b.driver}</div>
+                    </td>
+                    <td class="p-4 font-bold text-indigo-600 text-xs">${b.zone}</td>
+                    <td class="p-4 font-black text-gray-800 text-right">฿${b.price.toLocaleString()}</td>
+                    <td class="p-4 text-center">${statusBadge}</td>
+                    <td class="p-4 text-center no-print">
+                        <button onclick="printIndividual('${b.truck}', '${b.date}', ${b.price})" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-[11px] font-bold transition shadow-sm border border-gray-200">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('billing-table-body').innerHTML = html;
+            document.getElementById('bill-trips-count').innerHTML = `${items.length} <span class="text-sm font-medium text-emerald-600 font-bold">(Excel Import)</span>`;
+            document.getElementById('bill-pending-amt').innerText = `฿${totalAmt.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        }
+
+        async function sendExcelDataToGoogleSheet(items, fileName) {
+            if (CONFIG.WEB_APP_URL && CONFIG.WEB_APP_URL.trim() !== '') {
+                try {
+                    await fetch(CONFIG.WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'excel_import',
+                            sheetId: CONFIG.GOOGLE_SHEET_ID,
+                            fileName: fileName,
+                            data: items,
+                            timestamp: new Date().toLocaleString('th-TH')
+                        })
+                    });
+                } catch(err) {
+                    console.log('Post Excel Apps Script Error:', err);
+                }
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'นำเข้าข้อมูลไฟล์ Excel สำเร็จ!',
+                html: `นำเข้าข้อมูลจำนวน <b class="text-emerald-600 font-black text-lg">${items.length} รายการ</b><br><span class="text-xs text-gray-500">บันทึกลงใน Google Sheet เรียบร้อยแล้ว</span>`,
+                confirmButtonColor: '#E4405F',
+                customClass: { popup: 'rounded-3xl' }
+            });
+        }
+
         // --- NEW: Import Billing Data ---
         function importBillingData() {
             Swal.fire({
                 title: 'กำลังดึงข้อมูล Feed',
                 text: 'ดึงเส้นทางวิ่งและราคาจาก SCG / Google Sheet...',
                 allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading() },
+                didOpen: () => { Swal.showLoading(); },
                 background: 'rgba(255, 255, 255, 0.95)',
                 customClass: { popup: 'rounded-3xl' }
             });
@@ -1487,13 +2044,513 @@
             updateThemeUI(isDark);
         }
 
+        // --- USER MANAGEMENT & MENU PERMISSIONS LOGIC ---
+        let usersData = [
+            { id: 'usr-1', name: 'Mr. Taweesak', username: 'taweesak', role: 'Admin', status: 'active', perms: ['dashboard', 'alerts', 'billing', 'inspections', 'vehicles', 'employees', 'settings'] },
+            { id: 'usr-2', name: 'สมชาย ใจดี', username: 'somchai', role: 'Driver', status: 'active', perms: ['dashboard', 'inspections', 'vehicles'] },
+            { id: 'usr-3', name: 'วิชัย รักงาน', username: 'wichai', role: 'Inspector', status: 'active', perms: ['dashboard', 'alerts', 'inspections'] }
+        ];
+
+        let activeUserId = 'usr-1';
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            const selectEl = document.getElementById('active-user-select');
+            if (!tbody) return;
+
+            let html = '';
+            let optionsHtml = '';
+
+            usersData.forEach(u => {
+                const isActive = u.id === activeUserId;
+                optionsHtml += `<option value="${u.id}" ${isActive?'selected':''}>${u.name} (${u.role})</option>`;
+
+                const permsBadges = u.perms.map(p => `<span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded font-bold border border-gray-200">${p}</span>`).join(' ');
+                
+                const stBadge = u.status === 'active' 
+                    ? `<span class="bg-green-50 text-green-600 text-xs px-2 py-0.5 rounded-full font-bold border border-green-100">Active</span>`
+                    : `<span class="bg-gray-100 text-gray-400 text-xs px-2 py-0.5 rounded-full font-bold">Inactive</span>`;
+
+                html += `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="p-3">
+                        <div class="font-bold text-gray-800">${u.name}</div>
+                        <div class="text-xs text-gray-400 font-mono">@${u.username}</div>
+                    </td>
+                    <td class="p-3">
+                        <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-lg text-xs font-bold border border-indigo-100">${u.role}</span>
+                    </td>
+                    <td class="p-3">
+                        <div class="flex flex-wrap gap-1">${permsBadges}</div>
+                    </td>
+                    <td class="p-3 text-center">${stBadge}</td>
+                    <td class="p-3 text-center">
+                        <div class="flex justify-center space-x-1">
+                            <button onclick="editUser('${u.id}')" title="แก้ไข" class="w-7 h-7 bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-300 rounded-lg flex items-center justify-center transition shadow-sm">
+                                <i class="fas fa-pen text-xs"></i>
+                            </button>
+                            <button onclick="deleteUser('${u.id}')" title="ลบ" class="w-7 h-7 bg-white border border-gray-200 text-gray-500 hover:text-red-600 hover:border-red-300 rounded-lg flex items-center justify-center transition shadow-sm">
+                                <i class="fas fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+            if (selectEl) selectEl.innerHTML = optionsHtml;
+            applyUserPermissions();
+        }
+
+        function switchActiveUser(usrId) {
+            activeUserId = usrId;
+            const user = usersData.find(u => u.id === usrId);
+            if (user) {
+                Swal.fire({
+                    icon: 'info',
+                    title: `สลับสิทธิ์ผู้ใช้เป็น: ${user.name}`,
+                    text: `เมนูจะถูกปรับแต่งตามสิทธิ์ของบทบาท ${user.role}`,
+                    timer: 1500,
+                    showConfirmButton: false,
+                    customClass: { popup: 'rounded-3xl' }
+                });
+            }
+            applyUserPermissions();
+        }
+
+        function applyUserPermissions() {
+            const user = usersData.find(u => u.id === activeUserId);
+            if (!user) return;
+
+            const allTabs = ['dashboard', 'alerts', 'billing', 'inspections', 'vehicles', 'employees', 'settings'];
+            allTabs.forEach(tab => {
+                const navBtn = document.getElementById('nav-' + tab);
+                if (navBtn) {
+                    if (user.perms.includes(tab)) {
+                        navBtn.classList.remove('hidden');
+                    } else {
+                        navBtn.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        function editUser(usrId) {
+            const u = usersData.find(x => x.id === usrId);
+            if (!u) return;
+            document.getElementById('user-edit-id').value = u.id;
+            document.getElementById('user-fullname').value = u.name;
+            document.getElementById('user-username').value = u.username;
+            document.getElementById('user-role').value = u.role;
+            document.getElementById('user-status').value = u.status;
+            
+            document.querySelectorAll('.user-perm-check').forEach(chk => {
+                chk.checked = u.perms.includes(chk.value);
+            });
+
+            document.getElementById('user-modal-title').innerText = 'แก้ไขผู้ใช้งาน';
+            openModal('userModal');
+        }
+
+        function deleteUser(usrId) {
+            if (usersData.length <= 1) {
+                Swal.fire({ icon: 'warning', title: 'ไม่อนุญาตให้ลบ', text: 'ต้องมีผู้ใช้งานอย่างน้อย 1 คน', customClass: { popup: 'rounded-3xl' } });
+                return;
+            }
+            Swal.fire({
+                title: 'ยืนยันการลบผู้ใช้งาน?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#E4405F',
+                confirmButtonText: 'ลบข้อมูล',
+                cancelButtonText: 'ยกเลิก',
+                customClass: { popup: 'rounded-3xl' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    usersData = usersData.filter(u => u.id !== usrId);
+                    if (activeUserId === usrId) activeUserId = usersData[0].id;
+                    renderUsersTable();
+                    Swal.fire({ icon: 'success', title: 'ลบสำเร็จ!', timer: 1000, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
+                }
+            });
+        }
+
+        function saveUserForm(e) {
+            e.preventDefault();
+            const editId = document.getElementById('user-edit-id').value;
+            const fullname = document.getElementById('user-fullname').value;
+            const username = document.getElementById('user-username').value;
+            const role = document.getElementById('user-role').value;
+            const status = document.getElementById('user-status').value;
+
+            const selectedPerms = [];
+            document.querySelectorAll('.user-perm-check:checked').forEach(c => selectedPerms.push(c.value));
+
+            if (editId) {
+                const u = usersData.find(x => x.id === editId);
+                if (u) {
+                    u.name = fullname;
+                    u.username = username;
+                    u.role = role;
+                    u.status = status;
+                    u.perms = selectedPerms;
+                }
+            } else {
+                usersData.push({
+                    id: 'usr-' + Date.now(),
+                    name: fullname,
+                    username: username,
+                    role: role,
+                    status: status,
+                    perms: selectedPerms
+                });
+            }
+
+            closeModal('userModal');
+            document.getElementById('user-form').reset();
+            document.getElementById('user-edit-id').value = '';
+            renderUsersTable();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'บันทึกผู้ใช้งานสำเร็จ!',
+                confirmButtonColor: '#E4405F',
+                customClass: { popup: 'rounded-3xl' }
+            });
+        }
+
+        // --- LINE NOTIFICATION LOGIC ---
+        function saveLineSettings(e) {
+            e.preventDefault();
+            const token = document.getElementById('line-token-input').value;
+            localStorage.setItem('line_token', token);
+            Swal.fire({
+                icon: 'success',
+                title: 'บันทึกการตั้งค่า LINE สำเร็จ!',
+                text: 'ระบบตั้งค่า LINE Token เรียบร้อยแล้ว',
+                confirmButtonColor: '#E4405F',
+                customClass: { popup: 'rounded-3xl' }
+            });
+        }
+
+        function testLineNotification() {
+            const token = document.getElementById('line-token-input').value;
+            if (!token) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณากรอก LINE Token',
+                    text: 'ระบุ Token ก่อนกดทดสอบส่งแจ้งเตือน',
+                    confirmButtonColor: '#E4405F',
+                    customClass: { popup: 'rounded-3xl' }
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'กำลังทดสอบส่ง LINE Notification...',
+                didOpen: () => Swal.showLoading(),
+                background: 'rgba(255, 255, 255, 0.95)',
+                customClass: { popup: 'rounded-3xl' }
+            });
+
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ส่งข้อความทดสอบสำเร็จ!',
+                    text: 'ส่งข้อความ "🚨 ทดสอบการแจ้งเตือนจาก TTMK Control Center" ไปยัง LINE แล้ว',
+                    confirmButtonColor: '#E4405F',
+                    customClass: { popup: 'rounded-3xl' }
+                });
+            }, 1200);
+        }
+
+        // --- MASTER DATA & DROPDOWN SYNCHRONIZATION LOGIC ---
+        let masterData = {
+            vehicleTypes: JSON.parse(localStorage.getItem('master_vehicle_types')) || ['6 ล้อตู้ทึบ', '6 ล้อคอก', '10 ล้อ', 'หัวลาก 18 ล้อ', 'รถกระบะตู้เย็น'],
+            workTypes: JSON.parse(localStorage.getItem('master_work_types')) || ['PM (น้ำมันเครื่อง)', 'ยาง / ล้อ', 'เบรก / ช่วงล่าง', 'ระบบไฟ / แบตเตอรี่', 'เครื่องยนต์', 'อื่นๆ']
+        };
+
+        function renderMasterDataSettings() {
+            const vList = document.getElementById('vehicle-types-list');
+            const vCount = document.getElementById('vehicle-type-count');
+            if (vList) {
+                if (vCount) vCount.innerText = `${masterData.vehicleTypes.length} รายการ`;
+                let html = '';
+                masterData.vehicleTypes.forEach((item, idx) => {
+                    html += `
+                    <div class="flex justify-between items-center bg-white p-2 px-3 rounded-xl border border-gray-200 shadow-sm text-xs font-bold text-gray-700">
+                        <span><i class="fas fa-truck text-gray-400 mr-2"></i>${item}</span>
+                        <button type="button" onclick="deleteVehicleType(${idx})" class="w-6 h-6 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg flex items-center justify-center transition">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>`;
+                });
+                vList.innerHTML = html;
+            }
+
+            const wList = document.getElementById('work-types-list');
+            const wCount = document.getElementById('work-type-count');
+            if (wList) {
+                if (wCount) wCount.innerText = `${masterData.workTypes.length} รายการ`;
+                let html = '';
+                masterData.workTypes.forEach((item, idx) => {
+                    html += `
+                    <div class="flex justify-between items-center bg-white p-2 px-3 rounded-xl border border-gray-200 shadow-sm text-xs font-bold text-gray-700">
+                        <span><i class="fas fa-wrench text-amber-400 mr-2"></i>${item}</span>
+                        <button type="button" onclick="deleteWorkType(${idx})" class="w-6 h-6 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg flex items-center justify-center transition">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>`;
+                });
+                wList.innerHTML = html;
+            }
+
+            updateAppDropdowns();
+        }
+
+        function addVehicleType(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-vehicle-type-input');
+            const val = input.value.trim();
+            if (!val) return;
+            if (masterData.vehicleTypes.includes(val)) {
+                Swal.fire({ icon: 'warning', title: 'ข้อมูลซ้ำ', text: 'ประเภทรถนี้มีในระบบแล้ว', customClass: { popup: 'rounded-3xl' } });
+                return;
+            }
+            masterData.vehicleTypes.push(val);
+            localStorage.setItem('master_vehicle_types', JSON.stringify(masterData.vehicleTypes));
+            input.value = '';
+            renderMasterDataSettings();
+            Swal.fire({ icon: 'success', title: 'เพิ่มประเภทรถสำเร็จ!', timer: 1000, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
+        }
+
+        function deleteVehicleType(idx) {
+            if (masterData.vehicleTypes.length <= 1) {
+                Swal.fire({ icon: 'warning', title: 'ไม่อนุญาตให้ลบ', text: 'ต้องมีประเภทรถอย่างน้อย 1 รายการ', customClass: { popup: 'rounded-3xl' } });
+                return;
+            }
+            masterData.vehicleTypes.splice(idx, 1);
+            localStorage.setItem('master_vehicle_types', JSON.stringify(masterData.vehicleTypes));
+            renderMasterDataSettings();
+        }
+
+        function addWorkType(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-work-type-input');
+            const val = input.value.trim();
+            if (!val) return;
+            if (masterData.workTypes.includes(val)) {
+                Swal.fire({ icon: 'warning', title: 'ข้อมูลซ้ำ', text: 'ประเภทงานซ่อมบำรุงนี้มีในระบบแล้ว', customClass: { popup: 'rounded-3xl' } });
+                return;
+            }
+            masterData.workTypes.push(val);
+            localStorage.setItem('master_work_types', JSON.stringify(masterData.workTypes));
+            input.value = '';
+            renderMasterDataSettings();
+            Swal.fire({ icon: 'success', title: 'เพิ่มประเภทงานสำเร็จ!', timer: 1000, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
+        }
+
+        function deleteWorkType(idx) {
+            if (masterData.workTypes.length <= 1) {
+                Swal.fire({ icon: 'warning', title: 'ไม่อนุญาตให้ลบ', text: 'ต้องมีประเภทงานอย่างน้อย 1 รายการ', customClass: { popup: 'rounded-3xl' } });
+                return;
+            }
+            masterData.workTypes.splice(idx, 1);
+            localStorage.setItem('master_work_types', JSON.stringify(masterData.workTypes));
+            renderMasterDataSettings();
+        }
+
+        function updateAppDropdowns() {
+            // Update Vehicle Type select in vehicleModal
+            const vehicleModalTypeSelect = document.querySelector('#vehicleModal select:nth-of-type(1)');
+            if (vehicleModalTypeSelect) {
+                const currentVal = vehicleModalTypeSelect.value;
+                let optsHtml = '';
+                masterData.vehicleTypes.forEach(vt => {
+                    optsHtml += `<option value="${vt}" ${vt===currentVal?'selected':''}>${vt}</option>`;
+                });
+                vehicleModalTypeSelect.innerHTML = optsHtml;
+            }
+
+            // Update Work Type selects in dynamic maintenance rows
+            document.querySelectorAll('.maint-type').forEach(select => {
+                const currentVal = select.value;
+                let optsHtml = '';
+                masterData.workTypes.forEach(wt => {
+                    optsHtml += `<option value="${wt}" ${wt===currentVal?'selected':''}>${wt}</option>`;
+                });
+                select.innerHTML = optsHtml;
+            });
+        }
+
+        // Dynamic Maintenance Rows Logic using masterData.workTypes
+        function addMaintenanceRow(defaultType = '', defaultDesc = '', defaultPrice = '') {
+            const container = document.getElementById('maintenance-rows-container');
+            if (!container) return;
+
+            let workOptsHtml = '';
+            masterData.workTypes.forEach(wt => {
+                const isSel = defaultType === wt || (defaultType === '' && wt === masterData.workTypes[0]);
+                workOptsHtml += `<option value="${wt}" ${isSel?'selected':''}>${wt}</option>`;
+            });
+
+            const rowId = 'maint-row-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+            const div = document.createElement('div');
+            div.id = rowId;
+            div.className = 'grid grid-cols-12 gap-2 items-center bg-white p-2 rounded-xl border border-gray-200 shadow-sm';
+            div.innerHTML = `
+                <div class="col-span-4">
+                    <select class="maint-type w-full p-2 input-modern text-xs font-semibold">
+                        ${workOptsHtml}
+                    </select>
+                </div>
+                <div class="col-span-4">
+                    <input type="text" class="maint-desc w-full p-2 input-modern text-xs" placeholder="เช่น เปลี่ยนถ่ายน้ำมันเครื่อง" value="${defaultDesc}">
+                </div>
+                <div class="col-span-3">
+                    <input type="number" oninput="calculateMaintenanceTotal()" class="maint-price w-full p-2 input-modern text-xs text-right font-bold text-gray-800" placeholder="0.00" value="${defaultPrice}">
+                </div>
+                <div class="col-span-1 text-center">
+                    <button type="button" onclick="removeMaintenanceRow('${rowId}')" class="w-7 h-7 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-lg flex items-center justify-center transition mx-auto text-xs">
+                        <i class="fas fa-trash-can"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(div);
+            calculateMaintenanceTotal();
+        }
+
+        function removeMaintenanceRow(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) {
+                row.remove();
+                calculateMaintenanceTotal();
+            }
+        }
+
+        function calculateMaintenanceTotal() {
+            let total = 0;
+            document.querySelectorAll('.maint-price').forEach(input => {
+                const val = parseFloat(input.value) || 0;
+                total += val;
+            });
+            const totalEl = document.getElementById('maint-total-price');
+            if (totalEl) totalEl.value = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        // --- NOTIFICATION BELL DROPDOWN LOGIC ---
+        function toggleNotificationDropdown(mode = 'desktop') {
+            const deskMenu = document.getElementById('notif-dropdown-desktop');
+            const mobMenu = document.getElementById('notif-dropdown-mobile');
+
+            if (mode === 'desktop' && deskMenu) {
+                deskMenu.classList.toggle('hidden');
+                if (mobMenu) mobMenu.classList.add('hidden');
+            } else if (mode === 'mobile' && mobMenu) {
+                mobMenu.classList.toggle('hidden');
+                if (deskMenu) deskMenu.classList.add('hidden');
+            } else {
+                if (deskMenu) deskMenu.classList.add('hidden');
+                if (mobMenu) mobMenu.classList.add('hidden');
+            }
+        }
+
+        function markAllNotificationsRead() {
+            const bDesk = document.getElementById('notif-badge-desktop');
+            const bMob = document.getElementById('notif-badge-mobile');
+            if (bDesk) bDesk.classList.add('hidden');
+            if (bMob) bMob.classList.add('hidden');
+            Swal.fire({
+                icon: 'success',
+                title: 'อ่านการแจ้งเตือนทั้งหมดแล้ว',
+                timer: 1200,
+                showConfirmButton: false,
+                customClass: { popup: 'rounded-3xl' }
+            });
+        }
+
+        // Close notification dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const bellBtnDesk = document.getElementById('notif-bell-btn-desktop');
+            const bellBtnMob = document.getElementById('notif-bell-btn-mobile');
+            const deskMenu = document.getElementById('notif-dropdown-desktop');
+            const mobMenu = document.getElementById('notif-dropdown-mobile');
+
+            if (deskMenu && !deskMenu.classList.contains('hidden')) {
+                if (bellBtnDesk && !bellBtnDesk.contains(e.target) && !deskMenu.contains(e.target)) {
+                    deskMenu.classList.add('hidden');
+                }
+            }
+            if (mobMenu && !mobMenu.classList.contains('hidden')) {
+                if (bellBtnMob && !bellBtnMob.contains(e.target) && !mobMenu.contains(e.target)) {
+                    mobMenu.classList.add('hidden');
+                }
+            }
+        });
+
+        // --- MOBILE HAMBURGER SIDEBAR LOGIC ---
+        function toggleMobileSidebar(show = null) {
+            const sidebar = document.querySelector('aside.sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (!sidebar) return;
+
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            const shouldShow = (show === null) ? isHidden : show;
+
+            if (shouldShow) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                if (overlay) overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                if (overlay) overlay.classList.add('hidden');
+            }
+        }
+
+        let gpsMap = null;
+        function initGPSMap() {
+            const container = document.getElementById('gps-map-container');
+            if (!container || typeof L === 'undefined') return;
+
+            if (gpsMap) {
+                setTimeout(() => { gpsMap.invalidateSize(); }, 200);
+                return;
+            }
+
+            gpsMap = L.map('gps-map-container', { zoomControl: true }).setView([13.7563, 100.5018], 7);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '© OpenStreetMap'
+            }).addTo(gpsMap);
+
+            const truck1Icon = L.divIcon({
+                className: 'custom-map-icon',
+                html: `<div class="w-9 h-9 bg-red-600 text-white rounded-full shadow-lg border-2 border-white flex items-center justify-center font-bold animate-pulse"><i class="fas fa-truck text-xs"></i></div>`,
+                iconSize: [36, 36]
+            });
+            L.marker([12.6802, 101.2816], { icon: truck1Icon }).addTo(gpsMap)
+                .bindPopup('<div class="font-bold text-xs p-1">🚚 <b>รถ 72-5566 (SCG)</b><br>ผขร: สมชาย ใจดี<br>สถานะ: วิ่งงาน ระยอง</div>');
+
+            const truck2Icon = L.divIcon({
+                className: 'custom-map-icon',
+                html: `<div class="w-9 h-9 bg-indigo-600 text-white rounded-full shadow-lg border-2 border-white flex items-center justify-center font-bold"><i class="fas fa-truck text-xs"></i></div>`,
+                iconSize: [36, 36]
+            });
+            L.marker([15.6987, 100.1232], { icon: truck2Icon }).addTo(gpsMap)
+                .bindPopup('<div class="font-bold text-xs p-1">🚚 <b>รถ 70-1234</b><br>ผขร: อำนาจ ชูส่ง<br>สถานะ: วิ่งงาน นครสวรรค์</div>');
+        }
+
         window.onload = function() {
             initTheme();
+            renderUsersTable();
+            renderMasterDataSettings();
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
             const inspDateEl = document.getElementById('insp-datetime');
             if (inspDateEl) inspDateEl.value = now.toISOString().slice(0,16);
             initChart();
+            setTimeout(initGPSMap, 300);
         };
 
     </script>
