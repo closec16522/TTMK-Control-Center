@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTMK Control Center Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sarabun', 'sans-serif'],
+                    },
+                    colors: {
+                        'ttmk-red': '#E4405F',
+                        'ttmk-dark': '#2D3142',
+                        'ttmk-light': '#F8F9FB',
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.05)',
+                        'floating': '0 20px 40px -10px rgba(228, 64, 95, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F3F5F8;
+            background-image: radial-gradient(circle at 100% 0%, #ffffff 0%, transparent 50%), 
+                              radial-gradient(circle at 0% 100%, #ffffff 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active {
+            display: block;
+            animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08);
+        }
+
+        .sidebar-item {
+            transition: all 0.3s ease;
+            border-radius: 16px;
+        }
+        .sidebar-item.active {
+            background: linear-gradient(135deg, #FF6B6B 0%, #E4405F 100%);
+            color: white;
+            box-shadow: 0 10px 20px -5px rgba(228, 64, 95, 0.3);
+        }
+        .sidebar-item:hover:not(.active) {
+            background-color: #FFF0F2;
+            color: #E4405F;
+            transform: translateX(4px);
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .input-modern {
+            background-color: #F8FAFC;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .input-modern:focus {
+            background-color: #FFFFFF;
+            border-color: #E4405F;
+            box-shadow: 0 0 0 4px rgba(228, 64, 95, 0.1);
+            outline: none;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #E4405F 0%, #FF8E53 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* เพิ่มขนาดและสไตล์ให้ Icon ใน Sidebar กลับมาสวยเหมือนเดิม */
+        .sidebar-item i {
+            font-size: 1.25rem; /* เทียบเท่า text-xl */
+            width: 2rem;       /* เทียบเท่า w-8 */
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        .sidebar-item:hover i {
+            transform: scale(1.1); /* ขยายเวลากด */
+        }
+        /* --- Dark Mode Custom Styles --- */
+        body.dark-mode {
+            background-color: #0F172A !important;
+            background-image: radial-gradient(circle at 100% 0%, #1E293B 0%, transparent 50%), 
+                              radial-gradient(circle at 0% 100%, #1E293B 0%, transparent 50%) !important;
+            color: #F1F5F9 !important;
+        }
+
+        body.dark-mode aside.sidebar {
+            background: rgba(30, 41, 59, 0.85) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        body.dark-mode .glass-card {
+            background: rgba(30, 41, 59, 0.85) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: #F1F5F9 !important;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+        }
+
+        body.dark-mode h1, 
+        body.dark-mode h2, 
+        body.dark-mode h3, 
+        body.dark-mode h4,
+        body.dark-mode .text-gray-800,
+        body.dark-mode .text-gray-700 {
+            color: #F8FAFC !important;
+        }
+
+        body.dark-mode .text-gray-600,
+        body.dark-mode .text-gray-500,
+        body.dark-mode .text-gray-400 {
+            color: #94A3B8 !important;
+        }
+
+        body.dark-mode .bg-white {
+            background-color: #1E293B !important;
+            color: #F8FAFC !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        body.dark-mode .bg-gray-50,
+        body.dark-mode .bg-gray-50\/50,
+        body.dark-mode .bg-slate-100 {
+            background-color: #0F172A !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        body.dark-mode .input-modern {
+            background-color: #0F172A !important;
+            color: #F8FAFC !important;
+            border-color: #334155 !important;
+        }
+        body.dark-mode .input-modern:focus {
+            background-color: #1E293B !important;
+            border-color: #E4405F !important;
+        }
+
+        body.dark-mode table thead tr {
+            background-color: #0F172A !important;
+            color: #94A3B8 !important;
+        }
+
+        body.dark-mode table tbody tr {
+            border-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        body.dark-mode table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.03) !important;
+        }
+
+        body.dark-mode #maintenanceModal > div,
+        body.dark-mode #vehicleModal > div,
+        body.dark-mode #employeeModal > div {
+            background-color: #1E293B !important;
+            color: #F8FAFC !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* --- Print Styles --- */
+        @media print {
+            .no-print, .sidebar, header, footer { display: none !important; }
+            body { background: white !important; font-size: 12pt; }
+            .main-content { padding: 0 !important; margin: 0 !important; overflow: visible !important; height: auto !important; }
+            .glass-card { box-shadow: none !important; border: 1px solid #ccc !important; filter: none !important; backdrop-filter: none !important; background: white !important; }
+            .tab-content { display: none !important; }
+            .tab-content.active { display: block !important; }
+            /* Force table lines for printing */
+            table { border-collapse: collapse !important; width: 100% !important; }
+            th, td { border: 1px solid #ddd !important; padding: 8px !important; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                bottom: 16px;
+                left: 16px;
+                right: 16px;
+                width: auto;
+                height: 70px;
+                flex-direction: row;
+                z-index: 50;
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: blur(10px);
+                border-radius: 24px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                border: 1px solid rgba(255,255,255,0.5);
+                overflow-x: auto;
+            }
+            .main-content {
+                padding-bottom: 100px !important;
+            }
+            .sidebar-header { display: none; }
+            .sidebar-nav {
+                display: flex;
+                flex-direction: row;
+                width: max-content;
+                padding: 0 8px;
+                align-items: center;
+                gap: 4px;
+            }
+            .sidebar-item {
+                padding: 8px 12px;
+                flex-direction: column;
+                font-size: 0.65rem;
+                justify-content: center;
+                align-items: center;
+                border-radius: 16px;
+                white-space: nowrap;
+            }
+            .sidebar-item.active {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 15px rgba(228,64,95,0.3);
+            }
+            .sidebar-item i { margin-right: 0; margin-bottom: 4px; font-size: 1.2rem; width: auto; }
+            .sidebar-item span { display: block; font-weight: 600;}
+        }
+    </style>
+</head>
+<body class="text-gray-700 antialiased h-screen flex overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar w-64 bg-white/60 backdrop-blur-xl flex-shrink-0 h-full flex flex-col transition-all duration-300 md:relative absolute z-40 md:m-4 md:rounded-3xl md:h-[calc(100vh-32px)] md:shadow-soft md:border md:border-white">
+        <div class="sidebar-header p-8 flex flex-col items-center justify-center relative">
+            <div class="w-16 h-16 bg-gradient-to-tr from-ttmk-red to-orange-400 rounded-2xl flex items-center justify-center mb-4 shadow-floating">
+                <i class="fas fa-truck-fast text-white text-3xl"></i>
+            </div>
+            <div class="text-center">
+                <h1 class="text-2xl font-extrabold text-ttmk-dark tracking-tight">TTMK.</h1>
+                <p class="text-xs text-gradient font-bold mt-1 uppercase tracking-wider">Control Center</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav flex-1 px-4 py-2 space-y-2 overflow-y-auto">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active w-full flex items-center px-4 py-3.5 text-sm font-medium">
+                <i class="fas fa-chart-pie"></i>
+                <span class="ml-2">ภาพรวม (Overview)</span>
+            </button>
+            <button onclick="switchTab('alerts')" id="nav-alerts" class="sidebar-item w-full flex items-center px-4 py-3.5 text-sm font-medium relative">
+                <i class="fas fa-bell"></i>
+                <span class="ml-2">SCG Alerts</span>
+                <span class="absolute top-4 right-4 flex h-2.5 w-2.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                </span>
+            </button>
+            <button onclick="switchTab('billing')" id="nav-billing" class="sidebar-item w-full flex items-center px-4 py-3.5 text-sm font-medium">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span class="ml-2">ตั้งเบิก / รายได้วิ่งรถ</span>
+            </button>
+            <button onclick="switchTab('inspections')" id="nav-inspections" class="sidebar-item w-full flex items-center px-4 py-3.5 text-sm font-medium">
+                <i class="fas fa-shield-check"></i>
+                <span class="ml-2">ตรวจความปลอดภัย</span>
+            </button>
+            <button onclick="switchTab('vehicles')" id="nav-vehicles" class="sidebar-item w-full flex items-center px-4 py-3.5 text-sm font-medium">
+                <i class="fas fa-truck-wrench"></i>
+                <span class="ml-2">จัดการรถ / ซ่อมบำรุง</span>
+            </button>
+            <button onclick="switchTab('employees')" id="nav-employees" class="sidebar-item w-full flex items-center px-4 py-3.5 text-sm font-medium">
+                <i class="fas fa-user-group"></i>
+                <span class="ml-2">พนักงาน / เบิกจ่าย</span>
+            </button>
+            <button onclick="toggleDarkMode()" id="theme-toggle-btn-mobile" class="sidebar-item w-full flex items-center px-4 py-3.5 text-sm font-medium border-t border-gray-100 mt-2">
+                <i id="theme-toggle-icon-mobile" class="fas fa-moon"></i>
+                <span class="ml-2 font-bold" id="theme-toggle-text">โหมดมืด (Dark Mode)</span>
+            </button>
+        </nav>
+        
+        <!-- User Profile Mini -->
+        <div class="p-4 hidden md:block">
+            <div class="bg-white rounded-2xl p-3 flex items-center shadow-sm border border-gray-100">
+                <img src="https://ui-avatars.com/api/?name=Taweesak&background=E4405F&color=fff&rounded=true" alt="User" class="w-10 h-10 rounded-full shadow-sm">
+                <div class="ml-3">
+                    <p class="text-sm font-bold text-gray-800">Mr. Taweesak</p>
+                    <p class="text-[10px] text-gray-500">Admin System</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content flex-1 h-full overflow-y-auto w-full md:p-4 relative">
+        
+        <!-- Top Header (Desktop) Modern -->
+        <header class="flex justify-between items-center mb-8 px-4 md:px-0 pt-4 md:pt-2 hidden md:flex no-print">
+            <div>
+                <h2 id="page-title" class="text-3xl font-extrabold text-gray-800 tracking-tight">ภาพรวมระบบขนส่ง</h2>
+                <p class="text-sm text-gray-500 mt-1 font-medium">ยินดีต้อนรับกลับมา! วันนี้มีรถวิ่งงาน 24 คัน 🚚</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 flex items-center space-x-2 text-sm font-semibold">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-gray-600">GPS & AI Camera: <span class="text-green-500">Online</span></span>
+                </div>
+                <div class="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100 flex items-center space-x-2 text-sm font-semibold">
+                    <i class="fas fa-file-excel text-green-600"></i>
+                    <span class="text-gray-600">Google Sheet: <span class="text-green-600 font-mono text-xs" title="19Ve3nx5crTV4JJu05ZPqDI_04pBVOkRLNcf7wxfzC8o">19Ve3nx5...8o</span></span>
+                </div>
+                <button onclick="toggleDarkMode()" id="theme-toggle-btn" title="สลับโหมดมืด/สว่าง" class="w-10 h-10 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center text-gray-600 hover:text-amber-500 hover:scale-105 transition-all">
+                    <i id="theme-toggle-icon" class="fas fa-moon text-lg"></i>
+                </button>
+                <button class="w-10 h-10 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center text-gray-500 hover:text-ttmk-red transition-colors">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Container -->
+        <div class="pb-24 md:pb-8">
+            
+            <!-- TAB: Dashboard -->
+            <div id="tab-dashboard" class="tab-content active px-4 md:px-0">
+                <!-- KPI Cards (Canva Style) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                    <!-- Card 1 -->
+                    <div class="glass-card p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-none">
+                        <div class="flex flex-col h-full justify-between">
+                            <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-blue-500 mb-4">
+                                <i class="fas fa-truck-moving text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-black text-gray-800 mb-1">24<span class="text-sm font-medium text-gray-500 ml-1">/ 30 คัน</span></h3>
+                                <p class="text-sm font-bold text-gray-600">กำลังวิ่งงาน (SCGJWD)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="glass-card p-6 bg-gradient-to-br from-red-50 to-pink-50 border-none relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-red-500 opacity-5 rounded-full"></div>
+                        <div class="flex flex-col h-full justify-between relative z-10">
+                            <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-red-500 mb-4">
+                                <i class="fas fa-triangle-exclamation text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-black text-red-600 mb-1">3<span class="text-sm font-medium text-gray-500 ml-1">รายการ</span></h3>
+                                <p class="text-sm font-bold text-gray-600">Alert ต้องตรวจสอบด่วน</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="glass-card p-6 bg-gradient-to-br from-amber-50 to-orange-50 border-none">
+                        <div class="flex flex-col h-full justify-between">
+                            <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-amber-500 mb-4">
+                                <i class="fas fa-screwdriver-wrench text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-black text-gray-800 mb-1">2<span class="text-sm font-medium text-gray-500 ml-1">คัน</span></h3>
+                                <p class="text-sm font-bold text-gray-600">ถึงกำหนด PM (6 ล้อ)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 4 -->
+                    <div class="glass-card p-6 bg-gradient-to-br from-emerald-50 to-teal-50 border-none">
+                        <div class="flex flex-col h-full justify-between">
+                            <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-emerald-500 mb-4">
+                                <i class="fas fa-shield-heart text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-black text-gray-800 mb-1">95<span class="text-xl font-bold text-emerald-600 ml-1">%</span></h3>
+                                <p class="text-sm font-bold text-gray-600">คะแนนความปลอดภัย</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts & Map Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Chart -->
+                    <div class="glass-card p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-gray-800">สถิติพฤติกรรมการขับขี่ (AI)</h3>
+                            <button class="bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold text-gray-600 transition-colors">ดูรายงานเต็ม</button>
+                        </div>
+                        <div class="h-64 relative w-full">
+                            <canvas id="safetyChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Modern GPS Map -->
+                    <div class="glass-card p-6 flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-gray-800">Live GPS Tracking</h3>
+                            <span class="flex items-center text-xs font-bold bg-green-100 text-green-700 px-3 py-1.5 rounded-full">
+                                <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span> Real-time
+                            </span>
+                        </div>
+                        <div class="flex-1 rounded-3xl overflow-hidden relative shadow-inner bg-slate-100 min-h-[250px] border border-gray-200">
+                            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop" alt="Map Base" class="absolute inset-0 w-full h-full object-cover opacity-40 grayscale blur-[1px]">
+                            <div class="absolute inset-0 p-4">
+                                <div class="absolute top-1/3 left-1/3 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
+                                    <div class="bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl shadow-lg font-bold text-gray-800 text-xs mb-2 opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:-translate-y-1">70-1234 (6 ล้อ)</div>
+                                    <div class="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center border-2 border-blue-500 z-10">
+                                        <i class="fas fa-truck text-blue-500"></i>
+                                    </div>
+                                </div>
+                                <div class="absolute top-2/3 left-2/3 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer">
+                                    <div class="bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl shadow-lg font-bold text-ttmk-red text-xs mb-2">72-5566 (SCG)</div>
+                                    <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-pink-500 rounded-full shadow-lg flex items-center justify-center border-4 border-white z-10 animate-bounce">
+                                        <i class="fas fa-truck text-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Billing (ตั้งเบิก) NEW!!! -->
+            <div id="tab-billing" class="tab-content px-4 md:px-0">
+                
+                <!-- Billing Dashboard Header -->
+                <div class="glass-card p-6 md:p-8 mb-6 border-l-4 border-l-green-500">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div class="mb-4 md:mb-0">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-1">ระบบดึงข้อมูล & ตั้งเบิก <span class="text-sm bg-green-100 text-green-700 px-2 py-0.5 rounded-full ml-2">Beta</span></h3>
+                            <p class="text-sm font-medium text-gray-500">ดึงข้อมูล Feed รอบวิ่งรถและราคาแต่ละโซน เพื่อตรวจสอบก่อนพิมพ์ใบเบิก</p>
+                        </div>
+                        <div class="flex gap-2 no-print">
+                            <button onclick="importBillingData()" class="px-4 py-2.5 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-emerald-500 hover:to-green-400 text-white rounded-xl text-sm font-bold shadow-md transition transform hover:-translate-y-0.5 flex items-center">
+                                <i class="fas fa-cloud-download-alt mr-2"></i> นำเข้าข้อมูล (Feed)
+                            </button>
+                            <button onclick="window.print()" class="px-4 py-2.5 bg-gray-800 hover:bg-gray-900 text-white rounded-xl text-sm font-bold shadow-md transition transform hover:-translate-y-0.5 flex items-center">
+                                <i class="fas fa-print mr-2"></i> พิมพ์สรุปทั้งหมด
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing Mini Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center">
+                        <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl mr-4"><i class="fas fa-route"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400">จำนวนเที่ยวรอเบิก</p>
+                            <h4 class="text-2xl font-black text-gray-800" id="bill-trips-count">0 <span class="text-sm font-medium text-gray-500">เที่ยว</span></h4>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center">
+                        <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center text-xl mr-4"><i class="fas fa-file-invoice"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400">ยอดรอตั้งเบิก (ประมาณการ)</p>
+                            <h4 class="text-2xl font-black text-gray-800" id="bill-pending-amt">฿0.00</h4>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center">
+                        <div class="w-12 h-12 bg-green-50 text-green-500 rounded-xl flex items-center justify-center text-xl mr-4"><i class="fas fa-check-circle"></i></div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400">เบิกสำเร็จ (เดือนนี้)</p>
+                            <h4 class="text-2xl font-black text-green-600">฿145,200.00</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing Table Area -->
+                <div class="glass-card overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 bg-white/50 flex justify-between items-center no-print">
+                        <h4 class="font-bold text-gray-800"><i class="fas fa-list-ul mr-2 text-gray-400"></i>รายการวิ่งรถรอทำจ่าย</h4>
+                        <div class="flex gap-2">
+                            <select class="input-modern px-3 py-1.5 text-sm font-bold text-gray-600">
+                                <option>ทุกทะเบียน</option>
+                                <option>70-1234</option>
+                                <option>72-5566</option>
+                            </select>
+                            <select class="input-modern px-3 py-1.5 text-sm font-bold text-gray-600">
+                                <option>ทุกโซน</option>
+                                <option>ตะวันออก (ระยอง/ชลบุรี)</option>
+                                <option>เหนือ (นครสวรรค์)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-gray-400 text-xs uppercase tracking-widest font-bold bg-gray-50/50">
+                                    <th class="p-4 pb-2">วันที่วิ่งงาน</th>
+                                    <th class="p-4 pb-2">ทะเบียนรถ / คนขับ</th>
+                                    <th class="p-4 pb-2">ปลายทาง (Zone)</th>
+                                    <th class="p-4 pb-2 text-right">ราคา/เที่ยว (฿)</th>
+                                    <th class="p-4 pb-2 text-center">สถานะเบิก</th>
+                                    <th class="p-4 pb-2 text-center no-print">ออกเอกสาร</th>
+                                </tr>
+                            </thead>
+                            <tbody id="billing-table-body" class="text-sm divide-y divide-gray-100 bg-white">
+                                <!-- Initial empty state -->
+                                <tr>
+                                    <td colspan="6" class="p-10 text-center text-gray-400">
+                                        <i class="fas fa-inbox text-4xl mb-3 text-gray-200"></i>
+                                        <p class="font-bold">ยังไม่มีข้อมูล</p>
+                                        <p class="text-xs mt-1">กรุณากดปุ่ม "นำเข้าข้อมูล (Feed)" เพื่อดึงรายการวิ่งรถ</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: SCG Alerts -->
+            <div id="tab-alerts" class="tab-content px-4 md:px-0">
+                <div class="glass-card overflow-hidden">
+                    <div class="p-6 md:p-8 border-b border-gray-100 bg-white/50 flex flex-col md:flex-row justify-between items-center">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-1">SCG System Alerts</h3>
+                            <p class="text-sm font-medium text-gray-500">จัดการและตอบกลับแจ้งเตือนจากระบบส่วนกลาง</p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex gap-3">
+                            <button class="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-50 shadow-sm transition"><i class="fas fa-filter mr-2"></i>ตัวกรอง</button>
+                            <button onclick="loadMockData('alerts')" class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5"><i class="fas fa-rotate mr-2"></i>อัปเดตข้อมูล</button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto p-4">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-gray-400 text-xs uppercase tracking-widest font-bold">
+                                    <th class="p-4 pb-2">เวลา</th>
+                                    <th class="p-4 pb-2">รถ / คนขับ</th>
+                                    <th class="p-4 pb-2">ประเภท Alert</th>
+                                    <th class="p-4 pb-2">รายละเอียด</th>
+                                    <th class="p-4 pb-2">สถานะ</th>
+                                    <th class="p-4 pb-2 text-center">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alerts-table-body" class="text-sm divide-y divide-gray-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Safety Inspections -->
+            <div id="tab-inspections" class="tab-content px-4 md:px-0">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-5">
+                        <div class="glass-card p-6 md:p-8 sticky top-6 bg-gradient-to-b from-white to-gray-50/50">
+                            <div class="flex items-center mb-6">
+                                <div class="w-12 h-12 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center mr-4">
+                                    <i class="fas fa-clipboard-check text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800">บันทึกสุ่มตรวจ (LIFF)</h3>
+                                    <p class="text-xs font-bold text-gray-400 mt-1">ฟอร์มส่งตรงเข้า Google Sheet</p>
+                                </div>
+                            </div>
+                            
+                            <form id="inspection-form" onsubmit="submitForm(event, 'inspection')">
+                                <div class="space-y-5">
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-700 mb-2">วันที่และเวลา</label>
+                                        <input type="datetime-local" id="insp-datetime" required class="w-full p-3 input-modern">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-bold text-gray-700 mb-2">ทะเบียนรถ</label>
+                                            <select id="insp-vehicle" required class="w-full p-3 input-modern font-semibold">
+                                                <option value="">เลือกรถ</option>
+                                                <option value="70-1234">70-1234</option>
+                                                <option value="71-9988">71-9988</option>
+                                                <option value="72-5566">72-5566 (SCG)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-bold text-gray-700 mb-2">พนักงาน (ผขร)</label>
+                                            <input type="text" id="insp-driver" required placeholder="ชื่อคนขับ" class="w-full p-3 input-modern">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                                        <p class="text-sm font-extrabold text-gray-800 mb-4 border-b border-gray-50 pb-2">หัวข้อการตรวจสอบ</p>
+                                        <div class="flex items-center justify-between mb-4">
+                                            <span class="text-sm font-bold text-gray-600"><i class="fas fa-user-shield text-gray-400 w-5"></i> คาดเข็มขัดนิรภัย</span>
+                                            <div class="flex space-x-2 bg-gray-100 p-1 rounded-xl">
+                                                <label class="cursor-pointer">
+                                                    <input type="radio" name="seatbelt" value="pass" required class="peer sr-only">
+                                                    <div class="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-500 peer-checked:bg-green-500 peer-checked:text-white transition-all">ทำ</div>
+                                                </label>
+                                                <label class="cursor-pointer">
+                                                    <input type="radio" name="seatbelt" value="fail" class="peer sr-only">
+                                                    <div class="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-500 peer-checked:bg-red-500 peer-checked:text-white transition-all">ไม่ทำ</div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm font-bold text-gray-600"><i class="fas fa-mobile-screen text-gray-400 w-5"></i> ใช้โทรศัพท์ขณะขับ</span>
+                                            <div class="flex space-x-2 bg-gray-100 p-1 rounded-xl">
+                                                <label class="cursor-pointer">
+                                                    <input type="radio" name="phone" value="fail" required class="peer sr-only">
+                                                    <div class="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-500 peer-checked:bg-red-500 peer-checked:text-white transition-all">ใช้</div>
+                                                </label>
+                                                <label class="cursor-pointer">
+                                                    <input type="radio" name="phone" value="pass" class="peer sr-only">
+                                                    <div class="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-500 peer-checked:bg-green-500 peer-checked:text-white transition-all">ไม่ใช้</div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-ttmk-red to-pink-500 hover:from-pink-500 hover:to-ttmk-red text-white font-bold rounded-2xl shadow-lg transition-all transform hover:-translate-y-1">
+                                        <i class="fas fa-paper-plane mr-2"></i> บันทึกข้อมูล
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-7">
+                        <div class="glass-card p-6 md:p-8 h-full">
+                            <h3 class="text-lg font-bold text-gray-800 mb-6">ประวัติการสุ่มตรวจล่าสุด</h3>
+                            <div class="space-y-4" id="inspections-list-body"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Vehicles -->
+            <div id="tab-vehicles" class="tab-content px-4 md:px-0">
+                <div class="glass-card p-6 md:p-8 mb-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-1">จัดการรถ & ซ่อมบำรุง</h3>
+                            <p class="text-sm font-medium text-gray-500">ฐานข้อมูลรถ 6 ล้อ TTMK.</p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex gap-3">
+                             <button onclick="openModal('vehicleModal')" class="px-5 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl text-sm font-bold hover:bg-gray-50 shadow-sm transition"><i class="fas fa-plus mr-2 text-ttmk-red"></i>เพิ่มรถ</button>
+                             <button onclick="openModal('maintenanceModal')" class="px-5 py-2.5 bg-ttmk-dark text-white rounded-xl text-sm font-bold hover:bg-gray-800 shadow-md transition transform hover:-translate-y-0.5"><i class="fas fa-wrench mr-2"></i>บันทึกซ่อมบำรุง</button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-400 text-xs uppercase tracking-widest font-bold border-b border-gray-100">
+                                    <th class="p-4 pb-3">ทะเบียนรถ</th>
+                                    <th class="p-4 pb-3">สถานะระบบ</th>
+                                    <th class="p-4 pb-3">คนขับประจำ</th>
+                                    <th class="p-4 pb-3">ซ่อมบำรุง/PM</th>
+                                    <th class="p-4 pb-3 text-center">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vehicles-table-body" class="divide-y divide-gray-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Employees -->
+            <div id="tab-employees" class="tab-content px-4 md:px-0">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-card p-6 md:p-8 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 opacity-5 rounded-bl-full"></div>
+                        <div class="flex items-center mb-6 relative z-10">
+                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mr-4">
+                                <i class="fas fa-wallet text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">ระบบเบิก-จ่าย</h3>
+                                <p class="text-xs font-bold text-gray-400 mt-1">ค่าน้ำมัน / เบี้ยเลี้ยง / ซ่อมรายทาง</p>
+                            </div>
+                        </div>
+                        <form id="expense-form" onsubmit="submitForm(event, 'expense')">
+                            <div class="space-y-4 relative z-10">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-600 mb-2">วันที่</label>
+                                        <input type="date" required class="w-full p-3 input-modern text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-600 mb-2">พนักงาน (ผขร)</label>
+                                        <select required class="w-full p-3 input-modern text-sm font-semibold">
+                                            <option value="">เลือกพนักงาน</option>
+                                            <option value="EMP001">สมชาย ใจดี</option>
+                                            <option value="EMP002">วิชัย รักงาน</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-2">ประเภทการเบิก</label>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="exp_type" value="fuel" required class="peer sr-only" checked>
+                                            <div class="p-2 border-2 border-transparent bg-gray-50 rounded-xl text-center text-xs font-bold text-gray-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 transition">น้ำมัน</div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="exp_type" value="allowance" class="peer sr-only">
+                                            <div class="p-2 border-2 border-transparent bg-gray-50 rounded-xl text-center text-xs font-bold text-gray-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 transition">เบี้ยเลี้ยง</div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="exp_type" value="toll" class="peer sr-only">
+                                            <div class="p-2 border-2 border-transparent bg-gray-50 rounded-xl text-center text-xs font-bold text-gray-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 transition">ทางด่วน</div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="exp_type" value="repair" class="peer sr-only">
+                                            <div class="p-2 border-2 border-transparent bg-gray-50 rounded-xl text-center text-xs font-bold text-gray-500 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 transition">ซ่อมรถ</div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-600 mb-2">จำนวนเงิน (฿)</label>
+                                        <input type="number" required min="0" class="w-full p-3 input-modern text-sm text-right font-bold text-indigo-700 text-lg" placeholder="0.00">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-600 mb-2">เลขที่บิล/อ้างอิง</label>
+                                        <input type="text" class="w-full p-3 input-modern text-sm" placeholder="INV-xxx">
+                                    </div>
+                                </div>
+                                <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg transition-all transform hover:-translate-y-1 mt-4">
+                                    บันทึกลง Google Sheet
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="glass-card p-6 md:p-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-800">ทีมงาน (ผขร)</h3>
+                            <button onclick="openModal('employeeModal')" class="w-10 h-10 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-600 transition"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <div class="space-y-3" id="employees-list-body"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End Content Container -->
+
+        <!-- Modals Container (Glass Effect) -->
+        <div id="maintenanceModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 hidden flex justify-center items-center no-print overflow-y-auto py-6">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 md:p-8 m-4 transform transition-all border border-white/50 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-amber-100 text-amber-500 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-wrench text-lg"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">บันทึกซ่อมบำรุง</h3>
+                    </div>
+                    <button onclick="closeModal('maintenanceModal')" class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <form onsubmit="submitForm(event, 'maintenance', 'maintenanceModal')">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">ทะเบียนรถ</label>
+                                <select required class="w-full p-3 input-modern font-semibold text-sm">
+                                    <option value="">เลือกรถ</option>
+                                    <option>70-1234</option>
+                                    <option>71-9988</option>
+                                    <option>72-5566</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">สถานที่ซ่อม / ศูนย์บริการ</label>
+                                <input type="text" required placeholder="เช่น อู่ ช.การช่าง / ศูนย์ Hino" class="w-full p-3 input-modern text-sm">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">วันที่</label>
+                                <input type="date" required class="w-full p-3 input-modern text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">เลขไมล์ (กม.)</label>
+                                <input type="number" required class="w-full p-3 input-modern text-sm text-right" placeholder="0">
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Work Items Section -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider">
+                                    <i class="fas fa-list-check mr-1.5 text-amber-500"></i>รายการงานซ่อมบำรุง
+                                </label>
+                                <button type="button" onclick="addMaintenanceRow()" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition flex items-center shadow-sm">
+                                    <i class="fas fa-plus mr-1"></i> เพิ่มรายการ
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-12 gap-2 text-[10px] font-extrabold text-gray-400 uppercase tracking-wider px-1">
+                                <div class="col-span-4">ประเภทงาน</div>
+                                <div class="col-span-4">รายละเอียดงาน</div>
+                                <div class="col-span-3 text-right">ราคา (บาท)</div>
+                                <div class="col-span-1 text-center">ลบ</div>
+                            </div>
+
+                            <div id="maintenance-rows-container" class="space-y-2">
+                                <!-- Dynamic Rows -->
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-bold text-gray-600">ค่าใช้จ่ายรวมทั้งสิ้น (บาท)</label>
+                                <span class="text-[11px] text-gray-400 font-medium">* คำนวณจากรวมรายการงานซ่อม</span>
+                            </div>
+                            <input type="text" id="maint-total-price" readonly class="w-full p-3 input-modern text-xl font-black text-amber-600 text-right bg-amber-50/50" value="0.00">
+                        </div>
+
+                        <!-- 2 Camera Capture Sections (Camera Only - No Upload) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Card 1: Receipt Photo -->
+                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider">
+                                            <i class="fas fa-file-invoice-dollar mr-1.5 text-amber-500"></i>รูปใบเสร็จ <span class="text-red-500 font-bold">*</span>
+                                        </label>
+                                        <span class="text-[9px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-bold border border-red-100">
+                                            <i class="fas fa-ban mr-1"></i>ถ่ายรูปเท่านั้น
+                                        </span>
+                                    </div>
+
+                                    <input type="file" id="maint-camera-input-receipt" accept="image/*" capture="environment" class="hidden" onchange="handleNativeCameraCapture(event, 'receipt')">
+                                    <input type="hidden" id="maint-receipt-data" name="receipt_image">
+
+                                    <div class="relative bg-white p-2 rounded-xl border border-gray-200 flex flex-col items-center justify-center min-h-[150px]">
+                                        <video id="maint-video-feed-receipt" autoplay playsinline class="hidden w-full h-40 object-cover rounded-lg border border-amber-300"></video>
+                                        <canvas id="maint-canvas-receipt" class="hidden"></canvas>
+                                        <img id="maint-receipt-preview" class="hidden w-full h-40 object-cover rounded-lg border border-green-400 shadow-sm" alt="รูปใบเสร็จที่ถ่าย">
+
+                                        <div id="maint-camera-placeholder-receipt" class="text-center py-3">
+                                            <div class="w-10 h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-1.5">
+                                                <i class="fas fa-camera text-lg"></i>
+                                            </div>
+                                            <p class="text-xs font-bold text-gray-600">ยังไม่มีรูปถ่ายใบเสร็จ</p>
+                                            <p class="text-[9px] text-gray-400 mt-0.5">กดปุ่มด้านล่างเพื่อถ่ายรูปใบเสร็จ</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-2 pt-1">
+                                    <button type="button" id="btn-open-camera-receipt" onclick="triggerCameraCapture('receipt')" class="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm">
+                                        <i class="fas fa-camera mr-1 text-sm"></i> ถ่ายใบเสร็จ
+                                    </button>
+                                    <button type="button" id="btn-snap-photo-receipt" onclick="snapPhoto('receipt')" class="hidden flex-1 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm">
+                                        <i class="fas fa-circle-dot mr-1 text-sm animate-pulse"></i> กดถ่ายภาพ
+                                    </button>
+                                    <button type="button" id="btn-retake-photo-receipt" onclick="resetCameraCapture('receipt')" class="hidden py-2 px-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl text-xs font-bold transition flex items-center justify-center">
+                                        <i class="fas fa-rotate-right mr-1"></i> ถ่ายใหม่
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Spare Parts / Repair Area Photo -->
+                            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <label class="block text-xs font-extrabold text-gray-700 uppercase tracking-wider">
+                                            <i class="fas fa-screwdriver-wrench mr-1.5 text-blue-500"></i>รูปอะไหล่/จุดซ่อม <span class="text-red-500 font-bold">*</span>
+                                        </label>
+                                        <span class="text-[9px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-bold border border-red-100">
+                                            <i class="fas fa-ban mr-1"></i>ถ่ายรูปเท่านั้น
+                                        </span>
+                                    </div>
+
+                                    <input type="file" id="maint-camera-input-repair" accept="image/*" capture="environment" class="hidden" onchange="handleNativeCameraCapture(event, 'repair')">
+                                    <input type="hidden" id="maint-repair-data" name="repair_image">
+
+                                    <div class="relative bg-white p-2 rounded-xl border border-gray-200 flex flex-col items-center justify-center min-h-[150px]">
+                                        <video id="maint-video-feed-repair" autoplay playsinline class="hidden w-full h-40 object-cover rounded-lg border border-blue-300"></video>
+                                        <canvas id="maint-canvas-repair" class="hidden"></canvas>
+                                        <img id="maint-repair-preview" class="hidden w-full h-40 object-cover rounded-lg border border-green-400 shadow-sm" alt="รูปอะไหล่/จุดซ่อมที่ถ่าย">
+
+                                        <div id="maint-camera-placeholder-repair" class="text-center py-3">
+                                            <div class="w-10 h-10 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-1.5">
+                                                <i class="fas fa-camera text-lg"></i>
+                                            </div>
+                                            <p class="text-xs font-bold text-gray-600">ยังไม่มีรูปถ่ายจุดซ่อม</p>
+                                            <p class="text-[9px] text-gray-400 mt-0.5">กดปุ่มด้านล่างเพื่อถ่ายรูปจุดซ่อม</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-2 pt-1">
+                                    <button type="button" id="btn-open-camera-repair" onclick="triggerCameraCapture('repair')" class="flex-1 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm">
+                                        <i class="fas fa-camera mr-1 text-sm"></i> ถ่ายจุดซ่อม
+                                    </button>
+                                    <button type="button" id="btn-snap-photo-repair" onclick="snapPhoto('repair')" class="hidden flex-1 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-bold transition flex items-center justify-center shadow-sm">
+                                        <i class="fas fa-circle-dot mr-1 text-sm animate-pulse"></i> กดถ่ายภาพ
+                                    </button>
+                                    <button type="button" id="btn-retake-photo-repair" onclick="resetCameraCapture('repair')" class="hidden py-2 px-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl text-xs font-bold transition flex items-center justify-center">
+                                        <i class="fas fa-rotate-right mr-1"></i> ถ่ายใหม่
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit" class="w-full py-3.5 bg-ttmk-dark hover:bg-gray-800 text-white font-bold rounded-2xl transition-transform transform hover:-translate-y-1 shadow-lg">
+                                บันทึกข้อมูลซ่อมบำรุง
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Vehicle Modal -->
+        <div id="vehicleModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 hidden flex justify-center items-center no-print">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 m-4 transform transition-all border border-white/50">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-red-100 text-ttmk-red rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-truck text-lg"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">เพิ่มรถใหม่</h3>
+                    </div>
+                    <button onclick="closeModal('vehicleModal')" class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <form onsubmit="submitForm(event, 'vehicle', 'vehicleModal')">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">ทะเบียนรถ</label>
+                            <input type="text" required placeholder="เช่น 73-1234" class="w-full p-3 input-modern text-sm font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">ประเภทรถ</label>
+                            <select required class="w-full p-3 input-modern text-sm">
+                                <option value="6 ล้อตู้ทึบ">6 ล้อตู้ทึบ</option>
+                                <option value="6 ล้อคอก">6 ล้อคอก</option>
+                                <option value="10 ล้อ">10 ล้อ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">คนขับประจำ</label>
+                            <input type="text" required placeholder="ชื่อ-นามสกุล คนขับ" class="w-full p-3 input-modern text-sm">
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit" class="w-full py-3.5 bg-ttmk-red hover:bg-red-600 text-white font-bold rounded-2xl transition-transform transform hover:-translate-y-1 shadow-lg">
+                                บันทึกข้อมูลรถ
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Employee Modal -->
+        <div id="employeeModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 hidden flex justify-center items-center no-print">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 m-4 transform transition-all border border-white/50">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-user-plus text-lg"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">เพิ่มพนักงาน (ผขร)</h3>
+                    </div>
+                    <button onclick="closeModal('employeeModal')" class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <form onsubmit="submitForm(event, 'employee', 'employeeModal')">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">รหัสพนักงาน</label>
+                            <input type="text" required placeholder="เช่น EMP003" class="w-full p-3 input-modern text-sm font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">ชื่อ-นามสกุล</label>
+                            <input type="text" required placeholder="ชื่อ-นามสกุล พนักงาน" class="w-full p-3 input-modern text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">รถประจำตำแหน่ง / ทะเบียน</label>
+                            <select required class="w-full p-3 input-modern text-sm">
+                                <option value="70-1234">70-1234</option>
+                                <option value="71-9988">71-9988</option>
+                                <option value="72-5566">72-5566</option>
+                            </select>
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl transition-transform transform hover:-translate-y-1 shadow-lg">
+                                บันทึกข้อมูลพนักงาน
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Footer Footer -->
+        <footer class="text-center py-6 text-xs mt-auto w-full z-20 md:relative pb-24 md:pb-6 no-print">
+            <p class="font-bold text-gray-400">Credit © 2026 GA Central System. All rights reserved.</p>
+            <p class="text-[10px] text-gray-400 mt-1 flex items-center justify-center gap-1 font-medium">
+                <i class="fab fa-line text-green-500 text-sm"></i> Mr. Taweesak.kom (0623285963)
+            </p>
+        </footer>
+    </main>
+
+    <script>
+        // --- GOOGLE SHEETS & DRIVE CONFIGURATION ---
+        const CONFIG = {
+            GOOGLE_SHEET_ID: '19Ve3nx5crTV4JJu05ZPqDI_04pBVOkRLNcf7wxfzC8o',
+            GOOGLE_DRIVE_FOLDER_ID: '1K_N2Wbrjoslm5MMc6jjRa488VgjDuWXf',
+            WEB_APP_URL: '' // URL ของ Web App จาก Google Apps Script
+        };
+
+        // Tab Switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav-' + tabId).classList.add('active');
+            
+            const titles = {
+                'dashboard': 'ภาพรวมระบบขนส่ง (Overview)',
+                'alerts': 'จัดการ SCG Alerts',
+                'billing': 'ระบบดึงข้อมูล & ตั้งเบิก',
+                'inspections': 'ตรวจสอบความปลอดภัย (LIFF)',
+                'vehicles': 'คลังข้อมูลรถและซ่อมบำรุง',
+                'employees': 'ทีมงานและระบบเบิกจ่าย'
+            };
+            const titleEl = document.getElementById('page-title');
+            if(titleEl) titleEl.innerText = titles[tabId];
+
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+                el.style.animation = 'none';
+                el.offsetHeight; // trigger reflow
+                el.style.animation = null; 
+            });
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            if (tabId === 'dashboard') initChart();
+            if (tabId === 'alerts' && document.getElementById('alerts-table-body').children.length === 0) loadMockData('alerts');
+            if (tabId === 'inspections' && document.getElementById('inspections-list-body').children.length === 0) loadMockData('inspections');
+            if (tabId === 'vehicles' && document.getElementById('vehicles-table-body').children.length === 0) loadMockData('vehicles');
+            if (tabId === 'employees' && document.getElementById('employees-list-body').children.length === 0) loadMockData('employees');
+        }
+
+        function openModal(modalId) {
+            const m = document.getElementById(modalId);
+            if (!m) return;
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            if (modalId === 'maintenanceModal') {
+                const container = document.getElementById('maintenance-rows-container');
+                if (container && container.children.length === 0) {
+                    addMaintenanceRow('PM', 'เปลี่ยนถ่ายน้ำมันเครื่อง 10L', 3500);
+                }
+            }
+        }
+        function closeModal(modalId) {
+            const m = document.getElementById(modalId);
+            if (!m) return;
+            if (modalId === 'maintenanceModal') {
+                stopCameraStream();
+                resetCameraCapture('receipt');
+                resetCameraCapture('repair');
+            }
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        // --- RECEIPT & REPAIR CAMERA LOGIC (Camera Only - No Upload) ---
+        const cameraStreams = { receipt: null, repair: null };
+
+        async function triggerCameraCapture(type = 'receipt') {
+            const video = document.getElementById(`maint-video-feed-${type}`);
+            const placeholder = document.getElementById(`maint-camera-placeholder-${type}`);
+            const btnOpen = document.getElementById(`btn-open-camera-${type}`);
+            const btnSnap = document.getElementById(`btn-snap-photo-${type}`);
+
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    cameraStreams[type] = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: { ideal: "environment" } },
+                        audio: false
+                    });
+                    video.srcObject = cameraStreams[type];
+                    video.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                    btnOpen.classList.add('hidden');
+                    btnSnap.classList.remove('hidden');
+                    return;
+                } catch (err) {
+                    console.log(`MediaDevices camera error for ${type}:`, err);
+                }
+            }
+
+            document.getElementById(`maint-camera-input-${type}`).click();
+        }
+
+        function handleNativeCameraCapture(e, type = 'receipt') {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                displayCapturedPhoto(evt.target.result, type);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function snapPhoto(type = 'receipt') {
+            const video = document.getElementById(`maint-video-feed-${type}`);
+            const canvas = document.getElementById(`maint-canvas-${type}`);
+            if (!video || !cameraStreams[type]) return;
+
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            stopCameraStream(type);
+            displayCapturedPhoto(dataUrl, type);
+        }
+
+        function displayCapturedPhoto(dataUrl, type = 'receipt') {
+            const preview = document.getElementById(`maint-${type}-preview`);
+            const placeholder = document.getElementById(`maint-camera-placeholder-${type}`);
+            const video = document.getElementById(`maint-video-feed-${type}`);
+            const hiddenInput = document.getElementById(`maint-${type}-data`);
+            const btnOpen = document.getElementById(`btn-open-camera-${type}`);
+            const btnSnap = document.getElementById(`btn-snap-photo-${type}`);
+            const btnRetake = document.getElementById(`btn-retake-photo-${type}`);
+
+            if (hiddenInput) hiddenInput.value = dataUrl;
+            if (preview) { preview.src = dataUrl; preview.classList.remove('hidden'); }
+            if (video) video.classList.add('hidden');
+            if (placeholder) placeholder.classList.add('hidden');
+
+            if (btnOpen) btnOpen.classList.add('hidden');
+            if (btnSnap) btnSnap.classList.add('hidden');
+            if (btnRetake) btnRetake.classList.remove('hidden');
+        }
+
+        function stopCameraStream(type = null) {
+            if (type) {
+                if (cameraStreams[type]) {
+                    cameraStreams[type].getTracks().forEach(track => track.stop());
+                    cameraStreams[type] = null;
+                }
+            } else {
+                Object.keys(cameraStreams).forEach(key => stopCameraStream(key));
+            }
+        }
+
+        function resetCameraCapture(type = 'receipt') {
+            stopCameraStream(type);
+            const preview = document.getElementById(`maint-${type}-preview`);
+            const placeholder = document.getElementById(`maint-camera-placeholder-${type}`);
+            const video = document.getElementById(`maint-video-feed-${type}`);
+            const hiddenInput = document.getElementById(`maint-${type}-data`);
+            const btnOpen = document.getElementById(`btn-open-camera-${type}`);
+            const btnSnap = document.getElementById(`btn-snap-photo-${type}`);
+            const btnRetake = document.getElementById(`btn-retake-photo-${type}`);
+            const fileInput = document.getElementById(`maint-camera-input-${type}`);
+
+            if (hiddenInput) hiddenInput.value = '';
+            if (fileInput) fileInput.value = '';
+            if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+            if (video) video.classList.add('hidden');
+            if (placeholder) placeholder.classList.remove('hidden');
+
+            if (btnOpen) btnOpen.classList.remove('hidden');
+            if (btnSnap) btnSnap.classList.add('hidden');
+            if (btnRetake) btnRetake.classList.add('hidden');
+        }
+
+        async function submitForm(event, formType, modalId = null) {
+            event.preventDefault();
+            
+            const formEl = event.target;
+            const formData = new FormData(formEl);
+            const payload = {
+                action: formType,
+                sheetId: CONFIG.GOOGLE_SHEET_ID,
+                timestamp: new Date().toLocaleString('th-TH')
+            };
+            formData.forEach((value, key) => { payload[key] = value; });
+
+            if (formType === 'maintenance') {
+                const receiptData = document.getElementById('maint-receipt-data')?.value;
+                const repairData = document.getElementById('maint-repair-data')?.value;
+
+                if (!receiptData) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'กรุณาถ่ายรูปใบเสร็จ',
+                        text: 'ระบบบังคับให้ต้องแนบรูปใบเสร็จโดยการถ่ายรูปด้วยกล้องเท่านั้น',
+                        confirmButtonColor: '#E4405F',
+                        customClass: { popup: 'rounded-3xl' }
+                    });
+                    return;
+                }
+
+                if (!repairData) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'กรุณาถ่ายรูปจุดซ่อม / อะไหล่',
+                        text: 'ระบบบังคับให้ต้องแนบรูปถ่ายอะไหล่หรือจุดที่ซ่อมด้วยกล้องเท่านั้น',
+                        confirmButtonColor: '#E4405F',
+                        customClass: { popup: 'rounded-3xl' }
+                    });
+                    return;
+                }
+
+                payload.receipt_image = receiptData;
+                payload.repair_image = repairData;
+
+                const items = [];
+                document.querySelectorAll('#maintenance-rows-container > div').forEach(row => {
+                    const type = row.querySelector('.maint-type')?.value || '';
+                    const desc = row.querySelector('.maint-desc')?.value || '';
+                    const price = row.querySelector('.maint-price')?.value || '';
+                    if (desc || price) items.push({ type, desc, price });
+                });
+                payload.items = items;
+                payload.totalPrice = document.getElementById('maint-total-price')?.value || '0.00';
+            }
+
+            Swal.fire({
+                title: 'กำลังบันทึกลง Google Sheets...',
+                text: `Sheet ID: ${CONFIG.GOOGLE_SHEET_ID.substring(0, 10)}...`,
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading() },
+                background: 'rgba(255, 255, 255, 0.95)',
+                customClass: { popup: 'rounded-3xl' }
+            });
+
+            try {
+                if (CONFIG.WEB_APP_URL && CONFIG.WEB_APP_URL.trim() !== '') {
+                    await fetch(CONFIG.WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    await new Promise(resolve => setTimeout(resolve, 1200));
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'บันทึกสำเร็จ!',
+                    text: `ข้อมูล (${formType}) ถูกส่งไปยัง Google Sheet เรียบร้อยแล้ว`,
+                    confirmButtonColor: '#E4405F',
+                    customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-2' }
+                });
+                
+                formEl.reset();
+                if (modalId === 'maintenanceModal') {
+                    resetCameraCapture();
+                }
+                if (modalId) closeModal(modalId);
+            } catch (err) {
+                console.error('Sheet API Error:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถเชื่อมต่อ Google Sheets: ' + err.message,
+                    confirmButtonColor: '#E4405F',
+                    customClass: { popup: 'rounded-3xl' }
+                });
+            }
+        }
+
+        let chartInstance = null;
+        function initChart() {
+            const ctx = document.getElementById('safetyChart');
+            if(!ctx) return;
+            if (chartInstance) chartInstance.destroy();
+            Chart.defaults.font.family = "'Sarabun', sans-serif";
+            Chart.defaults.color = '#94a3b8';
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.'],
+                    datasets: [
+                        { label: 'ไม่คาดเข็มขัด', data: [12, 9, 5, 4, 2, 1], backgroundColor: '#FF6B6B', borderRadius: 6, barPercentage: 0.6 },
+                        { label: 'ใช้โทรศัพท์', data: [5, 7, 3, 2, 1, 0], backgroundColor: '#4ECDC4', borderRadius: 6, barPercentage: 0.6 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8, font: { weight: 'bold' } } } },
+                    scales: { x: { grid: { display: false } }, y: { border: { display: false }, grid: { color: '#f1f5f9' }, beginAtZero: true } },
+                    interaction: { mode: 'index', intersect: false }
+                }
+            });
+        }
+
+        // --- NEW: Import Billing Data ---
+        function importBillingData() {
+            Swal.fire({
+                title: 'กำลังดึงข้อมูล Feed',
+                text: 'ดึงเส้นทางวิ่งและราคาจาก SCG / Google Sheet...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading() },
+                background: 'rgba(255, 255, 255, 0.95)',
+                customClass: { popup: 'rounded-3xl' }
+            });
+
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success', title: 'นำเข้าสำเร็จ!', text: 'อัปเดตข้อมูลการวิ่งรถเรียบร้อย',
+                    timer: 1500, showConfirmButton: false, customClass: { popup: 'rounded-3xl' }
+                });
+                renderBillingTable();
+            }, 1800);
+        }
+
+        function renderBillingTable() {
+            const billData = [
+                { date: '01/09/2026', truck: '72-5566', driver: 'สมชาย ใจดี', zone: 'ระยอง (Zone A)', price: 4500, status: 'รอทำเบิก' },
+                { date: '01/09/2026', truck: '70-1234', driver: 'อำนาจ ชูส่ง', zone: 'นครสวรรค์ (Zone C)', price: 5200, status: 'รอทำเบิก' },
+                { date: '31/08/2026', truck: '71-9988', driver: 'วิชัย รักงาน', zone: 'ชลบุรี (Zone A)', price: 3800, status: 'เตรียมเอกสาร' },
+                { date: '30/08/2026', truck: '72-5566', driver: 'สมชาย ใจดี', zone: 'กรุงเทพฯ-ปริมณฑล', price: 2500, status: 'รอทำเบิก' }
+            ];
+
+            let totalAmt = 0;
+            let html = '';
+            billData.forEach((b, idx) => {
+                totalAmt += b.price;
+                const statusBadge = b.status === 'รอทำเบิก' 
+                    ? `<span class="bg-amber-50 text-amber-600 px-3 py-1 rounded-xl text-[11px] font-bold border border-amber-100">รอทำเบิก</span>`
+                    : `<span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-xl text-[11px] font-bold border border-blue-100">เตรียมเอกสาร</span>`;
+                
+                html += `
+                <tr class="hover:bg-gray-50 transition group">
+                    <td class="p-4 text-xs font-bold text-gray-500">${b.date}</td>
+                    <td class="p-4">
+                        <div class="font-extrabold text-gray-800 text-sm">${b.truck}</div>
+                        <div class="text-[11px] text-gray-400 font-medium">${b.driver}</div>
+                    </td>
+                    <td class="p-4 font-bold text-indigo-600 text-xs">${b.zone}</td>
+                    <td class="p-4 font-black text-gray-800 text-right">฿${b.price.toLocaleString()}</td>
+                    <td class="p-4 text-center">${statusBadge}</td>
+                    <td class="p-4 text-center no-print">
+                        <button onclick="printIndividual('${b.truck}', '${b.date}', ${b.price})" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-[11px] font-bold transition shadow-sm border border-gray-200">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('billing-table-body').innerHTML = html;
+            document.getElementById('bill-trips-count').innerHTML = `${billData.length} <span class="text-sm font-medium text-gray-500">เที่ยว</span>`;
+            document.getElementById('bill-pending-amt').innerText = `฿${totalAmt.toLocaleString()}.00`;
+        }
+
+        // Print function for a specific row
+        function printIndividual(truck, date, price) {
+            // In a real app, this might open a new window or filter the UI before triggering window.print()
+            Swal.fire({
+                title: `เตรียมพิมพ์เอกสาร`,
+                text: `สั่งพิมพ์รายการของรถทะเบียน ${truck} (รอบ ${date})`,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-print"></i> สั่งพิมพ์',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#2D3142',
+                customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-6 py-2', cancelButton: 'rounded-xl font-bold px-6 py-2' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Trigger browser print
+                    window.print();
+                }
+            });
+        }
+
+        // Existing Mock Data functions...
+        function loadMockData(type) {
+            if (type === 'alerts') {
+                const alerts = [
+                    { time: '14:30', truck: '72-5566', driver: 'สมชาย ใจดี', type: 'Fatigue (หลับใน)', desc: 'AI ตรวจจับหลับตา > 2 วิ', status: 'pending' },
+                    { time: '13:15', truck: '71-9988', driver: 'วิชัย รักงาน', type: 'Overspeed', desc: 'ความเร็ว 95 กม./ชม.', status: 'resolved' },
+                    { time: '09:45', truck: '72-5566', driver: 'สมชาย ใจดี', type: 'Route Dev.', desc: 'ออกนอกเส้นทาง', status: 'pending' }
+                ];
+                let html = '';
+                alerts.forEach(a => {
+                    const isPending = a.status === 'pending';
+                    const badge = isPending 
+                        ? `<span class="bg-red-50 text-red-600 px-3 py-1 rounded-xl text-xs font-bold border border-red-100">รอจัดการ</span>`
+                        : `<span class="bg-green-50 text-green-600 px-3 py-1 rounded-xl text-xs font-bold border border-green-100">เรียบร้อย</span>`;
+                    const btn = isPending
+                        ? `<button onclick="resolveAlert(this)" class="bg-white border border-gray-200 hover:border-blue-500 hover:text-blue-600 text-gray-600 px-4 py-1.5 rounded-xl text-xs font-bold transition shadow-sm">ตอบกลับ</button>`
+                        : `<i class="fas fa-check-circle text-green-400 text-lg"></i>`;
+                    html += `<tr class="hover:bg-gray-50 transition group"><td class="p-4 text-xs font-bold text-gray-400">${a.time}</td><td class="p-4"><div class="font-extrabold text-gray-800">${a.truck}</div><div class="text-xs text-gray-500 font-medium">${a.driver}</div></td><td class="p-4"><span class="font-bold text-ttmk-red">${a.type}</span></td><td class="p-4 text-sm text-gray-600">${a.desc}</td><td class="p-4">${badge}</td><td class="p-4 text-center">${btn}</td></tr>`;
+                });
+                document.getElementById('alerts-table-body').innerHTML = html;
+            } else if (type === 'inspections') {
+                const insp = [{ date: 'วันนี้ 08:30', truck: '70-1234', driver: 'อำนาจ ชูส่ง', seatbelt: true, phone: false }, { date: 'เมื่อวาน 15:00', truck: '72-5566', driver: 'สมชาย ใจดี', seatbelt: true, phone: true }];
+                let html = '';
+                insp.forEach(i => {
+                    const sbIcon = i.seatbelt ? '<span class="bg-green-100 text-green-600 w-6 h-6 rounded-full flex items-center justify-center text-[10px]"><i class="fas fa-check"></i></span>' : '<span class="bg-red-100 text-red-600 w-6 h-6 rounded-full flex items-center justify-center text-[10px]"><i class="fas fa-times"></i></span>';
+                    const phIcon = !i.phone ? '<span class="bg-green-100 text-green-600 w-6 h-6 rounded-full flex items-center justify-center text-[10px]"><i class="fas fa-check"></i></span>' : '<span class="bg-red-100 text-red-600 w-6 h-6 rounded-full flex items-center justify-center text-[10px]"><i class="fas fa-times"></i></span>';
+                    html += `<div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between hover:shadow-md transition"><div class="flex items-center gap-4"><div class="w-12 h-12 bg-gray-50 rounded-xl flex flex-col items-center justify-center border border-gray-100"><i class="fas fa-truck text-gray-400 text-sm mb-1"></i></div><div><h4 class="font-extrabold text-gray-800">${i.truck} <span class="text-xs font-medium text-gray-400 ml-2">${i.date}</span></h4><p class="text-xs font-bold text-gray-500">${i.driver}</p></div></div><div class="flex gap-4"><div class="flex flex-col items-center gap-1"><span class="text-[10px] font-bold text-gray-400">เข็มขัด</span>${sbIcon}</div><div class="flex flex-col items-center gap-1"><span class="text-[10px] font-bold text-gray-400">โทรศัพท์</span>${phIcon}</div></div></div>`;
+                });
+                document.getElementById('inspections-list-body').innerHTML = html;
+            } else if (type === 'vehicles') {
+                const veh = [{ reg: '72-5566', type: '6 ล้อตู้ทึบ', status: 'Online', driver: 'สมชาย ใจดี', pm: '1,500 กม.', pmAlert: false }, { reg: '70-1234', type: '6 ล้อคอก', status: 'Online', driver: 'อำนาจ ชูส่ง', pm: 'เลยกำหนด (ด่วน)', pmAlert: true }];
+                let html = '';
+                veh.forEach(v => {
+                    const stBadge = v.status === 'Online' ? '<span class="flex items-center text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg"><span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>Online</span>' : '<span class="flex items-center text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-lg"><span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span>Offline</span>';
+                    const pmClass = v.pmAlert ? 'text-red-600 font-extrabold bg-red-50 px-2 py-1 rounded-lg border border-red-100' : 'text-gray-500 font-medium';
+                    html += `<tr class="hover:bg-gray-50 transition"><td class="p-4"><div class="font-black text-lg text-ttmk-dark tracking-tight">${v.reg}</div><div class="text-xs text-gray-400 font-bold">${v.type}</div></td><td class="p-4">${stBadge}</td><td class="p-4 font-bold text-gray-700">${v.driver}</td><td class="p-4 text-sm"><span class="${pmClass}">${v.pm}</span></td><td class="p-4 text-center"><button class="w-8 h-8 bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-blue-500 hover:border-blue-200 shadow-sm transition mx-0.5"><i class="fas fa-edit text-xs"></i></button></td></tr>`;
+                });
+                document.getElementById('vehicles-table-body').innerHTML = html;
+            } else if (type === 'employees') {
+                 const emp = [{ id: 'EMP001', name: 'สมชาย ใจดี', img: 'https://ui-avatars.com/api/?name=Somchai&background=random', truck: '72-5566' }, { id: 'EMP002', name: 'วิชัย รักงาน', img: 'https://ui-avatars.com/api/?name=Wichai&background=random', truck: '71-9988' }];
+                let html = '';
+                emp.forEach(e => {
+                    html += `<div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between hover:shadow-md transition cursor-pointer"><div class="flex items-center gap-3"><img src="${e.img}" class="w-10 h-10 rounded-xl shadow-sm"><div><h4 class="font-extrabold text-gray-800 text-sm">${e.name}</h4><p class="text-[10px] font-bold text-gray-400">${e.id}</p></div></div><div class="bg-blue-50 text-blue-600 px-3 py-1 rounded-xl text-xs font-extrabold border border-blue-100">${e.truck}</div></div>`;
+                });
+                document.getElementById('employees-list-body').innerHTML = html;
+            }
+        }
+
+        function resolveAlert(btn) {
+            Swal.fire({
+                title: 'ตอบกลับ SCG', input: 'text', inputPlaceholder: 'ระบุการแก้ไข (เช่น ตักเตือนคนขับแล้ว)...', showCancelButton: true, confirmButtonText: 'ส่งเข้าระบบ', cancelButtonText: 'ยกเลิก', confirmButtonColor: '#4ECDC4', customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl font-bold px-5', cancelButton: 'rounded-xl font-bold px-5' }, inputValidator: (value) => { if (!value) return 'กรุณาระบุข้อมูล!' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'เรียบร้อย!', text: 'แจ้ง SCG แล้ว', icon: 'success', customClass: { popup: 'rounded-3xl' } });
+                    const tr = btn.closest('tr');
+                    tr.querySelector('td:nth-child(5)').innerHTML = `<span class="bg-green-50 text-green-600 px-3 py-1 rounded-xl text-xs font-bold border border-green-100">เรียบร้อย</span>`;
+                    tr.querySelector('td:nth-child(6)').innerHTML = `<i class="fas fa-check-circle text-green-400 text-lg"></i>`;
+                }
+            });
+        }
+
+        // --- DARK MODE LOGIC ---
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeUI(isDark);
+        }
+
+        function updateThemeUI(isDark) {
+            const iconDesktop = document.getElementById('theme-toggle-icon');
+            const iconMobile = document.getElementById('theme-toggle-icon-mobile');
+            const textMobile = document.getElementById('theme-toggle-text');
+
+            if (isDark) {
+                if (iconDesktop) iconDesktop.className = 'fas fa-sun text-lg text-amber-400';
+                if (iconMobile) iconMobile.className = 'fas fa-sun text-amber-400';
+                if (textMobile) textMobile.innerText = 'โหมดสว่าง (Light Mode)';
+            } else {
+                if (iconDesktop) iconDesktop.className = 'fas fa-moon text-lg text-gray-600';
+                if (iconMobile) iconMobile.className = 'fas fa-moon text-gray-600';
+                if (textMobile) textMobile.innerText = 'โหมดมืด (Dark Mode)';
+            }
+
+            if (chartInstance) initChart();
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+            
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            updateThemeUI(isDark);
+        }
+
+        window.onload = function() {
+            initTheme();
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            const inspDateEl = document.getElementById('insp-datetime');
+            if (inspDateEl) inspDateEl.value = now.toISOString().slice(0,16);
+            initChart();
+        };
+
+    </script>
+</body>
+</html>
