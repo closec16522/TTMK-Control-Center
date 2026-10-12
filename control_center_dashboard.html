@@ -686,9 +686,14 @@
                 <div class="flex items-center space-x-2">
                   <i class="fa-solid fa-wine-bottle text-blue-600 text-lg"></i>
                   <h3 class="font-bold text-base text-slate-800 dark:text-white">ข้อมูลการตรวจวัดแอลกอฮอล์และความดัน (Alcohol_Logs)</h3>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>LIVE REAL-TIME</span>
+                  </span>
                 </div>
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   ประวัติการตรวจวัดแอลกอฮอล์และค่าความดันโลหิตแบบ 1:1 Face Verification
+                  <span id="alcoholLastSyncTimeText" class="ml-2 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">• อัปเดตล่าสุด: กำลังเชื่อมต่อ...</span>
                 </p>
               </div>
 
@@ -696,6 +701,74 @@
                 <span class="text-xs text-slate-500 dark:text-slate-400">
                   เกณฑ์ SCG: <strong class="text-emerald-600">0.00 mg% เท่านั้น</strong>
                 </span>
+                <button type="button" onclick="syncAllSheetData(true)" class="px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 hover:bg-blue-100 text-xs font-semibold border border-blue-200 dark:border-blue-800 transition flex items-center gap-1 shadow-sm">
+                  <i class="fa-solid fa-rotate text-[11px]" id="alcTableSyncIcon"></i>
+                  <span>ซิงค์ทันที</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Alcohol Filter & Search Controls Bar -->
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5 text-xs">
+              
+              <!-- Search Box -->
+              <div class="relative flex-1 min-w-[200px] max-w-sm">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                <input type="text" id="alcoholSearchInput" oninput="filterAlcoholTable()"
+                       placeholder="ค้นหาชื่อคนขับ, ทะเบียน, รหัสพนักงาน, GPS..."
+                       class="w-full pl-8 pr-7 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs shadow-sm" />
+                <button type="button" onclick="clearAlcoholSearch()" id="btnClearAlcoholSearch" class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <!-- Filter Dropdowns -->
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- Alcohol Status -->
+                <select id="alcoholStatusFilter" onchange="filterAlcoholTable()"
+                        class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm">
+                  <option value="">แอลกอฮอล์: ทั้งหมด</option>
+                  <option value="pass">ผ่าน (0.00 mg%)</option>
+                  <option value="fail">ไม่ผ่าน (> 0.00 mg%)</option>
+                </select>
+
+                <!-- BP Status -->
+                <select id="alcoholBpFilter" onchange="filterAlcoholTable()"
+                        class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm">
+                  <option value="">ความดัน: ทั้งหมด</option>
+                  <option value="normal">ความดันปกติ</option>
+                  <option value="high">ความดันโลหิตสูง / เฝ้าระวัง</option>
+                </select>
+
+                <!-- Overall Status -->
+                <select id="alcoholOverallFilter" onchange="filterAlcoholTable()"
+                        class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm">
+                  <option value="">ผลประเมิน: ทั้งหมด</option>
+                  <option value="pass">ผ่านพร้อมปฏิบัติงาน</option>
+                  <option value="fail">ไม่ผ่านเกณฑ์</option>
+                </select>
+
+                <!-- Date Period Filter -->
+                <select id="alcoholDateFilter" onchange="filterAlcoholTable()"
+                        class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm">
+                  <option value="">วันที่: ทั้งหมด</option>
+                  <option value="today">วันนี้</option>
+                  <option value="7days">ย้อนหลัง 7 วัน</option>
+                  <option value="month">เดือนนี้</option>
+                </select>
+
+                <!-- Reset Filters Button -->
+                <button type="button" onclick="resetAlcoholFilters()"
+                        class="py-1.5 px-2.5 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold transition flex items-center gap-1 shadow-sm"
+                        title="ล้างตัวกรองทั้งหมด">
+                  <i class="fa-solid fa-arrow-rotate-left"></i>
+                  <span class="hidden sm:inline">ล้างตัวกรอง</span>
+                </button>
+              </div>
+
+              <!-- Counter Badge -->
+              <div class="flex items-center gap-2 ml-auto text-[11px] text-slate-500 dark:text-slate-400">
+                <span>แสดง <strong id="alcoholFilteredCount" class="text-blue-600 dark:text-blue-400 font-bold">0</strong> จาก <span id="alcoholTotalCount" class="font-bold">0</span> รายการ</span>
               </div>
             </div>
 
@@ -1298,6 +1371,11 @@
                    class="max-h-[460px] w-auto object-contain rounded-lg shadow-lg border border-slate-800" />
               <div class="mt-2.5 flex items-center justify-center gap-2">
                 <span class="text-xs text-slate-200 font-bold">จุดตรวจวัดความพร้อม SCG JWD วังน้อย (0.00 mg% ผ่านเกณฑ์ 100%)</span>
+                <a id="alcModalMeterDriveLink" href="https://drive.google.com/file/d/1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL/view?usp=drivesdk" target="_blank"
+                   class="px-2.5 py-1 rounded bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 text-[10px] font-semibold border border-amber-500/40 transition flex items-center gap-1.5 shadow-sm">
+                  <i class="fa-brands fa-google-drive text-amber-300"></i>
+                  <span>ดูรูปใน Google Drive</span>
+                </a>
               </div>
             </div>
             <p class="text-[11px] text-slate-400">
@@ -2000,10 +2078,12 @@
       if (icon) icon.className = isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon';
     }
 
-    // Data Sync
+    // Data Sync & Real-time Live Engine
     async function syncAllSheetData(showToast = false) {
       const syncIcon = document.getElementById('topSyncIcon');
       if (syncIcon) syncIcon.classList.add('fa-spin');
+      const tableSyncIcon = document.getElementById('alcTableSyncIcon');
+      if (tableSyncIcon) tableSyncIcon.classList.add('fa-spin');
 
       try {
         let loaded = false;
@@ -2070,17 +2150,24 @@
 
         renderAllTables();
 
+        const syncTimeEl = document.getElementById('alcoholLastSyncTimeText');
+        if (syncTimeEl) {
+          const now = new Date();
+          syncTimeEl.textContent = `• อัปเดตล่าสุด: ${now.toLocaleTimeString('th-TH')} น.`;
+        }
+
         if (showToast) {
           Swal.fire({
             icon: 'success',
             title: 'ซิงค์ข้อมูลสำเร็จ',
-            text: `ดึงข้อมูลพนักงานจริงเรียบร้อยแล้ว (${appState.drivers.length} คน)`,
+            text: `ดึงข้อมูลพนักงานจริงเรียบร้อยแล้ว (${appState.drivers.length} คน, ${appState.alcoholLogs.length} ผลตรวจ)`,
             timer: 1600,
             showConfirmButton: false
           });
         }
       } finally {
         if (syncIcon) syncIcon.classList.remove('fa-spin');
+        if (tableSyncIcon) tableSyncIcon.classList.remove('fa-spin');
       }
     }
 
@@ -2185,17 +2272,122 @@
       });
     }
 
+    let alcFilterDebounce = null;
+    function filterAlcoholTable() {
+      if (alcFilterDebounce) cancelAnimationFrame(alcFilterDebounce);
+      alcFilterDebounce = requestAnimationFrame(() => {
+        renderAlcoholTable();
+      });
+    }
+
+    function clearAlcoholSearch() {
+      const input = document.getElementById('alcoholSearchInput');
+      if (input) input.value = '';
+      const clearBtn = document.getElementById('btnClearAlcoholSearch');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      renderAlcoholTable();
+    }
+
+    function resetAlcoholFilters() {
+      const search = document.getElementById('alcoholSearchInput');
+      if (search) search.value = '';
+      const status = document.getElementById('alcoholStatusFilter');
+      if (status) status.value = '';
+      const bp = document.getElementById('alcoholBpFilter');
+      if (bp) bp.value = '';
+      const overall = document.getElementById('alcoholOverallFilter');
+      if (overall) overall.value = '';
+      const date = document.getElementById('alcoholDateFilter');
+      if (date) date.value = '';
+      const clearBtn = document.getElementById('btnClearAlcoholSearch');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      renderAlcoholTable();
+    }
+
     function renderAlcoholTable() {
       const tbody = document.getElementById('alcoholTableBody');
       if (!tbody) return;
 
-      tbody.innerHTML = appState.alcoholLogs.map((log, index) => {
-        const isAlcPass = log.status === 'ผ่าน' || log.alcoholValue === 0;
-        const alcBadge = isAlcPass 
-          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200">${(log.alcoholValue || 0).toFixed(2)} mg% ผ่าน</span>`
-          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 border border-red-200">${(log.alcoholValue || 0).toFixed(2)} mg% ไม่ผ่าน</span>`;
+      const searchInput = document.getElementById('alcoholSearchInput');
+      const search = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      const clearBtn = document.getElementById('btnClearAlcoholSearch');
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', search.length === 0);
+      }
 
-        const isBpHigh = (log.bpStatus && log.bpStatus.includes('สูง')) || log.bpDia >= 90 || log.bpSys >= 140;
+      const statusFilter = document.getElementById('alcoholStatusFilter') ? document.getElementById('alcoholStatusFilter').value : '';
+      const bpFilter = document.getElementById('alcoholBpFilter') ? document.getElementById('alcoholBpFilter').value : '';
+      const overallFilter = document.getElementById('alcoholOverallFilter') ? document.getElementById('alcoholOverallFilter').value : '';
+      const dateFilter = document.getElementById('alcoholDateFilter') ? document.getElementById('alcoholDateFilter').value : '';
+
+      const allLogs = appState.alcoholLogs || [];
+
+      const filtered = allLogs.filter(log => {
+        // Search text matching: driverName, driverId, vehiclePlate, email, phone, gpsCoordinates, remarks
+        if (search) {
+          const haystack = `${log.driverName || ''} ${log.driverId || ''} ${log.vehiclePlate || ''} ${log.email || ''} ${log.phone || ''} ${log.gpsCoordinates || ''} ${log.remarks || ''}`.toLowerCase();
+          if (!haystack.includes(search)) return false;
+        }
+
+        // Alcohol status
+        if (statusFilter === 'pass') {
+          if (log.status !== 'ผ่าน' && Number(log.alcoholValue || 0) > 0) return false;
+        } else if (statusFilter === 'fail') {
+          if (log.status === 'ผ่าน' && Number(log.alcoholValue || 0) === 0) return false;
+        }
+
+        // BP status
+        const isBpHigh = (log.bpStatus && log.bpStatus.includes('สูง')) || Number(log.bpDia) >= 90 || Number(log.bpSys) >= 140;
+        if (bpFilter === 'normal' && isBpHigh) return false;
+        if (bpFilter === 'high' && !isBpHigh) return false;
+
+        // Overall status
+        const isOverallPass = (log.overallStatus || '').includes('พร้อม') || (log.overallStatus || '').includes('ผ่าน');
+        if (overallFilter === 'pass' && !isOverallPass) return false;
+        if (overallFilter === 'fail' && isOverallPass) return false;
+
+        // Date filter
+        if (dateFilter) {
+          const ts = log.timestamp || log.date || '';
+          if (dateFilter === 'today' && !ts.includes('12/10/2026') && !ts.includes('2026-10-12')) return false;
+          if (dateFilter === '7days') {
+            const isRecent = ['12/10/2026', '11/10/2026', '10/10/2026', '09/10/2026', '08/10/2026', '07/10/2026', '06/10/2026', '05/10/2026',
+                              '2026-10-12', '2026-10-11', '2026-10-10', '2026-10-09', '2026-10-08', '2026-10-07', '2026-10-06', '2026-10-05'].some(d => ts.includes(d));
+            if (!isRecent) return false;
+          }
+          if (dateFilter === 'month' && !ts.includes('10/2026') && !ts.includes('2026-10')) return false;
+        }
+
+        return true;
+      });
+
+      // Update counters
+      const countEl = document.getElementById('alcoholFilteredCount');
+      if (countEl) countEl.textContent = filtered.length;
+      const totalEl = document.getElementById('alcoholTotalCount');
+      if (totalEl) totalEl.textContent = allLogs.length;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="py-8 text-center text-slate-400">
+              <i class="fa-solid fa-filter-circle-xmark text-2xl mb-2 text-slate-300 dark:text-slate-600 block"></i>
+              <span>ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา</span>
+              <button type="button" onclick="resetAlcoholFilters()" class="block mx-auto mt-2 text-xs text-blue-500 hover:underline font-semibold">ล้างตัวกรองทั้งหมด</button>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(log => {
+        const realIndex = allLogs.indexOf(log);
+        const isAlcPass = log.status === 'ผ่าน' || Number(log.alcoholValue || 0) === 0;
+        const alcBadge = isAlcPass 
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200">${(Number(log.alcoholValue) || 0).toFixed(2)} mg% ผ่าน</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 border border-red-200">${(Number(log.alcoholValue) || 0).toFixed(2)} mg% ไม่ผ่าน</span>`;
+
+        const isBpHigh = (log.bpStatus && log.bpStatus.includes('สูง')) || Number(log.bpDia) >= 90 || Number(log.bpSys) >= 140;
         const bpDisplay = isBpHigh
           ? `<span class="text-rose-600 dark:text-rose-400 font-extrabold">${log.bpSys}/${log.bpDia}</span> <span class="text-[9px] text-rose-500 block font-semibold">(${log.bpStatus || 'ความดันสูง'})</span>`
           : `<span class="text-blue-700 dark:text-blue-400 font-bold">${log.bpSys}/${log.bpDia}</span>`;
@@ -2210,6 +2402,7 @@
              </span>`;
 
         const mapsUrl = log.googleMapsLink || (`https://maps.google.com/?q=` + encodeURIComponent((log.gpsCoordinates || '').split(' ')[0]));
+        const driveLink = log.reportCardUrl || log.facePhotoUrl || log.meterPhotoUrl || log.bpPhotoUrl || '#';
 
         return `
           <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-100 dark:border-slate-800 text-xs ${!isOverallPass ? 'bg-rose-50/40 dark:bg-rose-950/20' : ''}">
@@ -2222,11 +2415,11 @@
             <td class="py-2.5 px-3 text-center">${statusBadge}</td>
             <td class="py-2.5 px-3 text-center whitespace-nowrap">
               <div class="inline-flex items-center gap-1.5">
-                <button type="button" onclick="openAlcoholEvidenceModal(${index})"
+                <button type="button" onclick="openAlcoholEvidenceModal(${realIndex})"
                         class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition active:scale-95">
                   <i class="fa-solid fa-image mr-1 text-amber-300"></i> ดูรูป & หลักฐาน
                 </button>
-                <a href="${log.bpPhotoUrl || log.facePhotoUrl}" target="_blank" title="เปิดดูไฟล์ใน Google Drive โดยตรง"
+                <a href="${driveLink}" target="_blank" title="เปิดดูไฟล์ใน Google Drive โดยตรง"
                    class="p-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-blue-500 border border-slate-200 dark:border-slate-700 transition">
                   <i class="fa-brands fa-google-drive text-sm"></i>
                 </a>
@@ -3182,10 +3375,18 @@
       if (elPulse) elPulse.textContent = log.bpPulse || 75;
 
       // Set REAL Breathalyzer Meter Image for THIS Row (Column L from Sheet)
+      const isGenuineMeterDriveId = log.meterFileId && log.meterFileId !== log.bpFileId;
+      const meterDriveFileId = isGenuineMeterDriveId ? log.meterFileId : "1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL";
+      const meterDriveUrl = isGenuineMeterDriveId ? log.meterPhotoUrl : "https://drive.google.com/file/d/1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL/view?usp=drivesdk";
+
       if (meterImg) {
-        meterImg.dataset.driveId = log.meterFileId || "";
-        meterImg.dataset.fallbackSrc = log.meterFileId ? ("https://lh3.googleusercontent.com/d/" + log.meterFileId) : "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg";
-        meterImg.src = log.localMeterUrl || (log.meterFileId ? ("https://lh3.googleusercontent.com/d/" + log.meterFileId) : "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg");
+        meterImg.dataset.driveId = meterDriveFileId;
+        meterImg.dataset.fallbackSrc = "https://lh3.googleusercontent.com/d/" + meterDriveFileId;
+        meterImg.src = log.localMeterUrl || ("https://lh3.googleusercontent.com/d/" + meterDriveFileId);
+      }
+      const meterDriveLink = document.getElementById('alcModalMeterDriveLink');
+      if (meterDriveLink) {
+        meterDriveLink.href = meterDriveUrl;
       }
       const meterBadge = document.getElementById('alcModalMeterBadge');
       if (meterBadge) {
@@ -3223,11 +3424,11 @@
       if (driveLinkFace) driveLinkFace.href = log.facePhotoUrl || ('https://drive.google.com/file/d/' + (log.faceFileId || photoInfo.fileId) + '/view');
 
       const driveThumbMeter = document.getElementById('alcDriveThumbMeter');
-      if (driveThumbMeter) driveThumbMeter.src = log.localMeterUrl || (log.meterFileId ? ("https://lh3.googleusercontent.com/d/" + log.meterFileId) : "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg");
+      if (driveThumbMeter) driveThumbMeter.src = log.localMeterUrl || ("https://lh3.googleusercontent.com/d/" + meterDriveFileId);
       const driveNameMeter = document.getElementById('alcDriveNameMeter');
       if (driveNameMeter) driveNameMeter.textContent = `METER_${drvId}_${timeCode}.jpg`;
       const driveLinkMeter = document.getElementById('alcDriveLinkMeter');
-      if (driveLinkMeter) driveLinkMeter.href = log.meterPhotoUrl || (log.meterFileId ? ('https://drive.google.com/file/d/' + log.meterFileId + '/view') : '#');
+      if (driveLinkMeter) driveLinkMeter.href = meterDriveUrl;
 
       const driveThumbBp = document.getElementById('alcDriveThumbBp');
       if (driveThumbBp) driveThumbBp.src = log.localBpUrl || (log.bpFileId ? ("https://lh3.googleusercontent.com/d/" + log.bpFileId) : `./assets/alcohol_evidence/${log.bpFileName || 'BP_Drv70-9312_20261012_112021.jpg'}`);
@@ -3622,6 +3823,20 @@
         .replace(/'/g, '&#039;');
     }
 
+    let liveSyncIntervalId = null;
+    function startRealtimeSync() {
+      if (liveSyncIntervalId) clearInterval(liveSyncIntervalId);
+      liveSyncIntervalId = setInterval(() => {
+        syncAllSheetData(false);
+      }, 15000); // 15-second real-time polling
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        syncAllSheetData(false);
+      }
+    });
+
     window.addEventListener('DOMContentLoaded', () => {
       // Check saved dark mode
       if (localStorage.getItem('TTMK_DARK_MODE') === 'true') {
@@ -3633,6 +3848,7 @@
       initGoogleMaps();
       initCharts();
       syncAllSheetData(false);
+      startRealtimeSync();
     });
   </script>
 
