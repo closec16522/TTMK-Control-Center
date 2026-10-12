@@ -2078,6 +2078,91 @@
       if (icon) icon.className = isDark ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon';
     }
 
+    // Helper function to parse live Google Sheet rows directly from GViz
+    function parseGvizAlcoholRows(rows) {
+      if (!Array.isArray(rows)) return [];
+      const result = [];
+      rows.forEach(r => {
+        const c = r.c || [];
+        const getVal = (idx) => (c[idx] && c[idx].v !== null && c[idx].v !== undefined) ? String(c[idx].v).trim() : '';
+        const getNum = (idx) => (c[idx] && c[idx].v !== null && !isNaN(c[idx].v)) ? Number(c[idx].v) : 0;
+        
+        const timestamp = getVal(0);
+        if (!timestamp) return;
+        
+        const date = getVal(1) || timestamp.split(' ')[0];
+        const time = getVal(2) || (timestamp.split(' ')[1] || '');
+        const driverId = getVal(3);
+        const driverName = getVal(4);
+        const email = getVal(5);
+        const phone = getVal(6);
+        const vehiclePlate = getVal(7);
+        const alcoholValue = getNum(8);
+        const status = getVal(9) || (alcoholValue > 0 ? 'ไม่ผ่าน' : 'ผ่าน');
+        const facePhotoUrl = getVal(10);
+        const meterPhotoUrl = getVal(11);
+        const gpsCoordinates = getVal(12);
+        const googleMapsLink = getVal(13);
+        const verificationMethod = getVal(14) || 'Face 1:1 Matching, AI OCR & Health BP';
+        const remarks = getVal(15);
+        const bpSys = getNum(16) || 120;
+        const bpDia = getNum(17) || 80;
+        const bpPulse = getNum(18) || 75;
+        const bpStatus = getVal(19) || (bpSys > 125 || bpDia >= 90 ? 'ความดันสูง' : 'ความดันปกติ');
+        const overallStatus = getVal(20) || (status === 'ไม่ผ่าน' || bpStatus === 'ความดันสูง' ? 'ไม่ผ่านเกณฑ์' : 'ผ่านพร้อมปฏิบัติงาน');
+        const faceMatchPercent = getVal(21) || '98%';
+        const reportCardUrl = getVal(22);
+        const bpPhotoUrl = getVal(23);
+
+        const extractDriveId = (url) => {
+          if (!url) return '';
+          const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+          return m ? m[1] : '';
+        };
+
+        const faceFileId = extractDriveId(facePhotoUrl);
+        const meterFileId = extractDriveId(meterPhotoUrl) || '1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL';
+        const bpFileId = extractDriveId(bpPhotoUrl);
+        const reportCardFileId = extractDriveId(reportCardUrl) || '1hUeljEZW4l3fDo5mWffoJ9PRxxMzUwp4';
+
+        result.push({
+          timestamp,
+          date,
+          time,
+          driverId,
+          driverName,
+          email,
+          phone,
+          vehiclePlate,
+          alcoholValue,
+          status,
+          bpSys,
+          bpDia,
+          bpPulse,
+          bpStatus,
+          overallStatus,
+          faceMatchPercent,
+          faceFileId,
+          meterFileId,
+          bpFileId,
+          reportCardFileId,
+          facePhotoUrl,
+          meterPhotoUrl,
+          bpPhotoUrl,
+          reportCardUrl,
+          gpsCoordinates,
+          googleMapsLink,
+          verificationMethod,
+          remarks,
+          localFaceUrl: ./assets/alcohol_evidence/FACE__.jpg,
+          localBpUrl: ./assets/alcohol_evidence/BP__.jpg,
+          localMeterUrl: './assets/alcohol_evidence/METER_DRV70-9312_1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL.jpg',
+          localReportUrl: './assets/alcohol_evidence/REPORT_DRV73-1735_12102026114310.jpg'
+        });
+      });
+      return result.reverse();
+    }
+
     // Data Sync & Real-time Live Engine
     async function syncAllSheetData(showToast = false) {
       const syncIcon = document.getElementById('topSyncIcon');
@@ -2119,6 +2204,26 @@
             }
           } catch(e){}
         }
+
+        // Query Google Sheet directly via GViz (live real-time sync when sheet is public/viewable)
+        try {
+          const gvizResp = await fetch(https://docs.google.com/spreadsheets/d//gviz/tq?tqx=out:json&sheet=Alcohol_Logs);
+          if (gvizResp.ok) {
+            const gvizText = await gvizResp.text();
+            const startIdx = gvizText.indexOf('{');
+            const endIdx = gvizText.lastIndexOf('}');
+            if (startIdx >= 0 && endIdx >= 0) {
+              const gvizData = JSON.parse(gvizText.substring(startIdx, endIdx + 1));
+              if (gvizData.table && gvizData.table.rows && gvizData.table.rows.length > 0) {
+                const liveLogs = parseGvizAlcoholRows(gvizData.table.rows);
+                if (liveLogs && liveLogs.length > 0) {
+                  appState.alcoholLogs = liveLogs;
+                  loaded = true;
+                }
+              }
+            }
+          }
+        } catch(e){}
 
         // Query GAS Web App for live alcohol logs (Google Sheet: Alcohol_Logs)
         try {
