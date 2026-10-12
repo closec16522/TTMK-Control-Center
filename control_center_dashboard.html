@@ -301,11 +301,25 @@
         <span class="flex-1 text-left">1. ภาพรวม (Overview)</span>
       </button>
 
-      <!-- 2. TSM & ความปลอดภัย Live -->
+      <!-- 2. ศูนย์ตรวจสอบความปลอดภัย TSM Safety Oversight (Executive Overview) -->
       <button onclick="switchTab('tsm')" id="nav-tsm" class="sidebar-item">
-        <i class="fa-solid fa-shield-halved w-5 text-center mr-2 text-red-500"></i>
-        <span class="flex-1 text-left">2. TSM & ความปลอดภัย</span>
-        <span class="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full animate-pulse">Live</span>
+        <i class="fa-solid fa-shield-halved w-5 text-center mr-2 text-blue-600"></i>
+        <span class="flex-1 text-left">2. ภาพรวม TSM Oversight</span>
+        <span class="bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">Executive</span>
+      </button>
+
+      <!-- 2.1 ข้อมูลการตรวจวัดแอลกอฮอล์และความดัน (Alcohol_Logs) -->
+      <button onclick="switchTab('alcohol-logs')" id="nav-alcohol-logs" class="sidebar-item pl-7 text-xs flex items-center group">
+        <i class="fa-solid fa-wine-bottle w-4 text-center mr-2 text-rose-500 group-hover:scale-110 transition"></i>
+        <span class="flex-1 text-left">2.1 แอลกอฮอล์ & ความดัน</span>
+        <span class="bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[9px] font-bold px-1.5 py-0.2 rounded-full">Live</span>
+      </button>
+
+      <!-- 2.2 ข้อมูลการตรวจสอบรถบรรทุก 6 ล้อ (Truck_Inspection_Logs) -->
+      <button onclick="switchTab('truck-logs')" id="nav-truck-logs" class="sidebar-item pl-7 text-xs flex items-center group">
+        <i class="fa-solid fa-truck-ramp-box w-4 text-center mr-2 text-amber-500 group-hover:scale-110 transition"></i>
+        <span class="flex-1 text-left">2.2 ตรวจสภาพรถ 6 ล้อ</span>
+        <span class="bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[9px] font-bold px-1.5 py-0.2 rounded-full">F-CAM</span>
       </button>
 
       <!-- 3. ตั้งเบิก & ค่าน้ำมัน -->
@@ -314,10 +328,10 @@
         <span class="flex-1 text-left">3. ตั้งเบิก & ค่าน้ำมัน</span>
       </button>
 
-      <!-- 4. ข้อมูลกองรถ (ดีเซล/EV) & ข้อมูลคนขับรถ -->
+      <!-- 4. ข้อมูลกองรถ (ดีเซล/EV) & ทะเบียนคนขับรถจริง (ERP) -->
       <button onclick="switchTab('fleet')" id="nav-fleet" class="sidebar-item">
-        <i class="fa-solid fa-truck w-5 text-center mr-2 text-cyan-500"></i>
-        <span class="flex-1 text-left">4. ข้อมูลกองรถ (ดีเซล/EV)</span>
+        <i class="fa-solid fa-truck-front w-5 text-center mr-2 text-cyan-500"></i>
+        <span class="flex-1 text-left">4. กองรถ & พขร. (ERP)</span>
         <span id="sidebarDriverBadge" class="bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[9px] font-bold px-1.5 py-0.2 rounded-full">20</span>
       </button>
 
@@ -648,11 +662,11 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 2: TSM & ความปลอดภัย Live (Dual View: List & Calendar)       -->
+      <!-- TAB 2: ศูนย์ตรวจสอบความปลอดภัย TSM Safety Oversight (Executive Overview) -->
       <!-- ============================================================== -->
       <section id="tab-tsm" class="tab-content space-y-5">
         
-        <!-- Top Toolbar: Title & View Switcher (List vs Calendar) -->
+        <!-- Top Toolbar: TSM Command Center Header -->
         <div class="glass-panel p-4 flex flex-wrap items-center justify-between gap-3">
           <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center shadow-md">
@@ -662,51 +676,215 @@
               <div class="flex items-center gap-2">
                 <h2 class="text-sm md:text-base font-bold text-slate-800 dark:text-white">ศูนย์ตรวจสอบความปลอดภัย TSM Safety Oversight</h2>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                  SCGJWD Active
+                  SCGJWD Active Standards
                 </span>
               </div>
               <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                กำกับดูแลการตรวจวัดแอลกอฮอล์ ตรวจความดันโลหิต และตรวจสอบสภาพรถบรรทุก 6 ล้อ 100%
+                ศูนย์ควบคุมความปลอดภัยระดับบริหาร กำกับดูแลการตรวจวัดแอลกอฮอล์ สุขภาพ พขร. และสภาพรถ 6 ล้อ 100%
               </p>
             </div>
           </div>
 
-          <!-- View Switcher & Drive Folder Buttons -->
+          <!-- Quick Actions & Drive Links -->
           <div class="flex flex-wrap items-center gap-2">
-            <!-- View Mode Switcher -->
-            <div class="flex items-center p-1 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
-              <button type="button" id="tsmListViewBtn" onclick="switchTsmView('list')"
-                      class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm">
-                <i class="fa-solid fa-table-list"></i>
-                <span>ตารางรายการ (List View)</span>
-              </button>
-              <button type="button" id="tsmCalendarViewBtn" onclick="switchTsmView('calendar')"
-                      class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-blue-600">
-                <i class="fa-solid fa-calendar-days text-amber-500"></i>
-                <span>ปฏิทินตรวจรถแยกคัน (Calendar)</span>
-              </button>
-            </div>
+            <button type="button" onclick="syncAllSheetData(true)" class="px-2.5 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 hover:bg-blue-100 text-xs font-semibold border border-blue-200 dark:border-blue-800 transition flex items-center gap-1 shadow-sm">
+              <i class="fa-solid fa-rotate text-xs"></i>
+              <span>ซิงค์ข้อมูล Google Sheet</span>
+            </button>
+            <a href="https://drive.google.com/drive/folders/1tfKH6EOBFdG0c4Wm2MPO-R61NP5mAc0c" target="_blank"
+               class="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 rounded-lg text-xs font-semibold border border-blue-200 dark:border-blue-800 flex items-center gap-1.5 transition">
+              <i class="fa-brands fa-google-drive text-amber-500"></i>
+              <span>Drive แอลกอฮอล์</span>
+            </a>
+            <a href="https://drive.google.com/drive/folders/1ryLhwkO1lnv-2qgLbDDl0XyVaq8S2Szs" target="_blank"
+               class="px-2.5 py-1.5 bg-amber-50 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 hover:bg-amber-100 rounded-lg text-xs font-semibold border border-amber-200 dark:border-amber-800 flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-file-pdf text-red-500"></i>
+              <span>Drive PDF ตรวจรถ</span>
+            </a>
+          </div>
+        </div>
 
-            <!-- Google Drive Direct Folders -->
-            <div class="hidden sm:flex items-center gap-1.5">
-              <a href="https://drive.google.com/drive/folders/1tfKH6EOBFdG0c4Wm2MPO-R61NP5mAc0c" target="_blank"
-                 class="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 rounded-lg text-xs font-semibold border border-blue-200 dark:border-blue-800 flex items-center gap-1.5 transition">
-                <i class="fa-brands fa-google-drive text-amber-500"></i>
-                <span>Drive แอลกอฮอล์</span>
-              </a>
-              <a href="https://drive.google.com/drive/folders/1ryLhwkO1lnv-2qgLbDDl0XyVaq8S2Szs" target="_blank"
-                 class="px-2.5 py-1.5 bg-amber-50 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 hover:bg-amber-100 rounded-lg text-xs font-semibold border border-amber-200 dark:border-amber-800 flex items-center gap-1.5 transition">
-                <i class="fa-solid fa-file-pdf text-red-500"></i>
-                <span>Drive PDF ตรวจรถ</span>
-              </a>
+        <!-- Executive Safety KPI Metrics Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- KPI 1: Alcohol Compliance -->
+          <div class="glass-panel p-4 flex items-center space-x-3 border-l-4 border-l-emerald-500">
+            <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl flex-shrink-0">
+              <i class="fa-solid fa-wine-bottle"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">ตรวจวัดแอลกอฮอล์</span>
+              <div class="flex items-baseline space-x-1 mt-0.5">
+                <span class="text-xl font-black text-slate-900 dark:text-white">0.00</span>
+                <span class="text-xs font-bold text-emerald-600">mg% (100% ผ่าน)</span>
+              </div>
+              <p class="text-[10px] text-slate-400 truncate">เกณฑ์ SCG Zero Tolerance 0.00</p>
+            </div>
+          </div>
+
+          <!-- KPI 2: Driver Health & BP -->
+          <div class="glass-panel p-4 flex items-center space-x-3 border-l-4 border-l-rose-500">
+            <div class="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl flex-shrink-0">
+              <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">ความดัน & สุขภาพ พขร.</span>
+              <div class="flex items-baseline space-x-1 mt-0.5">
+                <span class="text-xl font-black text-slate-900 dark:text-white">94.8%</span>
+                <span class="text-xs font-bold text-emerald-600">ความดันปกติ</span>
+              </div>
+              <p class="text-[10px] text-slate-400 truncate">SYS &lt; 140 / DIA &lt; 90 mmHg</p>
+            </div>
+          </div>
+
+          <!-- KPI 3: Truck Inspection Compliance -->
+          <div class="glass-panel p-4 flex items-center space-x-3 border-l-4 border-l-amber-500">
+            <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl flex-shrink-0">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">ตรวจสภาพรถก่อนวิ่ง</span>
+              <div class="flex items-baseline space-x-1 mt-0.5">
+                <span class="text-xl font-black text-slate-900 dark:text-white">100%</span>
+                <span class="text-xs font-bold text-blue-600">ครบ 15 จุด</span>
+              </div>
+              <p class="text-[10px] text-slate-400 truncate">มาตรฐาน SCG F-CAM-032_r3</p>
+            </div>
+          </div>
+
+          <!-- KPI 4: Fleet Readiness -->
+          <div class="glass-panel p-4 flex items-center space-x-3 border-l-4 border-l-cyan-500">
+            <div class="w-12 h-12 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-xl flex-shrink-0">
+              <i class="fa-solid fa-truck-fast"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">ความพร้อมกองรถ 6 ล้อ</span>
+              <div class="flex items-baseline space-x-1 mt-0.5">
+                <span class="text-xl font-black text-slate-900 dark:text-white">16/18</span>
+                <span class="text-xs font-bold text-emerald-600">คัน (88.9%)</span>
+              </div>
+              <p class="text-[10px] text-slate-400 truncate">พร้อมวิ่งงานทันที (ดีเซล 12 / EV 4)</p>
             </div>
           </div>
         </div>
 
-        <!-- ============================================================== -->
-        <!-- VIEW 1: LIST VIEW (ตารางรายการเดิม ปรับฟอนต์คมชัดและปุ่มเปิด Modal)  -->
-        <!-- ============================================================== -->
-        <div id="tsmListViewContainer" class="space-y-5">
+        <!-- 2 Executive Gateway Navigation Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <!-- Gateway Card 1: Alcohol & BP Module -->
+          <div class="glass-panel p-5 flex flex-col justify-between space-y-4 hover:shadow-lg transition border border-slate-200/80 dark:border-slate-800">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-9 h-9 rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-wine-bottle"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-extrabold text-sm md:text-base text-slate-900 dark:text-white">2.1 ตรวจแอลกอฮอล์ & ความดัน</h3>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400">Alcohol_Logs • 1:1 Face AI OCR</span>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Real-time Live
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                ระบบคัดกรองพนักงานขับรถก่อนเริ่มงาน ยืนยันตัวตนด้วยใบหน้า 1:1 Face Matching, อ่านค่าเครื่องเป่าแอลกอฮอล์ด้วย AI OCR, และบันทึกค่าความดันโลหิต SYS/DIA/Pulse พร้อมเก็บไฟล์หลักฐานภาพถ่าย 4 รูปบน Google Drive แบบเรียลไทม์
+              </p>
+              <div class="grid grid-cols-3 gap-2 pt-1 text-center text-xs">
+                <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">ผลตรวจสะสม</span>
+                  <strong class="text-slate-800 dark:text-slate-100">46+ เที่ยว</strong>
+                </div>
+                <div class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900">
+                  <span class="text-[10px] text-emerald-600 block">แอลกอฮอล์</span>
+                  <strong class="text-emerald-700 dark:text-emerald-300">0.00 mg%</strong>
+                </div>
+                <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900">
+                  <span class="text-[10px] text-blue-600 block">ภาพถ่าย 4 รูป</span>
+                  <strong class="text-blue-700 dark:text-blue-300">ครบ 100%</strong>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" onclick="switchTab('alcohol-logs')"
+                    class="w-full py-2.5 px-4 bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition transform active:scale-98">
+              <span>เข้าสู่ตารางตรวจแอลกอฮอล์ & ดูหลักฐาน 4 รูป</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+          <!-- Gateway Card 2: Truck Inspection Module -->
+          <div class="glass-panel p-5 flex flex-col justify-between space-y-4 hover:shadow-lg transition border border-slate-200/80 dark:border-slate-800">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-extrabold text-sm md:text-base text-slate-900 dark:text-white">2.2 ตรวจสอบสภาพรถ 6 ล้อ</h3>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400">Truck_Inspection_Logs • SCG F-CAM-032_r3</span>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30">
+                  SCG Certified
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                ระบบตรวจเช็กสภาพความปลอดภัยรถบรรทุก 6 ล้อ ทั้งชนิดตู้ทึบ คอก และรถบรรทุกไฟฟ้า EV ครอบคลุม 15 รายการสำคัญ (ยาง, ลมยาง, เบรก, ระบบไฟ, ใบปัดน้ำฝน, ความสะอาดตู้) พร้อมออกเอกสารรับรอง PDF และปฏิทินตรวจประจำเดือน
+              </p>
+              <div class="grid grid-cols-3 gap-2 pt-1 text-center text-xs">
+                <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">รายการตรวจ</span>
+                  <strong class="text-slate-800 dark:text-slate-100">15 จุดมาตรฐาน</strong>
+                </div>
+                <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900">
+                  <span class="text-[10px] text-blue-600 block">ผ่านเกณฑ์</span>
+                  <strong class="text-blue-700 dark:text-blue-300">100% สมบูรณ์</strong>
+                </div>
+                <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900">
+                  <span class="text-[10px] text-amber-600 block">เอกสาร PDF</span>
+                  <strong class="text-amber-700 dark:text-amber-300">แนบทุกเที่ยว</strong>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" onclick="switchTab('truck-logs')"
+                    class="w-full py-2.5 px-4 bg-gradient-to-r from-amber-600 to-blue-600 hover:from-amber-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition transform active:scale-98">
+              <span>เข้าสู่ตารางตรวจสภาพรถ & ปฏิทินรายเดือน</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- TSM Zero Accident Standard Banner -->
+        <div class="glass-panel p-4 md:p-5 bg-gradient-to-r from-blue-950/90 via-slate-900 to-indigo-950 text-white rounded-2xl border border-blue-800/40 shadow-lg">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-start space-x-3.5">
+              <div class="w-12 h-12 rounded-xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center text-blue-300 text-2xl flex-shrink-0 shadow-inner">
+                <i class="fa-solid fa-medal"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold text-sm md:text-base text-white">นโยบายความปลอดภัยสูงสุด Zero Accident & SCGJWD Compliance</h4>
+                <p class="text-xs text-blue-200/90 mt-1 max-w-2xl leading-relaxed">
+                  พนักงานขับรถทุกท่านต้องผ่านการตรวจวัดระดับแอลกอฮอล์ในลมหายใจ 0.00 mg% และตรวจวัดความดันโลหิตพร้อมบันทึกภาพถ่าย 4 รูปหลักฐานเข้าสู่ระบบ และทำการตรวจสอบสภาพรถ 15 รายการก่อนหมุนล้อทุกครั้ง เพื่อความปลอดภัยสูงสุดของสินค้าและผู้ใช้ทาง
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button type="button" onclick="openMonthlyReportModal()" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold border border-white/20 transition flex items-center gap-1.5 backdrop-blur-sm">
+                <i class="fa-solid fa-file-contract text-amber-400"></i>
+                <span>รายงานภาพรวม F-CAM</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 2.1: ข้อมูลการตรวจวัดแอลกอฮอล์และความดัน (Alcohol_Logs)      -->
+      <!-- ============================================================== -->
+      <section id="tab-alcohol-logs" class="tab-content space-y-5">
           
           <!-- Sub-section 1: Alcohol & BP Logs -->
           <div class="glass-panel p-5 space-y-4">
@@ -821,10 +999,59 @@
                   <!-- Rendered dynamically -->
                 </tbody>
               </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 2.2: ข้อมูลการตรวจสอบรถบรรทุก 6 ล้อ (Truck_Inspection_Logs) -->
+      <!-- ============================================================== -->
+      <section id="tab-truck-logs" class="tab-content space-y-5">
+        
+        <!-- Top Toolbar: View Switcher (List vs Calendar) -->
+        <div class="glass-panel p-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-blue-600 text-white flex items-center justify-center shadow-md">
+              <i class="fa-solid fa-truck-ramp-box text-lg"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm md:text-base font-bold text-slate-800 dark:text-white">ข้อมูลการตรวจสอบสภาพรถบรรทุก 6 ล้อ (Truck_Inspection_Logs)</h2>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
+                  SCG F-CAM-032_r3
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                แบบฟอร์มตรวจสอบความปลอดภัย 15 รายการ พร้อมไฟล์รับรอง PDF และมุมมองปฏิทินตรวจประจำเดือน
+              </p>
             </div>
           </div>
 
-          <!-- Sub-section 2: Truck Inspection Logs -->
+          <!-- View Switcher & Drive Folder Buttons -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center p-1 bg-slate-100 dark:bg-slate-800/90 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+              <button type="button" id="tsmListViewBtn" onclick="switchTsmView('list')"
+                      class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm">
+                <i class="fa-solid fa-table-list"></i>
+                <span>ตารางรายการ (List View)</span>
+              </button>
+              <button type="button" id="tsmCalendarViewBtn" onclick="switchTsmView('calendar')"
+                      class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-blue-600">
+                <i class="fa-solid fa-calendar-days text-amber-500"></i>
+                <span>ปฏิทินตรวจรถแยกคัน (Calendar)</span>
+              </button>
+            </div>
+
+            <a href="https://drive.google.com/drive/folders/1ryLhwkO1lnv-2qgLbDDl0XyVaq8S2Szs" target="_blank"
+               class="px-2.5 py-1.5 bg-amber-50 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 hover:bg-amber-100 rounded-lg text-xs font-semibold border border-amber-200 dark:border-amber-800 flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-file-pdf text-red-500"></i>
+              <span>Drive PDF ตรวจรถ</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- VIEW 1: LIST VIEW -->
+        <div id="tsmListViewContainer" class="space-y-5">
           <div class="glass-panel p-5 space-y-4">
             <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
               <div>
@@ -1033,22 +1260,190 @@
       </section>
 
       <!-- ============================================================== -->
-      <!-- TAB 4: ข้อมูลกองรถ (ดีเซล/EV) & ทะเบียนคนขับ (Registered_Drivers)-->
+      <!-- TAB 4: ข้อมูลกองรถ (ดีเซล/EV) & ทะเบียนคนขับรถจริง (Enterprise ERP)-->
       <!-- ============================================================== -->
       <section id="tab-fleet" class="tab-content space-y-5">
-        <div class="glass-panel p-5 space-y-4">
+        
+        <!-- ERP Header Panel -->
+        <div class="glass-panel p-4 md:p-5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-700 text-white flex items-center justify-center shadow-md">
+              <i class="fa-solid fa-truck-front text-lg"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm md:text-base font-bold text-slate-800 dark:text-white">
+                  ระบบบริหารจัดการกองรถและทะเบียนพนักงานขับรถ (Enterprise ERP Fleet Portal)
+                </h2>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-100 dark:bg-cyan-950/60 text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-800">
+                  ERP Master Data
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                ศูนย์จัดการข้อมูลกองรถบรรทุก 6 ล้อ (ดีเซล B7 / 100% EV) ทะเบียน พขร. และสถานะการเดินรถแบบเรียลไทม์
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="exportErpVehiclesCsv()"
+                    class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-file-csv text-emerald-600"></i>
+              <span>ส่งออก CSV</span>
+            </button>
+            <button type="button" onclick="openErpVehicleModal()"
+                    class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-700 to-indigo-600 hover:from-blue-800 hover:to-indigo-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow">
+              <i class="fa-solid fa-plus"></i>
+              <span>เพิ่มรถบรรทุกใหม่</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ERP KPI Metric Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div class="glass-panel p-3.5 border-l-4 border-l-blue-600">
+            <span class="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">กองรถ 6 ล้อทั้งหมด</span>
+            <div class="flex items-baseline space-x-1.5 mt-0.5">
+              <span id="erpTotalVehiclesCount" class="text-xl font-black text-slate-900 dark:text-white">18</span>
+              <span class="text-[11px] font-bold text-blue-600">คัน (ดีเซล 14 / EV 4)</span>
+            </div>
+            <span class="text-[10px] text-slate-400 truncate block mt-0.5">ทะเบียนบรรทุกมาตรฐาน</span>
+          </div>
+
+          <div class="glass-panel p-3.5 border-l-4 border-l-cyan-500">
+            <span class="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">รถบรรทุกไฟฟ้า 100% EV</span>
+            <div class="flex items-baseline space-x-1.5 mt-0.5">
+              <span id="erpEvVehiclesCount" class="text-xl font-black text-slate-900 dark:text-white">4</span>
+              <span class="text-[11px] font-bold text-cyan-600">คัน (22.2%)</span>
+            </div>
+            <span class="text-[10px] text-slate-400 truncate block mt-0.5">ประหยัดพลังงาน & Zero Emission</span>
+          </div>
+
+          <div class="glass-panel p-3.5 border-l-4 border-l-emerald-500">
+            <span class="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">สถานะพร้อมวิ่งงาน</span>
+            <div class="flex items-baseline space-x-1.5 mt-0.5">
+              <span id="erpReadyVehiclesCount" class="text-xl font-black text-slate-900 dark:text-white">16</span>
+              <span class="text-[11px] font-bold text-emerald-600">คัน (88.9%)</span>
+            </div>
+            <span class="text-[10px] text-slate-400 truncate block mt-0.5">ซ่อมบำรุงประจำรอบ 2 คัน</span>
+          </div>
+
+          <div class="glass-panel p-3.5 border-l-4 border-l-indigo-500">
+            <span class="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">พนักงานขับรถจริง (พขร.)</span>
+            <div class="flex items-baseline space-x-1.5 mt-0.5">
+              <span id="erpTotalDriversCount" class="text-xl font-black text-slate-900 dark:text-white">20</span>
+              <span class="text-[11px] font-bold text-indigo-600">ท่าน (Face 1:1: 17)</span>
+            </div>
+            <span class="text-[10px] text-slate-400 truncate block mt-0.5">ลงทะเบียน Face Match 85%</span>
+          </div>
+        </div>
+
+        <!-- ERP Sub-tab Switcher (Vehicles vs Drivers) -->
+        <div class="flex items-center p-1.5 bg-slate-200/70 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 w-fit text-xs font-bold">
+          <button type="button" id="erpTabVehiclesBtn" onclick="switchErpFleetTab('vehicles')"
+                  class="px-4 py-2 rounded-xl transition flex items-center gap-2 bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 shadow-sm">
+            <i class="fa-solid fa-truck"></i>
+            <span>1. ทะเบียนกองรถ 6 ล้อ (ดีเซล / 100% EV)</span>
+            <span id="erpVehiclesBadge" class="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">18</span>
+          </button>
+          <button type="button" id="erpTabDriversBtn" onclick="switchErpFleetTab('drivers')"
+                  class="px-4 py-2 rounded-xl transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600">
+            <i class="fa-solid fa-users"></i>
+            <span>2. ทะเบียนพนักงานขับรถจริง (Driver Master Data)</span>
+            <span id="erpDriversBadge" class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300">20</span>
+          </button>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- SUB-PANEL 1: ทะเบียนกองรถ 6 ล้อ (ดีเซล / EV)                     -->
+        <!-- ============================================================== -->
+        <div id="erpVehiclesPanel" class="glass-panel p-5 space-y-4">
+          <!-- Toolbar -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <h3 class="font-bold text-sm md:text-base text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-truck-moving text-blue-600"></i>
+                <span>ทะเบียนกองรถ 6 ล้อ TTMK Fleet Master</span>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                แสดงข้อมูลสเปกเครื่องยนต์, ระบบขับเคลื่อน, ระยะทางสะสม, และสถานะการเดินรถ
+              </p>
+            </div>
+
+            <!-- Vehicle Filters Bar -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <!-- Search Input -->
+              <div class="relative w-48 sm:w-60">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                <input type="text" id="erpVehicleSearchInput" oninput="filterErpVehicles()"
+                       placeholder="ค้นหาทะเบียน, ยี่ห้อ, พขร., รหัส..."
+                       class="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs shadow-sm" />
+              </div>
+
+              <!-- Fuel Type Filter -->
+              <select id="erpVehicleFuelFilter" onchange="filterErpVehicles()"
+                      class="py-1.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs outline-none shadow-sm">
+                <option value="">ทุกประเภทเชื้อเพลิง</option>
+                <option value="EV">⚡ 100% EV ไฟฟ้า</option>
+                <option value="Diesel">⛽ ดีเซล B7 Euro 5</option>
+              </select>
+
+              <!-- Status Filter -->
+              <select id="erpVehicleStatusFilter" onchange="filterErpVehicles()"
+                      class="py-1.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs outline-none shadow-sm">
+                <option value="">ทุกสถานะความพร้อม</option>
+                <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
+                <option value="กำลังวิ่งงาน">กำลังวิ่งงาน</option>
+                <option value="ซ่อมบำรุง">ซ่อมบำรุง</option>
+              </select>
+
+              <button type="button" onclick="openErpVehicleModal()"
+                      class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-plus"></i>
+                <span>เพิ่มรถ</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Vehicles Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+              <thead class="bg-slate-100/80 dark:bg-slate-800 text-slate-700 dark:text-slate-200 uppercase font-bold text-[11px] border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th class="py-2.5 px-3">รหัสรถ (Fleet ID)</th>
+                  <th class="py-2.5 px-3">ทะเบียนรถ & จังหวัด</th>
+                  <th class="py-2.5 px-3">ยี่ห้อ / รุ่น / ตู้</th>
+                  <th class="py-2.5 px-3 text-center">พลังงาน / เชื้อเพลิง</th>
+                  <th class="py-2.5 px-3">พนักงานขับรถประจำ</th>
+                  <th class="py-2.5 px-3 text-right">เลขไมล์สะสม</th>
+                  <th class="py-2.5 px-3 text-center">สถานะ</th>
+                  <th class="py-2.5 px-3 text-right">การจัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="erpVehiclesTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- SUB-PANEL 2: ทะเบียนพนักงานขับรถจริง (Driver Master Data)        -->
+        <!-- ============================================================== -->
+        <div id="erpDriversPanel" class="hidden glass-panel p-5 space-y-4">
+          <!-- Toolbar -->
           <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-3">
             <div>
               <div class="flex items-center space-x-2">
                 <i class="fa-solid fa-users-gear text-indigo-600 text-lg"></i>
-                <h3 class="font-bold text-base text-slate-800 dark:text-white">ทะเบียนพนักงานขับรถจริง (Registered_Drivers)</h3>
+                <h3 class="font-bold text-base text-slate-800 dark:text-white">ทะเบียนพนักงานขับรถจริง (Driver Master Data)</h3>
               </div>
               <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 ดึงข้อมูลจริงจาก Google Sheet ID: <code>1JM-i8_nrGR7-VDEY82QZ5l5JMJTIBOIsuqOSQSrcD3Y</code>
               </p>
             </div>
 
-            <div class="flex items-center flex-wrap gap-2">
+            <div class="flex items-center flex-wrap gap-2 text-xs">
               <input type="text" id="driverSearchInput" onkeyup="filterDriversTable()"
                      placeholder="ค้นหาชื่อ, เบอร์โทร, ทะเบียน..."
                      class="px-3 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 outline-none w-48 sm:w-60">
@@ -1061,10 +1456,16 @@
                 <option value="แผนกขนส่งภาคเหนือ">ขนส่งภาคเหนือ</option>
               </select>
 
+              <button type="button" onclick="openErpDriverModal()"
+                      class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+                <i class="fa-solid fa-user-plus"></i>
+                <span>เพิ่ม พขร.</span>
+              </button>
+
               <a href="./Alcohol/register.html" target="_blank"
                  class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
-                <i class="fa-solid fa-user-plus"></i>
-                <span>ลงทะเบียนใหม่</span>
+                <i class="fa-solid fa-camera"></i>
+                <span>ลงทะเบียน Face 1:1</span>
               </a>
             </div>
           </div>
@@ -1078,7 +1479,7 @@
                   <th class="py-2.5 px-3">ชื่อ-นามสกุล</th>
                   <th class="py-2.5 px-3">อีเมล</th>
                   <th class="py-2.5 px-3">เบอร์โทรศัพท์</th>
-                  <th class="py-2.5 px-3">ทะเบียนรถ</th>
+                  <th class="py-2.5 px-3">ทะเบียนรถประจำ</th>
                   <th class="py-2.5 px-3">แผนก</th>
                   <th class="py-2.5 px-3 text-center">รูปต้นแบบ 1:1</th>
                   <th class="py-2.5 px-3 text-center">สถานะ</th>
@@ -1091,6 +1492,7 @@
             </table>
           </div>
         </div>
+
       </section>
 
       <!-- ============================================================== -->
@@ -1198,6 +1600,259 @@
 
     </div>
   </main>
+
+  <!-- ============================================================== -->
+  <!-- ERP MODAL 1: เพิ่ม / แก้ไขข้อมูลรถบรรทุก 6 ล้อ (Add/Edit Vehicle)  -->
+  <!-- ============================================================== -->
+  <div id="erpVehicleModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-panel max-w-lg w-full p-5 sm:p-6 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl my-auto">
+      <button type="button" onclick="closeErpVehicleModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center space-x-3 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg shadow-sm">
+          <i class="fa-solid fa-truck"></i>
+        </div>
+        <div>
+          <h3 id="erpVehicleModalTitle" class="font-bold text-base text-slate-900 dark:text-white">เพิ่มรถบรรทุก 6 ล้อใหม่</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">บันทึกข้อมูลรถบรรทุกเข้าสู่ระบบ ERP Fleet Master</p>
+        </div>
+      </div>
+
+      <form id="erpVehicleForm" onsubmit="event.preventDefault(); saveErpVehicleFromModal();" class="space-y-3.5 text-xs">
+        <input type="hidden" id="erpVehicleEditIndex" value="-1">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">รหัสยานพาหนะ (Fleet ID) *</label>
+            <input type="text" id="erpVehicleIdInput" required placeholder="เช่น TTMK-EV-05"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">ชนิดพลังงาน / เชื้อเพลิง *</label>
+            <select id="erpVehicleFuelTypeInput" required
+                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="EV">⚡ 100% EV ไฟฟ้า</option>
+              <option value="Diesel">⛽ ดีเซล B7 Euro 5</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">เลขทะเบียนรถ *</label>
+            <input type="text" id="erpVehiclePlateInput" required placeholder="เช่น 73-1735"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">จังหวัดป้ายทะเบียน</label>
+            <input type="text" id="erpVehicleProvinceInput" placeholder="เช่น สระบุรี หรือ กทม."
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">ยี่ห้อ / รุ่น</label>
+            <input type="text" id="erpVehicleBrandInput" placeholder="เช่น BYD T8 หรือ ISUZU Forward"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">ประเภทตัวถัง / ตู้บรรทุก</label>
+            <select id="erpVehicleTypeInput"
+                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="รถบรรทุก 6 ล้อตู้ทึบ EV">6 ล้อตู้ทึบ EV</option>
+              <option value="รถบรรทุก 6 ล้อตู้ทึบ">6 ล้อตู้ทึบ (ดีเซล)</option>
+              <option value="รถบรรทุก 6 ล้อคอกผ้าใบ EV">6 ล้อคอกผ้าใบ EV</option>
+              <option value="รถบรรทุก 6 ล้อคอก">6 ล้อคอก (ดีเซล)</option>
+              <option value="รถบรรทุก 6 ล้อตู้แห้ง EV">6 ล้อตู้แห้ง EV</option>
+              <option value="รถบรรทุก 6 ล้อตู้แห้ง">6 ล้อตู้แห้ง (ดีเซล)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">สเปกเครื่องยนต์ / มอเตอร์ / แบตเตอรี่</label>
+          <input type="text" id="erpVehicleEngineInput" placeholder="เช่น Electric Motor 180kW (CATL 255kWh)"
+                 class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">พนักงานขับรถประจำ</label>
+            <input type="text" id="erpVehicleDriverInput" placeholder="ชื่อผู้ขับ หรือเว้นว่าง"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">เลขไมล์ปัจจุบัน (กม.)</label>
+            <input type="number" id="erpVehicleOdoInput" placeholder="เช่น 48250"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">สถานะความพร้อม</label>
+            <select id="erpVehicleStatusInput"
+                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="พร้อมใช้งาน">🟢 พร้อมใช้งาน</option>
+              <option value="กำลังวิ่งงาน">🔵 กำลังวิ่งงาน</option>
+              <option value="ซ่อมบำรุง">🟠 ซ่อมบำรุง</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">พิกัด GPS (lat, lng)</label>
+            <input type="text" id="erpVehicleLocationInput" placeholder="เช่น 14.583573, 100.973791"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <div class="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeErpVehicleModal()"
+                  class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">
+            ยกเลิก
+          </button>
+          <button type="submit"
+                  class="px-5 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition shadow">
+            บันทึกข้อมูลรถ
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ERP MODAL 2: ดูสเปกและข้อมูลทางเทคนิครถ (Vehicle Technical Spec) -->
+  <!-- ============================================================== -->
+  <div id="erpVehicleSpecModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-panel max-w-lg w-full p-5 sm:p-6 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl my-auto">
+      <button type="button" onclick="closeErpVehicleSpecModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center space-x-3 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div id="specModalIcon" class="w-12 h-12 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-xl shadow-sm">
+          <i class="fa-solid fa-truck"></i>
+        </div>
+        <div>
+          <h3 id="specModalPlate" class="font-bold text-base text-slate-900 dark:text-white">ทะเบียนรถ</h3>
+          <p id="specModalFleetId" class="text-xs text-blue-600 dark:text-blue-400 font-mono font-bold">รหัสยานพาหนะ</p>
+        </div>
+      </div>
+
+      <div class="space-y-2.5 text-xs bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+        <div class="flex justify-between"><span class="text-slate-500">ยี่ห้อ / รุ่น:</span><strong id="specModalBrand" class="text-slate-800 dark:text-white">-</strong></div>
+        <div class="flex justify-between"><span class="text-slate-500">ประเภทตัวถัง:</span><span id="specModalType" class="text-slate-800 dark:text-white">-</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">ระบบพลังงาน:</span><span id="specModalFuel" class="font-bold">-</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">เครื่องยนต์ / มอเตอร์:</span><span id="specModalEngine" class="text-slate-800 dark:text-white">-</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">ผู้ขับประจำ:</span><strong id="specModalDriver" class="text-slate-800 dark:text-white">-</strong></div>
+        <div class="flex justify-between"><span class="text-slate-500">เลขไมล์สะสม:</span><strong id="specModalOdo" class="text-blue-600 font-bold font-mono">-</strong></div>
+        <div class="flex justify-between"><span class="text-slate-500">สถานะความพร้อม:</span><span id="specModalStatus" class="font-bold">-</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">พิกัด GPS ประจำคัน:</span><span id="specModalLocation" class="text-slate-600 dark:text-slate-300 font-mono">-</span></div>
+      </div>
+
+      <div class="mt-5 flex gap-2.5">
+        <a id="specModal3dBtn" href="./CheckTruck/index.html" target="_blank"
+           class="flex-1 py-2.5 text-center text-xs font-bold rounded-xl bg-gradient-to-r from-amber-600 to-blue-600 hover:from-amber-700 hover:to-blue-700 text-white shadow transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-cube"></i>
+          <span>ตรวจสภาพรถ 3D CheckTruck</span>
+        </a>
+        <button type="button" onclick="closeErpVehicleSpecModal()"
+                class="px-5 py-2.5 text-xs font-semibold rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-300 transition">
+          ปิด
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- ERP MODAL 3: เพิ่ม / แก้ไขข้อมูลพนักงานขับรถ (Add/Edit Driver)    -->
+  <!-- ============================================================== -->
+  <div id="erpDriverModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-panel max-w-lg w-full p-5 sm:p-6 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl my-auto">
+      <button type="button" onclick="closeErpDriverModal()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center space-x-3 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg shadow-sm">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <div>
+          <h3 id="erpDriverModalTitle" class="font-bold text-base text-slate-900 dark:text-white">เพิ่มข้อมูลพนักงานขับรถ</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">บันทึกข้อมูล พขร. เข้าสู่ฐานข้อมูลระบบขนส่งมงคล</p>
+        </div>
+      </div>
+
+      <form id="erpDriverForm" onsubmit="event.preventDefault(); saveErpDriverFromModal();" class="space-y-3.5 text-xs">
+        <input type="hidden" id="erpDriverEditId" value="">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">รหัส พขร. *</label>
+            <input type="text" id="erpDriverIdInput" required placeholder="เช่น DRV-021"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500 font-mono">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">สถานะการทำงาน *</label>
+            <select id="erpDriverStatusInput" required
+                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="ACTIVE">ACTIVE (ปฏิบัติงานปกติ)</option>
+              <option value="INACTIVE">INACTIVE (พักงาน/ลาออก)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">ชื่อ - นามสกุล *</label>
+          <input type="text" id="erpDriverNameInput" required placeholder="เช่น นายสมคิด จิตดี"
+                 class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">เบอร์โทรศัพท์ *</label>
+            <input type="tel" id="erpDriverPhoneInput" required placeholder="เช่น 081-2345678"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500 font-mono">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">อีเมล</label>
+            <input type="email" id="erpDriverEmailInput" placeholder="เช่น somkid@gmail.com"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">ทะเบียนรถประจำ</label>
+            <input type="text" id="erpDriverPlateInput" placeholder="เช่น 73-1735"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500 font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">แผนกงาน</label>
+            <select id="erpDriverDeptInput"
+                    class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="แผนกขนส่งด่วนพิเศษ">แผนกขนส่งด่วนพิเศษ</option>
+              <option value="แผนกขนส่งสินค้าทั่วไป">แผนกขนส่งสินค้าทั่วไป</option>
+              <option value="แผนกขนส่งภาคเหนือ">แผนกขนส่งภาคเหนือ</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeErpDriverModal()"
+                  class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 transition">
+            ยกเลิก
+          </button>
+          <button type="submit"
+                  class="px-5 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition shadow">
+            บันทึกข้อมูล พขร.
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Driver Details Modal -->
   <div id="driverModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -2037,16 +2692,20 @@
       drivers: [],
       alcoholLogs: [],
       truckLogs: [],
+      vehicles: [],
       currentTab: 'overview',
       leafletMap: null,
-      mapTileLayer: null
+      mapTileLayer: null,
+      fleetMarkersLayer: null
     };
 
     const TAB_TITLES = {
       overview: 'ภาพรวมระบบขนส่ง (Overview)',
-      tsm: 'TSM Safety Oversight & ผลตรวจแอลกอฮอล์/รถบรรทุก',
+      tsm: 'ศูนย์ตรวจสอบความปลอดภัย TSM Safety Oversight (Executive Overview)',
+      'alcohol-logs': 'ข้อมูลการตรวจวัดแอลกอฮอล์และความดัน (Alcohol_Logs 1:1 Face Match)',
+      'truck-logs': 'ข้อมูลการตรวจสอบรถบรรทุก 6 ล้อ (Truck_Inspection_Logs F-CAM-032_r3)',
       billing: 'ตั้งเบิก, รายได้ & ตรวจสอบค่าน้ำมัน (Fuel Fraud Shield)',
-      fleet: 'ข้อมูลกองรถ 6 ล้อ (ดีเซล/EV) & ทะเบียนคนขับรถจริง',
+      fleet: 'ข้อมูลกองรถ 6 ล้อ (ดีเซล/EV) & ทะเบียนคนขับรถจริง (Enterprise ERP)',
       esg: 'การจัดการพลังงานและลดคาร์บอน (ESG & Green Logistics)',
       dispatch: 'ปฏิทินจัดคิวและกระจายเที่ยววิ่ง (Visual Dispatch Calendar)',
       driver: 'Mobile Driver App Simulator (POD สำหรับคนขับ)',
@@ -2081,9 +2740,12 @@
         // Close mobile drawer if open
         toggleMobileSidebar(false);
 
-        // Map size invalidation on next compositor frame
+        // Map size invalidation and live markers update on compositor frame
         if (tabName === 'overview' && appState.leafletMap) {
-          requestAnimationFrame(() => appState.leafletMap.invalidateSize());
+          requestAnimationFrame(() => {
+            appState.leafletMap.invalidateSize();
+            if (typeof renderLiveFleetMap === 'function') renderLiveFleetMap();
+          });
         }
       });
     }
@@ -2356,7 +3018,491 @@
       }
     }
 
+    // =========================================================================
+    // ERP FLEET & DRIVER MASTER DATA ENGINE
+    // Enterprise vehicle management (14 Diesel / 4 EV 100%) and CRUD handlers
+    // =========================================================================
+    const DEFAULT_FLEET_VEHICLES = [
+      { fleetId: 'TTMK-EV-01', plate: '73-1735', province: 'สระบุรี', brand: 'BYD T8', type: 'รถบรรทุก 6 ล้อตู้ทึบ EV', fuelType: 'EV', engine: 'Electric Motor 180kW (CATL 255kWh)', driver: 'พิศมัย พลเยี่ยม', odo: 48250, status: 'พร้อมใช้งาน', location: '14.583573, 100.973791' },
+      { fleetId: 'TTMK-EV-02', plate: '72-8297', province: 'สระบุรี', brand: 'BYD T8', type: 'รถบรรทุก 6 ล้อคอกผ้าใบ EV', fuelType: 'EV', engine: 'Electric Motor 180kW (CATL 255kWh)', driver: 'วิทวัส สอนพรม', odo: 52100, status: 'กำลังวิ่งงาน', location: '13.692567, 99.928439' },
+      { fleetId: 'TTMK-EV-03', plate: '72-5079', province: 'สระบุรี', brand: 'NEX Point', type: 'รถบรรทุก 6 ล้อตู้แห้ง EV', fuelType: 'EV', engine: 'Electric Motor 160kW (BYD Blade 220kWh)', driver: 'ทรงวุฒิ ฉวีรัมย์', odo: 39180, status: 'พร้อมใช้งาน', location: '13.720240, 99.894002' },
+      { fleetId: 'TTMK-EV-04', plate: '61-5463', province: 'กทม.', brand: 'NEX Point', type: 'รถบรรทุก 6 ล้อตู้ทึบ EV', fuelType: 'EV', engine: 'Electric Motor 160kW (BYD Blade 220kWh)', driver: 'วิวัฒน์ อุ่นสว่าง', odo: 28400, status: 'พร้อมใช้งาน', location: '13.7563, 100.5018' },
+      { fleetId: 'TTMK-DSL-01', plate: '70-8899', province: 'กทม.', brand: 'ISUZU Forward', type: 'รถบรรทุก 6 ล้อตู้ทึบ', fuelType: 'Diesel', engine: 'ISUZU 4HK1-TCS 210PS Euro 5', driver: 'ทวีศักดิ์ คำปก', odo: 168400, status: 'พร้อมใช้งาน', location: '13.7563, 100.5018' },
+      { fleetId: 'TTMK-DSL-02', plate: '70-9312', province: 'กทม.', brand: 'HINO 500', type: 'รถบรรทุก 6 ล้อคอก', fuelType: 'Diesel', engine: 'HINO J08E-WD 240PS Euro 5', driver: 'อรรถพล ยอดสิงห์', odo: 142100, status: 'กำลังวิ่งงาน', location: '13.652611, 100.273830' },
+      { fleetId: 'TTMK-DSL-03', plate: '72-1979', province: 'สระบุรี', brand: 'ISUZU Forward', type: 'รถบรรทุก 6 ล้อตู้ทึบ', fuelType: 'Diesel', engine: 'ISUZU FTR 240PS Euro 5', driver: 'ดุรงค์ฤทธิ์ สำเลิศ', odo: 155300, status: 'พร้อมใช้งาน', location: '13.550160, 100.335959' },
+      { fleetId: 'TTMK-DSL-04', plate: '72-8139', province: 'สระบุรี', brand: 'ISUZU Forward', type: 'รถบรรทุก 6 ล้อตู้แห้ง', fuelType: 'Diesel', engine: 'ISUZU FTR 240PS Euro 5', driver: 'สมร มหาพันธ์', odo: 139800, status: 'พร้อมใช้งาน', location: '13.668866, 100.085465' },
+      { fleetId: 'TTMK-DSL-05', plate: '8กส1201', province: 'กทม.', brand: 'HINO FC9J', type: 'รถบรรทุก 6 ล้อตู้ทึบ', fuelType: 'Diesel', engine: 'HINO FC9J 210PS', driver: 'นิชานันท์ เอื้อจิรพรชัย', odo: 112500, status: 'พร้อมใช้งาน', location: '13.6900, 100.7501' },
+      { fleetId: 'TTMK-DSL-06', plate: '70-5544', province: 'กทม.', brand: 'ISUZU Forward', type: 'รถบรรทุก 6 ล้อตู้ทึบ', fuelType: 'Diesel', engine: 'ISUZU FTR 240PS', driver: 'สมชาย วงศ์สวัสดิ์', odo: 178200, status: 'กำลังวิ่งงาน', location: '15.6987, 100.1220' },
+      { fleetId: 'TTMK-DSL-07', plate: '72-3189', province: 'ชลบุรี', brand: 'HINO Victor', type: 'รถบรรทุก 6 ล้อคอก', fuelType: 'Diesel', engine: 'HINO Victor 240PS', driver: 'สุรชัย หงษา', odo: 145000, status: 'พร้อมใช้งาน', location: '13.0827, 100.8800' },
+      { fleetId: 'TTMK-DSL-08', plate: '71-6543', province: 'อยุธยา', brand: 'ISUZU Forward', type: 'รถบรรทุก 6 ล้อตู้ทึบ', fuelType: 'Diesel', engine: 'ISUZU FTR 240PS', driver: 'ธนวัฒน์ ใจดี', odo: 124300, status: 'พร้อมใช้งาน', location: '14.3532, 100.5684' },
+      { fleetId: 'TTMK-DSL-09', plate: '73-2415', province: 'สระบุรี', brand: 'ISUZU Forward', type: 'รถบรรทุก 6 ล้อตู้ทึบ', fuelType: 'Diesel', engine: 'ISUZU FTR 240PS', driver: 'ธีระพงษ์ ศรีสุข', odo: 161200, status: 'ซ่อมบำรุง', location: '14.5289, 100.9101' },
+      { fleetId: 'TTMK-DSL-10', plate: '71-9820', province: 'กทม.', brand: 'HINO FC9J', type: 'รถบรรทุก 6 ล้อคอก', fuelType: 'Diesel', engine: 'HINO FC9J 210PS', driver: 'อนันต์ บุญรอด', odo: 133900, status: 'พร้อมใช้งาน', location: '13.7563, 100.5018' },
+      { fleetId: 'TTMK-DSL-11', plate: '72-4411', province: 'นครปฐม', brand: 'ISUZU Forward', type: 'รถบรรทุก 6 ล้อตู้แห้ง', fuelType: 'Diesel', engine: 'ISUZU 4HK1-TCS 210PS', driver: 'ประเสริฐ สุขสวัสดิ์', odo: 149000, status: 'พร้อมใช้งาน', location: '13.8199, 100.0443' },
+      { fleetId: 'TTMK-DSL-12', plate: '73-9081', province: 'สระบุรี', brand: 'ISUZU Forward', type: 'รถบรรทุก 6 ล้อตู้ทึบ', fuelType: 'Diesel', engine: 'ISUZU FTR 240PS', driver: 'มานะ ชนะศึก', odo: 182300, status: 'กำลังวิ่งงาน', location: '14.5835, 100.9737' },
+      { fleetId: 'TTMK-DSL-13', plate: '70-1122', province: 'กทม.', brand: 'HINO 500', type: 'รถบรรทุก 6 ล้อตู้ทึบ', fuelType: 'Diesel', engine: 'HINO 500 Dominator 210PS', driver: 'กิตติศักดิ์ เจริญดี', odo: 98400, status: 'พร้อมใช้งาน', location: '13.6526, 100.2738' },
+      { fleetId: 'TTMK-DSL-14', plate: '72-9901', province: 'ฉะเชิงเทรา', brand: 'ISUZU Forward', type: 'รถบรรทุก 6 ล้อคอก', fuelType: 'Diesel', engine: 'ISUZU FTR 240PS', driver: 'วิเชียร สมบูรณ์', odo: 154200, status: 'ซ่อมบำรุง', location: '13.6904, 101.0779' }
+    ];
+
+    function initErpVehicles() {
+      const saved = localStorage.getItem('TTMK_ERP_VEHICLES');
+      if (saved) {
+        try {
+          appState.vehicles = JSON.parse(saved);
+        } catch(e) {
+          appState.vehicles = JSON.parse(JSON.stringify(DEFAULT_FLEET_VEHICLES));
+        }
+      } else {
+        appState.vehicles = JSON.parse(JSON.stringify(DEFAULT_FLEET_VEHICLES));
+      }
+    }
+    initErpVehicles();
+
+    function saveErpVehicles() {
+      try {
+        localStorage.setItem('TTMK_ERP_VEHICLES', JSON.stringify(appState.vehicles));
+      } catch(e){}
+      renderErpVehiclesTable();
+      updateErpKpis();
+      populateCalendarPlateFilter();
+      populatePlateSelect();
+      if (typeof renderLiveFleetMap === 'function') renderLiveFleetMap();
+    }
+
+    function updateErpKpis() {
+      const vehicles = appState.vehicles || [];
+      const totalVehicles = vehicles.length;
+      const evCount = vehicles.filter(v => v.fuelType === 'EV' || (v.type && v.type.includes('EV'))).length;
+      const readyCount = vehicles.filter(v => v.status === 'พร้อมใช้งาน').length;
+      const driversCount = (appState.drivers || []).length;
+
+      const totalEl = document.getElementById('erpTotalVehiclesCount');
+      if (totalEl) totalEl.textContent = totalVehicles;
+
+      const evEl = document.getElementById('erpEvVehiclesCount');
+      if (evEl) evEl.textContent = evCount;
+
+      const readyEl = document.getElementById('erpReadyVehiclesCount');
+      if (readyEl) readyEl.textContent = readyCount;
+
+      const driversEl = document.getElementById('erpTotalDriversCount');
+      if (driversEl) driversEl.textContent = driversCount;
+
+      const vBadge = document.getElementById('erpVehiclesBadge');
+      if (vBadge) vBadge.textContent = totalVehicles;
+
+      const dBadge = document.getElementById('erpDriversBadge');
+      if (dBadge) dBadge.textContent = driversCount;
+
+      const sbBadge = document.getElementById('sidebarDriverBadge');
+      if (sbBadge) sbBadge.textContent = driversCount;
+    }
+
+    function switchErpFleetTab(tab) {
+      const vPanel = document.getElementById('erpVehiclesPanel');
+      const dPanel = document.getElementById('erpDriversPanel');
+      const vBtn = document.getElementById('erpTabVehiclesBtn');
+      const dBtn = document.getElementById('erpTabDriversBtn');
+
+      if (tab === 'vehicles') {
+        if (vPanel) vPanel.classList.remove('hidden');
+        if (dPanel) dPanel.classList.add('hidden');
+        if (vBtn) {
+          vBtn.className = "px-4 py-2 rounded-xl transition flex items-center gap-2 bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 shadow-sm";
+        }
+        if (dBtn) {
+          dBtn.className = "px-4 py-2 rounded-xl transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600";
+        }
+        renderErpVehiclesTable();
+      } else {
+        if (dPanel) dPanel.classList.remove('hidden');
+        if (vPanel) vPanel.classList.add('hidden');
+        if (dBtn) {
+          dBtn.className = "px-4 py-2 rounded-xl transition flex items-center gap-2 bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-400 shadow-sm";
+        }
+        if (vBtn) {
+          vBtn.className = "px-4 py-2 rounded-xl transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600";
+        }
+        renderDriversTable();
+      }
+    }
+
+    function filterErpVehicles() {
+      const search = (document.getElementById('erpVehicleSearchInput')?.value || '').toLowerCase();
+      const fuel = document.getElementById('erpVehicleFuelFilter')?.value || '';
+      const status = document.getElementById('erpVehicleStatusFilter')?.value || '';
+      renderErpVehiclesTable(search, fuel, status);
+    }
+
+    function renderErpVehiclesTable(filterText = '', filterFuel = '', filterStatus = '') {
+      const tbody = document.getElementById('erpVehiclesTableBody');
+      if (!tbody) return;
+
+      const vehicles = appState.vehicles || [];
+      const filtered = vehicles.filter(v => {
+        const text = `${v.fleetId || ''} ${v.plate || ''} ${v.province || ''} ${v.brand || ''} ${v.type || ''} ${v.driver || ''}`.toLowerCase();
+        const matchText = filterText ? text.includes(filterText.toLowerCase()) : true;
+        const matchFuel = filterFuel ? (v.fuelType === filterFuel || (filterFuel === 'EV' && v.type?.includes('EV'))) : true;
+        const matchStatus = filterStatus ? v.status === filterStatus : true;
+        return matchText && matchFuel && matchStatus;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-6 text-center text-slate-400">ไม่พบข้อมูลรถบรรทุกที่ตรงกับเงื่อนไขค้นหา</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(v => {
+        const isEv = v.fuelType === 'EV' || (v.type && v.type.includes('EV'));
+        const fuelBadge = isEv
+          ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-cyan-100 text-cyan-800 dark:bg-cyan-950/80 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 shadow-xs"><i class="fa-solid fa-bolt text-[9px] text-cyan-600"></i> 100% EV ไฟฟ้า</span>`
+          : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800"><i class="fa-solid fa-gas-pump text-[9px] text-blue-600"></i> ดีเซล B7 Euro 5</span>`;
+
+        let statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">🟢 พร้อมใช้งาน</span>`;
+        if (v.status === 'กำลังวิ่งงาน') {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">🔵 กำลังวิ่งงาน</span>`;
+        } else if (v.status === 'ซ่อมบำรุง') {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">🟠 ซ่อมบำรุง</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-100 dark:border-slate-800 text-xs">
+            <td class="py-2.5 px-3 font-mono font-bold text-blue-700 dark:text-blue-400">${escapeHtml(v.fleetId || '-')}</td>
+            <td class="py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100">
+              <span class="block">${escapeHtml(v.plate)}</span>
+              <span class="text-[10px] font-normal text-slate-500">${escapeHtml(v.province || '')}</span>
+            </td>
+            <td class="py-2.5 px-3">
+              <span class="font-bold text-slate-800 dark:text-slate-200 block">${escapeHtml(v.brand || '-')}</span>
+              <span class="text-[11px] text-slate-500 block truncate">${escapeHtml(v.type || '')}</span>
+            </td>
+            <td class="py-2.5 px-3 text-center">${fuelBadge}</td>
+            <td class="py-2.5 px-3">
+              <span class="font-bold text-slate-800 dark:text-slate-200 block">${escapeHtml(v.driver || '-')}</span>
+            </td>
+            <td class="py-2.5 px-3 text-right font-mono font-semibold text-slate-700 dark:text-slate-300">
+              ${(Number(v.odo) || 0).toLocaleString()} กม.
+            </td>
+            <td class="py-2.5 px-3 text-center">${statusBadge}</td>
+            <td class="py-2.5 px-3 text-right">
+              <div class="inline-flex items-center gap-1 justify-end">
+                <button type="button" onclick="viewErpVehicleSpec('${escapeHtml(v.fleetId)}')"
+                        title="ดูสเปกและตรวจ 3D"
+                        class="px-2 py-1 text-[11px] rounded-lg bg-cyan-50 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-100 font-semibold border border-cyan-200 dark:border-cyan-800 transition">
+                  <i class="fa-solid fa-circle-info"></i> สเปก
+                </button>
+                <button type="button" onclick="openErpVehicleModal('${escapeHtml(v.fleetId)}')"
+                        title="แก้ไขข้อมูลรถ"
+                        class="px-2 py-1 text-[11px] rounded-lg bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 hover:bg-amber-100 font-semibold border border-amber-200 dark:border-amber-800 transition">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button type="button" onclick="toggleErpVehicleStatus('${escapeHtml(v.fleetId)}')"
+                        title="เปลี่ยนสถานะความพร้อม"
+                        class="px-2 py-1 text-[11px] rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 hover:bg-blue-100 font-semibold border border-blue-200 dark:border-blue-800 transition">
+                  <i class="fa-solid fa-rotate"></i>
+                </button>
+                <button type="button" onclick="deleteErpVehicle('${escapeHtml(v.fleetId)}')"
+                        title="ลบรถคันนี้"
+                        class="px-2 py-1 text-[11px] rounded-lg bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 hover:bg-red-100 font-semibold border border-red-200 dark:border-red-800 transition">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openErpVehicleModal(fleetId = '') {
+      const form = document.getElementById('erpVehicleForm');
+      if (form) form.reset();
+
+      const modalTitle = document.getElementById('erpVehicleModalTitle');
+      const editIdxEl = document.getElementById('erpVehicleEditIndex');
+
+      if (fleetId) {
+        const idx = (appState.vehicles || []).findIndex(v => v.fleetId === fleetId);
+        if (idx >= 0) {
+          const veh = appState.vehicles[idx];
+          if (editIdxEl) editIdxEl.value = idx;
+          if (modalTitle) modalTitle.textContent = `แก้ไขข้อมูลรถบรรทุก (${veh.fleetId})`;
+
+          document.getElementById('erpVehicleIdInput').value = veh.fleetId || '';
+          document.getElementById('erpVehicleFuelTypeInput').value = veh.fuelType || 'Diesel';
+          document.getElementById('erpVehiclePlateInput').value = veh.plate || '';
+          document.getElementById('erpVehicleProvinceInput').value = veh.province || '';
+          document.getElementById('erpVehicleBrandInput').value = veh.brand || '';
+          document.getElementById('erpVehicleTypeInput').value = veh.type || 'รถบรรทุก 6 ล้อตู้ทึบ';
+          document.getElementById('erpVehicleEngineInput').value = veh.engine || '';
+          document.getElementById('erpVehicleDriverInput').value = veh.driver || '';
+          document.getElementById('erpVehicleOdoInput').value = veh.odo || 0;
+          document.getElementById('erpVehicleStatusInput').value = veh.status || 'พร้อมใช้งาน';
+          document.getElementById('erpVehicleLocationInput').value = veh.location || '';
+        }
+      } else {
+        if (editIdxEl) editIdxEl.value = '-1';
+        if (modalTitle) modalTitle.textContent = 'เพิ่มรถบรรทุก 6 ล้อใหม่';
+        const nextNum = (appState.vehicles || []).length + 1;
+        document.getElementById('erpVehicleIdInput').value = `TTMK-TRK-${nextNum < 10 ? '0' + nextNum : nextNum}`;
+        document.getElementById('erpVehicleStatusInput').value = 'พร้อมใช้งาน';
+      }
+
+      document.getElementById('erpVehicleModal')?.classList.remove('hidden');
+    }
+
+    function closeErpVehicleModal() {
+      document.getElementById('erpVehicleModal')?.classList.add('hidden');
+    }
+
+    function saveErpVehicleFromModal() {
+      const editIdx = parseInt(document.getElementById('erpVehicleEditIndex')?.value, 10);
+      const fleetId = document.getElementById('erpVehicleIdInput')?.value.trim();
+      const plate = document.getElementById('erpVehiclePlateInput')?.value.trim();
+
+      if (!fleetId || !plate) {
+        Swal.fire({ icon: 'warning', title: 'กรุณากรอกข้อมูล', text: 'ต้องระบุรหัสยานพาหนะและเลขทะเบียนรถ' });
+        return;
+      }
+
+      const vehicleData = {
+        fleetId: fleetId,
+        fuelType: document.getElementById('erpVehicleFuelTypeInput')?.value || 'Diesel',
+        plate: plate,
+        province: document.getElementById('erpVehicleProvinceInput')?.value.trim() || 'สระบุรี',
+        brand: document.getElementById('erpVehicleBrandInput')?.value.trim() || 'ISUZU Forward',
+        type: document.getElementById('erpVehicleTypeInput')?.value || 'รถบรรทุก 6 ล้อตู้ทึบ',
+        engine: document.getElementById('erpVehicleEngineInput')?.value.trim() || 'ISUZU 4HK1-TCS 210PS',
+        driver: document.getElementById('erpVehicleDriverInput')?.value.trim() || '-',
+        odo: parseInt(document.getElementById('erpVehicleOdoInput')?.value, 10) || 0,
+        status: document.getElementById('erpVehicleStatusInput')?.value || 'พร้อมใช้งาน',
+        location: document.getElementById('erpVehicleLocationInput')?.value.trim() || '14.1500, 100.6500'
+      };
+
+      if (!appState.vehicles) appState.vehicles = [];
+
+      if (editIdx >= 0 && editIdx < appState.vehicles.length) {
+        appState.vehicles[editIdx] = vehicleData;
+      } else {
+        appState.vehicles.push(vehicleData);
+      }
+
+      saveErpVehicles();
+      closeErpVehicleModal();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'บันทึกข้อมูลเรียบร้อย',
+        text: `อัปเดตข้อมูลรถทะเบียน ${vehicleData.plate} ในระบบ ERP สำเร็จ`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+    }
+
+    function deleteErpVehicle(fleetId) {
+      const idx = (appState.vehicles || []).findIndex(v => v.fleetId === fleetId);
+      if (idx < 0) return;
+      const veh = appState.vehicles[idx];
+
+      Swal.fire({
+        title: 'ยืนยันการลบรถบรรทุก?',
+        text: `ต้องการลบรถรหัส ${veh.fleetId} ทะเบียน ${veh.plate} ออกจากระบบ ERP หรือไม่?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ใช่, ลบข้อมูล',
+        cancelButtonText: 'ยกเลิก'
+      }).then(result => {
+        if (result.isConfirmed) {
+          appState.vehicles.splice(idx, 1);
+          saveErpVehicles();
+          Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', text: 'ลบข้อมูลรถออกจากระบบแล้ว', timer: 1400, showConfirmButton: false });
+        }
+      });
+    }
+
+    function toggleErpVehicleStatus(fleetId) {
+      const veh = (appState.vehicles || []).find(v => v.fleetId === fleetId);
+      if (!veh) return;
+
+      const statuses = ['พร้อมใช้งาน', 'กำลังวิ่งงาน', 'ซ่อมบำรุง'];
+      const curIdx = statuses.indexOf(veh.status);
+      const nextStatus = statuses[(curIdx + 1) % statuses.length];
+      veh.status = nextStatus;
+
+      saveErpVehicles();
+
+      Swal.fire({
+        icon: 'info',
+        title: 'เปลี่ยนสถานะรถ',
+        text: `ทะเบียน ${veh.plate} เปลี่ยนเป็น: ${nextStatus}`,
+        timer: 1200,
+        showConfirmButton: false
+      });
+    }
+
+    function viewErpVehicleSpec(fleetId) {
+      const veh = (appState.vehicles || []).find(v => v.fleetId === fleetId);
+      if (!veh) return;
+
+      const isEv = veh.fuelType === 'EV' || (veh.type && veh.type.includes('EV'));
+
+      document.getElementById('specModalPlate').textContent = `${veh.plate} ${veh.province || ''}`;
+      document.getElementById('specModalFleetId').textContent = veh.fleetId;
+      document.getElementById('specModalBrand').textContent = veh.brand || '-';
+      document.getElementById('specModalType').textContent = veh.type || '-';
+      document.getElementById('specModalFuel').innerHTML = isEv 
+        ? `<span class="text-cyan-600 font-bold">⚡ 100% EV ไฟฟ้า (Zero Emission)</span>`
+        : `<span class="text-blue-600 font-bold">⛽ ดีเซล B7 Euro 5</span>`;
+      document.getElementById('specModalEngine').textContent = veh.engine || '-';
+      document.getElementById('specModalDriver').textContent = veh.driver || 'ยังไม่ได้กำหนด';
+      document.getElementById('specModalOdo').textContent = `${(Number(veh.odo) || 0).toLocaleString()} กม.`;
+      document.getElementById('specModalStatus').textContent = veh.status || 'พร้อมใช้งาน';
+      document.getElementById('specModalLocation').textContent = veh.location || '14.1500, 100.6500';
+
+      const btn3d = document.getElementById('specModal3dBtn');
+      if (btn3d) {
+        btn3d.href = `./CheckTruck/index.html?plate=${encodeURIComponent(veh.plate)}`;
+      }
+
+      document.getElementById('erpVehicleSpecModal')?.classList.remove('hidden');
+    }
+
+    function closeErpVehicleSpecModal() {
+      document.getElementById('erpVehicleSpecModal')?.classList.add('hidden');
+    }
+
+    function exportErpVehiclesCsv() {
+      const vehicles = appState.vehicles || DEFAULT_FLEET_VEHICLES;
+      let csv = "\uFEFFรหัสยานพาหนะ,ทะเบียนรถ,จังหวัด,ยี่ห้อ/รุ่น,ประเภทตัวถัง,ชนิดเชื้อเพลิง,ระบบขับเคลื่อน,ผู้ขับประจำ,เลขไมล์สะสม(กม.),สถานะ,พิกัดGPS\n";
+
+      vehicles.forEach(v => {
+        csv += `"${v.fleetId || ''}","${v.plate || ''}","${v.province || ''}","${v.brand || ''}","${v.type || ''}","${v.fuelType || ''}","${v.engine || ''}","${v.driver || ''}","${v.odo || 0}","${v.status || ''}","${v.location || ''}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `TTMK_ERP_Fleet_Master_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function openErpDriverModal(driverId = '') {
+      const form = document.getElementById('erpDriverForm');
+      if (form) form.reset();
+
+      const modalTitle = document.getElementById('erpDriverModalTitle');
+      const editIdEl = document.getElementById('erpDriverEditId');
+
+      if (driverId) {
+        const d = (appState.drivers || []).find(x => x.driverId === driverId);
+        if (d) {
+          if (editIdEl) editIdEl.value = d.driverId;
+          if (modalTitle) modalTitle.textContent = `แก้ไขข้อมูล พขร. (${d.driverId})`;
+
+          document.getElementById('erpDriverIdInput').value = d.driverId || '';
+          document.getElementById('erpDriverNameInput').value = d.driverName || '';
+          document.getElementById('erpDriverPhoneInput').value = d.phone || '';
+          document.getElementById('erpDriverEmailInput').value = d.email || '';
+          document.getElementById('erpDriverPlateInput').value = d.vehiclePlate || '';
+          document.getElementById('erpDriverDeptInput').value = d.department || 'แผนกขนส่งด่วนพิเศษ';
+          document.getElementById('erpDriverStatusInput').value = d.status || 'ACTIVE';
+        }
+      } else {
+        if (editIdEl) editIdEl.value = '';
+        if (modalTitle) modalTitle.textContent = 'เพิ่มข้อมูลพนักงานขับรถใหม่';
+        const nextId = `DRV-${((appState.drivers || []).length + 1).toString().padStart(3, '0')}`;
+        document.getElementById('erpDriverIdInput').value = nextId;
+        document.getElementById('erpDriverStatusInput').value = 'ACTIVE';
+      }
+
+      document.getElementById('erpDriverModal')?.classList.remove('hidden');
+    }
+
+    function closeErpDriverModal() {
+      document.getElementById('erpDriverModal')?.classList.add('hidden');
+    }
+
+    function saveErpDriverFromModal() {
+      const editId = document.getElementById('erpDriverEditId')?.value;
+      const driverId = document.getElementById('erpDriverIdInput')?.value.trim();
+      const driverName = document.getElementById('erpDriverNameInput')?.value.trim();
+      const phone = document.getElementById('erpDriverPhoneInput')?.value.trim();
+
+      if (!driverId || !driverName || !phone) {
+        Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบถ้วน', text: 'กรุณากรอกรหัส พขร., ชื่อ-นามสกุล, และเบอร์โทรศัพท์' });
+        return;
+      }
+
+      const driverData = {
+        driverId: driverId,
+        driverName: driverName,
+        phone: phone,
+        email: document.getElementById('erpDriverEmailInput')?.value.trim() || '',
+        vehiclePlate: document.getElementById('erpDriverPlateInput')?.value.trim() || '-',
+        department: document.getElementById('erpDriverDeptInput')?.value || 'แผนกขนส่งด่วนพิเศษ',
+        status: document.getElementById('erpDriverStatusInput')?.value || 'ACTIVE',
+        hasMasterFace: false
+      };
+
+      if (!appState.drivers) appState.drivers = [];
+
+      if (editId) {
+        const idx = appState.drivers.findIndex(x => x.driverId === editId);
+        if (idx >= 0) {
+          driverData.hasMasterFace = appState.drivers[idx].hasMasterFace;
+          driverData.masterFaceUrl = appState.drivers[idx].masterFaceUrl;
+          appState.drivers[idx] = Object.assign({}, appState.drivers[idx], driverData);
+        }
+      } else {
+        appState.drivers.push(driverData);
+      }
+
+      renderDriversTable();
+      updateBadges();
+      updateErpKpis();
+      populatePlateSelect();
+      closeErpDriverModal();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'บันทึกข้อมูล พขร. เรียบร้อย',
+        text: `อัปเดตข้อมูล ${driverData.driverName} ในระบบสำเร็จ`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+    }
+
+    function deleteErpDriver(driverId) {
+      const idx = (appState.drivers || []).findIndex(x => x.driverId === driverId);
+      if (idx < 0) return;
+      const drv = appState.drivers[idx];
+
+      Swal.fire({
+        title: 'ยืนยันการลบ พขร.?',
+        text: `ต้องการลบข้อมูลคุณ ${drv.driverName} (${drv.driverId}) หรือไม่?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ใช่, ลบข้อมูล',
+        cancelButtonText: 'ยกเลิก'
+      }).then(result => {
+        if (result.isConfirmed) {
+          appState.drivers.splice(idx, 1);
+          renderDriversTable();
+          updateBadges();
+          updateErpKpis();
+          Swal.fire({ icon: 'success', title: 'ลบสำเร็จ', text: 'ลบข้อมูลพนักงานขับรถแล้ว', timer: 1400, showConfirmButton: false });
+        }
+      });
+    }
+
     function renderAllTables() {
+      renderErpVehiclesTable();
       renderDriversTable();
       renderAlcoholTable();
       renderTruckTable();
@@ -2364,12 +3510,18 @@
       populateCalendarPlateFilter();
       renderInspectionCalendar();
       updateBadges();
+      updateErpKpis();
+      if (appState.leafletMap && typeof renderLiveFleetMap === 'function') {
+        renderLiveFleetMap();
+      }
     }
 
     function updateBadges() {
-      const count = appState.drivers.length;
+      const count = (appState.drivers || []).length;
       const b1 = document.getElementById('sidebarDriverBadge');
       if (b1) b1.textContent = count;
+      const b2 = document.getElementById('erpDriversBadge');
+      if (b2) b2.textContent = count;
     }
 
     // =========================================================================
@@ -2437,10 +3589,23 @@
               <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">ACTIVE</span>
             </td>
             <td class="py-2.5 px-3 text-right">
-              <button type="button" onclick="openDriverModal('${escapeHtml(d.driverId)}')"
-                      class="px-2.5 py-1 text-xs rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 font-semibold border border-blue-200 dark:border-blue-800 transition">
-                ดูข้อมูล
-              </button>
+              <div class="inline-flex items-center gap-1 justify-end">
+                <button type="button" onclick="openDriverModal('${escapeHtml(d.driverId)}')"
+                        title="ดูโปรไฟล์"
+                        class="px-2 py-1 text-[11px] rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 font-semibold border border-blue-200 dark:border-blue-800 transition">
+                  <i class="fa-solid fa-eye"></i> ข้อมูล
+                </button>
+                <button type="button" onclick="openErpDriverModal('${escapeHtml(d.driverId)}')"
+                        title="แก้ไขข้อมูล พขร."
+                        class="px-2 py-1 text-[11px] rounded-lg bg-amber-50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 font-semibold border border-amber-200 dark:border-amber-800 transition">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button type="button" onclick="deleteErpDriver('${escapeHtml(d.driverId)}')"
+                        title="ลบ พขร."
+                        class="px-2 py-1 text-[11px] rounded-lg bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-100 font-semibold border border-red-200 dark:border-red-800 transition">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
             </td>
           </tr>
         `;
@@ -3872,43 +5037,197 @@
       document.getElementById('driverModal').classList.add('hidden');
     }
 
-    // Google Maps
-    function initGoogleMaps() {
-      if (appState.leafletMap) return;
-      appState.leafletMap = L.map('fleetMap').setView([14.1500, 100.6500], 8);
-      setMapLayer('roadmap');
+    // =========================================================================
+    // LIVE VEHICLE TELEMETRY & GPS TRACKING (Google Maps Thailand)
+    // Synchronized with latest Alcohol_Logs GPS per vehicle plate
+    // =========================================================================
+    function renderLiveFleetMap() {
+      if (!appState.leafletMap) return;
 
-      const fleetPoints = [
-        { plate: "70-8899 กทม.", driver: "นายทวีศักดิ์ คำปก", lat: 13.7563, lng: 100.5018, status: "ศูนย์พระนคร", type: "6 ล้อตู้ทึบ" },
-        { plate: "72-8297 สระบุรี", driver: "วิทวัส สอนพรม", lat: 14.5289, lng: 100.9101, status: "สระบุรี-แก่งคอย", type: "6 ล้อคอก" },
-        { plate: "8กส1201", driver: "นิชานันท์ เอื้อจิรพรชัย", lat: 13.6900, lng: 100.7501, status: "ศูนย์สุวรรณภูมิ", type: "6 ล้อตู้แห้ง" },
-        { plate: "72-1979 สระบุรี", driver: "ดุรงค์ฤทธิ์ สำเลิศ", lat: 14.3532, lng: 100.5684, status: "วังน้อย คลัง SCG", type: "6 ล้อตู้ทึบ" },
-        { plate: "72-3189", driver: "สุรชัย หงษา", lat: 13.0827, lng: 100.8800, status: "ท่าเรือแหลมฉบัง", type: "6 ล้อคอก" },
-        { plate: "70-5544 กทม.", driver: "นายสมชาย วงศ์สวัสดิ์", lat: 15.6987, lng: 100.1220, status: "นครสวรรค์ สายเหนือ", type: "6 ล้อตู้ทึบ" },
-        { plate: "72-5079", driver: "ทรงวุฒิ นิวิรัตน์", lat: 13.5991, lng: 100.9925, status: "อมตะซิตี้ ชลบุรี", type: "6 ล้อตู้ทึบ" }
-      ];
+      if (!appState.fleetMarkersLayer) {
+        appState.fleetMarkersLayer = L.layerGroup().addTo(appState.leafletMap);
+      } else {
+        appState.fleetMarkersLayer.clearLayers();
+      }
 
-      fleetPoints.forEach(pt => {
+      // 1. Group Alcohol_Logs by vehicle plate to find the LATEST record per plate
+      const latestLogsByPlate = {};
+      const allLogs = appState.alcoholLogs || [];
+
+      // Alcohol logs are sorted newest-first in appState
+      allLogs.forEach((log, index) => {
+        const rawPlate = (log.vehiclePlate || '').trim();
+        if (!rawPlate || rawPlate === '-') return;
+        const basePlate = rawPlate.split(' ')[0];
+        if (!latestLogsByPlate[basePlate]) {
+          latestLogsByPlate[basePlate] = { log, index };
+        }
+        if (!latestLogsByPlate[rawPlate]) {
+          latestLogsByPlate[rawPlate] = { log, index };
+        }
+      });
+
+      // 2. Fetch fleet vehicles
+      const mappedVehicles = (appState.vehicles && appState.vehicles.length > 0) ? appState.vehicles : DEFAULT_FLEET_VEHICLES;
+      const bounds = [];
+
+      mappedVehicles.forEach(veh => {
+        const basePlate = veh.plate.split(' ')[0];
+        const logEntry = latestLogsByPlate[basePlate] || latestLogsByPlate[veh.plate];
+
+        let lat = null, lng = null;
+        let isRealGps = false;
+        let gpsText = '-';
+        let logIndex = null;
+        let alcoholVal = 0.00;
+        let bpText = '120/80 mmHg';
+        let driverName = veh.driver || 'พนักงานขับรถประจำ';
+        let inspectionTime = 'ล่าสุด วันนี้';
+        let googleMapsLink = '';
+
+        if (logEntry && logEntry.log) {
+          const l = logEntry.log;
+          logIndex = logEntry.index;
+          if (l.driverName) driverName = l.driverName;
+          inspectionTime = l.timestamp || `${l.date || ''} ${l.time || ''}`.trim() || inspectionTime;
+          alcoholVal = typeof l.alcoholValue === 'number' ? l.alcoholValue : parseFloat(l.alcoholValue) || 0.0;
+          if (l.bpSys && l.bpDia) {
+            bpText = `${l.bpSys}/${l.bpDia} mmHg (ชีพจร ${l.bpPulse || 75} bpm)`;
+          }
+          if (l.googleMapsLink && l.googleMapsLink.startsWith('http')) {
+            googleMapsLink = l.googleMapsLink;
+          }
+
+          if (l.gpsCoordinates && l.gpsCoordinates.includes(',')) {
+            const parts = l.gpsCoordinates.split(',');
+            const pLat = parseFloat(parts[0].trim());
+            const pLng = parseFloat(parts[1].trim());
+            if (!isNaN(pLat) && !isNaN(pLng) && pLat > 5 && pLat < 21 && pLng > 95 && pLng < 106) {
+              lat = pLat;
+              lng = pLng;
+              isRealGps = true;
+              gpsText = `${pLat.toFixed(6)}, ${pLng.toFixed(6)}`;
+              if (!googleMapsLink) {
+                googleMapsLink = `https://maps.google.com/?q=${pLat},${pLng}`;
+              }
+            }
+          }
+        }
+
+        // Fallback to vehicle registered coordinates if log doesn't contain valid GPS
+        if (lat === null || lng === null) {
+          if (veh.location && veh.location.includes(',')) {
+            const parts = veh.location.split(',');
+            const pLat = parseFloat(parts[0].trim());
+            const pLng = parseFloat(parts[1].trim());
+            if (!isNaN(pLat) && !isNaN(pLng)) {
+              lat = pLat;
+              lng = pLng;
+              gpsText = `${pLat.toFixed(6)}, ${pLng.toFixed(6)}`;
+            }
+          }
+          if (lat === null || lng === null) {
+            lat = 14.1500;
+            lng = 100.6500;
+            gpsText = 'ศูนย์กลาง วังน้อย คลัง SCG';
+          }
+        }
+
+        bounds.push([lat, lng]);
+
+        const isEv = (veh.fuelType === 'EV') || (veh.type && veh.type.includes('EV'));
+        const isAlcoholAlert = alcoholVal > 0;
+        const isBpAlert = bpText.includes('เสี่ยง') || bpText.includes('สูง');
+
+        let pinBg = 'linear-gradient(135deg, #1e40af, #3b82f6)';
+        let pinIcon = 'fa-truck';
+        let pinBorder = '#ffffff';
+        let typeBadge = isEv ? '⚡ 100% EV' : '⛽ ดีเซล B7 Euro 5';
+
+        if (isAlcoholAlert || isBpAlert) {
+          pinBg = 'linear-gradient(135deg, #dc2626, #ef4444)';
+          pinIcon = 'fa-triangle-exclamation';
+          pinBorder = '#fee2e2';
+        } else if (isEv) {
+          pinBg = 'linear-gradient(135deg, #0284c7, #06b6d4)';
+          pinIcon = 'fa-bolt';
+          pinBorder = '#e0f2fe';
+        }
+
         const customIcon = L.divIcon({
-          className: 'custom-truck-pin',
-          html: `<div style="background:#1e40af; color:#fff; border:2px solid #fff; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(0,0,0,0.4);"><i class="fa-solid fa-truck text-xs"></i></div>`,
-          iconSize: [30, 30],
-          iconAnchor: [15, 15]
+          className: 'custom-live-truck-pin',
+          html: `
+            <div style="background:${pinBg}; color:#fff; border:2.5px solid ${pinBorder}; border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.35); cursor:pointer;">
+              <i class="fa-solid ${pinIcon} text-xs"></i>
+            </div>
+          `,
+          iconSize: [34, 34],
+          iconAnchor: [17, 17]
         });
 
-        const marker = L.marker([pt.lat, pt.lng], { icon: customIcon }).addTo(appState.leafletMap);
+        const marker = L.marker([lat, lng], { icon: customIcon });
+
+        const gMapsBtn = googleMapsLink ? `
+          <a href="${googleMapsLink}" target="_blank" style="display:inline-flex; align-items:center; gap:4px; padding:4px 8px; background:#eff6ff; color:#1d4ed8; border-radius:6px; font-size:11px; font-weight:700; text-decoration:none; border:1px solid #bfdbfe;">
+            <i class="fa-solid fa-map-location-dot"></i> ดูบน Google Maps
+          </a>
+        ` : '';
+
+        const evidenceBtn = (logIndex !== null) ? `
+          <button type="button" onclick="openAlcoholEvidenceModal(${logIndex})" style="display:inline-flex; align-items:center; gap:4px; padding:4px 8px; background:#059669; color:#ffffff; border-radius:6px; font-size:11px; font-weight:700; border:none; cursor:pointer;">
+            <i class="fa-solid fa-id-card"></i> ดูผลตรวจ 4 รูป
+          </button>
+        ` : '';
+
         marker.bindPopup(`
-          <div style="font-family:'Sarabun',sans-serif; min-width:180px;">
-            <strong style="color:#1e3a8a; font-size:13px; display:block;">🚚 ${pt.plate}</strong>
-            <span style="font-size:11px; color:#475569; display:block;">ผู้ขับ: <b>${pt.driver}</b></span>
-            <span style="font-size:11px; color:#059669; display:block;">ประเภท: ${pt.type}</span>
-            <span style="font-size:11px; color:#64748b; display:block;">ตำแหน่ง: ${pt.status}</span>
-            <div style="margin-top:6px; padding-top:4px; border-top:1px solid #e2e8f0; font-size:10px; color:#0284c7;">
-              ✅ แอลกอฮอล์: 0.00 mg% (ผ่านเกณฑ์)
+          <div style="font-family:'Sarabun',sans-serif; min-width:230px; max-width:290px; padding:2px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:5px;">
+              <strong style="color:#0f172a; font-size:13px; display:flex; align-items:center; gap:5px;">
+                🚚 ${escapeHtml(veh.plate)} ${escapeHtml(veh.province || '')}
+              </strong>
+              <span style="font-size:10px; font-weight:700; padding:2px 6px; border-radius:9999px; background:${isEv ? '#cffafe' : '#dbeafe'}; color:${isEv ? '#0891b2' : '#1d4ed8'};">
+                ${typeBadge}
+              </span>
+            </div>
+
+            <div style="font-size:11px; color:#334155; line-height:1.55;">
+              <div>👤 <b>ผู้ขับประจำ:</b> ${escapeHtml(driverName)}</div>
+              <div>🕒 <b>เวลาตรวจล่าสุด:</b> ${escapeHtml(inspectionTime)}</div>
+              <div style="margin-top:4px; padding:5px 7px; background:#f0fdf4; border-radius:7px; border:1px solid #bbf7d0; color:#166534; font-size:11px;">
+                <b>🍺 ผลแอลกอฮอล์:</b> ${alcoholVal.toFixed(2)} mg% (ผ่านเกณฑ์ 100%)<br>
+                <b>💓 ความดัน & ชีพจร:</b> ${escapeHtml(bpText)}
+              </div>
+              <div style="margin-top:5px; color:#64748b; font-size:10px;">
+                📍 <b>พิกัด GPS:</b> ${escapeHtml(gpsText)} ${isRealGps ? '<span style="color:#059669; font-weight:700;">(สดจาก Alcohol_Logs)</span>' : '<span style="color:#94a3b8;">(ศูนย์กระจายสินค้า)</span>'}
+              </div>
+            </div>
+
+            <div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; padding-top:6px; border-top:1px solid #f1f5f9;">
+              ${gMapsBtn}
+              ${evidenceBtn}
             </div>
           </div>
         `);
+
+        appState.fleetMarkersLayer.addLayer(marker);
       });
+
+      if (bounds.length > 0 && appState.leafletMap) {
+        try {
+          appState.leafletMap.fitBounds(L.latLngBounds(bounds), { padding: [35, 35], maxZoom: 11 });
+        } catch(e){}
+      }
+    }
+
+    // Google Maps Initialization
+    function initGoogleMaps() {
+      if (appState.leafletMap) {
+        renderLiveFleetMap();
+        return;
+      }
+      appState.leafletMap = L.map('fleetMap').setView([14.1500, 100.6500], 8);
+      setMapLayer('roadmap');
+      renderLiveFleetMap();
     }
 
     function setMapLayer(type) {
