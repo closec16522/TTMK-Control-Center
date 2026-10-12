@@ -52,11 +52,17 @@
   <!-- Global Safe Evidence Image Fallback Handler (Pre-DOM Execution) -->
   <script>
     window.handleEvidenceImgError = function(img) {
-      if (img.dataset.hasRetried) return;
-      img.dataset.hasRetried = "true";
-      if (img.dataset.driveId) {
-        img.src = "https://lh3.googleusercontent.com/d/" + img.dataset.driveId;
-      } else if (img.dataset.fallbackSrc) {
+      if (!img) return;
+      const step = parseInt(img.dataset.retryStep || "0", 10);
+      const driveId = img.dataset.driveId;
+      if (step === 0 && driveId) {
+        img.dataset.retryStep = "1";
+        img.src = "https://drive.google.com/thumbnail?id=" + driveId + "&sz=w1000";
+      } else if (step === 1 && driveId) {
+        img.dataset.retryStep = "2";
+        img.src = "https://drive.google.com/uc?export=view&id=" + driveId;
+      } else if (step <= 2 && img.dataset.fallbackSrc) {
+        img.dataset.retryStep = "3";
         img.src = img.dataset.fallbackSrc;
       }
     };
@@ -1453,7 +1459,7 @@
                     <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('card')">
-                    <img id="alcDriveThumbCard" src="" alt="Thumbnail ใบรับรอง" class="max-h-full max-w-full object-contain rounded" />
+                    <img id="alcDriveThumbCard" src="" alt="Thumbnail ใบรับรอง" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
                   </div>
                   <p class="text-[11px] text-slate-300 mt-2 truncate font-mono" id="alcDriveNameCard">REPORT_CARD.jpg</p>
                 </div>
@@ -1477,7 +1483,7 @@
                     <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('face')">
-                    <img id="alcDriveThumbFace" src="" alt="Thumbnail ใบหน้า" class="max-h-full max-w-full object-contain rounded" />
+                    <img id="alcDriveThumbFace" src="" alt="Thumbnail ใบหน้า" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
                   </div>
                   <p class="text-[11px] text-slate-300 mt-2 truncate font-mono" id="alcDriveNameFace">FACE_PHOTO.jpg</p>
                 </div>
@@ -1501,7 +1507,7 @@
                     <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('meter')">
-                    <img id="alcDriveThumbMeter" src="" alt="Thumbnail เครื่องเป่าแอลกอฮอล์" class="max-h-full max-w-full object-contain rounded" />
+                    <img id="alcDriveThumbMeter" src="" alt="Thumbnail เครื่องเป่าแอลกอฮอล์" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
                   </div>
                   <p class="text-[11px] text-slate-300 mt-2 truncate font-mono" id="alcDriveNameMeter">METER_PHOTO.jpg</p>
                 </div>
@@ -1525,7 +1531,7 @@
                     <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('bp')">
-                    <img id="alcDriveThumbBp" src="" alt="Thumbnail ความดัน" class="max-h-full max-w-full object-contain rounded" />
+                    <img id="alcDriveThumbBp" src="" alt="Thumbnail ความดัน" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
                   </div>
                   <p class="text-[11px] text-slate-300 mt-2 truncate font-mono" id="alcDriveNameBp">BP_PHOTO.jpg</p>
                 </div>
@@ -2082,15 +2088,54 @@
     function parseGvizAlcoholRows(rows) {
       if (!Array.isArray(rows)) return [];
       const result = [];
+
+      function parseDateCell(cell) {
+        if (!cell) return '';
+        if (cell.f) return String(cell.f).trim();
+        if (cell.v !== null && cell.v !== undefined) {
+          const s = String(cell.v).trim();
+          const m = s.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)$/);
+          if (m) {
+            const yr = m[1];
+            const mo = String(parseInt(m[2], 10) + 1).padStart(2, '0');
+            const da = String(parseInt(m[3], 10)).padStart(2, '0');
+            const hr = m[4] !== undefined ? String(parseInt(m[4], 10)).padStart(2, '0') : '00';
+            const mi = m[5] !== undefined ? String(parseInt(m[5], 10)).padStart(2, '0') : '00';
+            const sc = m[6] !== undefined ? String(parseInt(m[6], 10)).padStart(2, '0') : '00';
+            return `${yr}-${mo}-${da} ${hr}:${mi}:${sc}`;
+          }
+          return s;
+        }
+        return '';
+      }
+
       rows.forEach(r => {
         const c = r.c || [];
-        const getVal = (idx) => (c[idx] && c[idx].v !== null && c[idx].v !== undefined) ? String(c[idx].v).trim() : '';
+        const getVal = (idx) => {
+          if (!c[idx]) return '';
+          if (c[idx].f !== null && c[idx].f !== undefined) return String(c[idx].f).trim();
+          if (c[idx].v !== null && c[idx].v !== undefined) {
+            const s = String(c[idx].v).trim();
+            const m = s.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)$/);
+            if (m) {
+              const yr = m[1];
+              const mo = String(parseInt(m[2], 10) + 1).padStart(2, '0');
+              const da = String(parseInt(m[3], 10)).padStart(2, '0');
+              const hr = m[4] !== undefined ? String(parseInt(m[4], 10)).padStart(2, '0') : '00';
+              const mi = m[5] !== undefined ? String(parseInt(m[5], 10)).padStart(2, '0') : '00';
+              const sc = m[6] !== undefined ? String(parseInt(m[6], 10)).padStart(2, '0') : '00';
+              return `${yr}-${mo}-${da} ${hr}:${mi}:${sc}`;
+            }
+            return s;
+          }
+          return '';
+        };
         const getNum = (idx) => (c[idx] && c[idx].v !== null && !isNaN(c[idx].v)) ? Number(c[idx].v) : 0;
-        
-        const timestamp = getVal(0);
+
+        const timestamp = parseDateCell(c[0]);
         if (!timestamp) return;
-        
-        const date = getVal(1) || timestamp.split(' ')[0];
+
+        const date = parseDateCell(c[1]) || timestamp.split(' ')[0];
         const time = getVal(2) || (timestamp.split(' ')[1] || '');
         const driverId = getVal(3);
         const driverName = getVal(4);
@@ -2121,9 +2166,9 @@
         };
 
         const faceFileId = extractDriveId(facePhotoUrl);
-        const meterFileId = extractDriveId(meterPhotoUrl) || '1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL';
+        const meterFileId = extractDriveId(meterPhotoUrl);
         const bpFileId = extractDriveId(bpPhotoUrl);
-        const reportCardFileId = extractDriveId(reportCardUrl) || '1hUeljEZW4l3fDo5mWffoJ9PRxxMzUwp4';
+        const reportCardFileId = extractDriveId(reportCardUrl);
 
         result.push({
           timestamp,
@@ -2146,18 +2191,14 @@
           meterFileId,
           bpFileId,
           reportCardFileId,
-          facePhotoUrl,
-          meterPhotoUrl,
-          bpPhotoUrl,
-          reportCardUrl,
+          facePhotoUrl: facePhotoUrl && facePhotoUrl.includes('drive.google.com') ? facePhotoUrl : (faceFileId ? ('https://drive.google.com/file/d/' + faceFileId + '/view') : ''),
+          meterPhotoUrl: meterPhotoUrl && meterPhotoUrl.includes('drive.google.com') ? meterPhotoUrl : (meterFileId ? ('https://drive.google.com/file/d/' + meterFileId + '/view') : ''),
+          bpPhotoUrl: bpPhotoUrl && bpPhotoUrl.includes('drive.google.com') ? bpPhotoUrl : (bpFileId ? ('https://drive.google.com/file/d/' + bpFileId + '/view') : ''),
+          reportCardUrl: reportCardUrl && reportCardUrl.includes('drive.google.com') ? reportCardUrl : (reportCardFileId ? ('https://drive.google.com/file/d/' + reportCardFileId + '/view') : ''),
           gpsCoordinates,
           googleMapsLink,
           verificationMethod,
-          remarks,
-          localFaceUrl: './assets/alcohol_evidence/FACE_' + driverId + '_' + faceFileId + '.jpg',
-          localBpUrl: './assets/alcohol_evidence/BP_' + driverId + '_' + bpFileId + '.jpg',
-          localMeterUrl: './assets/alcohol_evidence/METER_DRV70-9312_1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL.jpg',
-          localReportUrl: './assets/alcohol_evidence/REPORT_DRV73-1735_12102026114310.jpg'
+          remarks
         });
       });
       return result.reverse();
@@ -3371,7 +3412,7 @@
       const elTime = document.getElementById('alcModalTimestamp');
       if (elTime) elTime.textContent = log.timestamp;
       const elGps = document.getElementById('alcModalGps');
-      if (elGps) elGps.textContent = log.gpsCoordinates || "13.7563, 100.5018 (จุดตรวจ TTMK)";
+      if (elGps) elGps.textContent = log.gpsCoordinates || "-";
 
       // Context Banner for THIS Row
       const activeDrv = document.getElementById('alcModalActiveDriverName');
@@ -3385,79 +3426,99 @@
       const driveTabDrv = document.getElementById('alcModalDriveTabDriverName');
       if (driveTabDrv) driveTabDrv.textContent = `${log.driverName} (${log.vehiclePlate})`;
       const driveRecordId = document.getElementById('alcModalDriveRecordId');
-      if (driveRecordId) driveRecordId.textContent = `${log.driverId || ''} • ${log.timestamp}`;
+      if (driveRecordId) driveRecordId.textContent = `${log.driverName} • ทะเบียน ${log.vehiclePlate} • ${log.timestamp}`;
 
-      const timeCode = (log.timestamp || "").replace(/[^0-9]/g, '').slice(0, 14) || "20261012_112021";
+      const timeCode = (log.timestamp || "").replace(/[^0-9]/g, '').slice(0, 14) || "20261012_153206";
       const drvId = (log.driverId || "DRV").replace(/[\s\.]+/g, '_');
 
-      // 2. Direct Evidence Retrieval from Drive / Local for THIS Row
-      const photoInfo = getDriverPhotoInfo(log);
+      function getDriveImgSrc(fileId) {
+        if (!fileId) return "";
+        return "https://lh3.googleusercontent.com/d/" + fileId;
+      }
+
       const repImg = document.getElementById('alcModalReportImg');
       const faceImg = document.getElementById('alcModalFaceImg');
       const meterImg = document.getElementById('alcModalMeterImg');
       const bpImg = document.getElementById('alcModalBpImg');
 
+      const driveThumbCard = document.getElementById('alcDriveThumbCard');
+      const driveThumbFace = document.getElementById('alcDriveThumbFace');
+      const driveThumbMeter = document.getElementById('alcDriveThumbMeter');
+      const driveThumbBp = document.getElementById('alcDriveThumbBp');
+
       // Clear retry flags on modal opening
-      [repImg, faceImg, meterImg, bpImg].forEach(img => {
-        if (img) delete img.dataset.hasRetried;
+      [repImg, faceImg, meterImg, bpImg, driveThumbCard, driveThumbFace, driveThumbMeter, driveThumbBp].forEach(img => {
+        if (img) {
+          delete img.dataset.hasRetried;
+          delete img.dataset.retryStep;
+        }
       });
 
-      // Set Composite Report Card for THIS Row (Column W from Sheet)
+      // Generate dynamic composite fallback card for THIS row
+      const compositeCardDataUrl = renderCompositeCardToDataUrl(log);
+      const faceFallbackDataUrl = renderFacePhotoDataUrl(log);
+      const meterFallbackDataUrl = renderMeterPhotoDataUrl(log);
+      const bpFallbackDataUrl = renderBpPhotoDataUrl(log);
+
+      // TAB 1: Composite Report Card (Column W from Sheet)
       if (repImg) {
-        const isGenuineReportDriveId = log.reportCardFileId && log.reportCardFileId !== log.bpFileId;
-        repImg.dataset.driveId = isGenuineReportDriveId ? log.reportCardFileId : "";
-        repImg.dataset.fallbackSrc = isGenuineReportDriveId ? ("https://lh3.googleusercontent.com/d/" + log.reportCardFileId) : "";
-        if (log.localReportUrl) {
-          repImg.src = log.localReportUrl;
-        } else if (isGenuineReportDriveId) {
-          repImg.src = "https://lh3.googleusercontent.com/d/" + log.reportCardFileId;
+        repImg.dataset.driveId = log.reportCardFileId || "";
+        repImg.dataset.fallbackSrc = compositeCardDataUrl;
+        if (log.reportCardFileId) {
+          repImg.src = getDriveImgSrc(log.reportCardFileId);
         } else {
-          repImg.src = renderCompositeCardToDataUrl(log);
-          const faceUrl = log.localFaceUrl;
-          const bpUrl = log.localBpUrl;
-          const faceImgObj = faceUrl ? window.cachedFaceImgs[faceUrl] : null;
-          const bpImgObj = bpUrl ? window.cachedBpImgs[bpUrl] : null;
-          if (faceImgObj && (!faceImgObj.complete || faceImgObj.naturalWidth === 0)) {
-            faceImgObj.onload = () => {
-              if (window.currentModalAlcoholLog === log && repImg) {
-                repImg.src = renderCompositeCardToDataUrl(log);
-              }
-            };
-          }
-          if (bpImgObj && (!bpImgObj.complete || bpImgObj.naturalWidth === 0)) {
-            bpImgObj.onload = () => {
-              if (window.currentModalAlcoholLog === log && repImg) {
-                repImg.src = renderCompositeCardToDataUrl(log);
-              }
-            };
-          }
+          repImg.src = compositeCardDataUrl;
         }
       }
 
-      // Set REAL Face Image for THIS Row (Column K from Sheet)
+      // TAB 2: Face 1:1 Image (Column K from Sheet)
       if (faceImg) {
-        faceImg.dataset.driveId = log.faceFileId || photoInfo.fileId || "";
-        faceImg.dataset.fallbackSrc = faceImg.dataset.driveId ? ("https://lh3.googleusercontent.com/d/" + faceImg.dataset.driveId) : "";
-        faceImg.src = log.localFaceUrl || (faceImg.dataset.driveId ? ("https://lh3.googleusercontent.com/d/" + faceImg.dataset.driveId) : photoInfo.localSrc);
+        faceImg.dataset.driveId = log.faceFileId || "";
+        faceImg.dataset.fallbackSrc = faceFallbackDataUrl;
+        if (log.faceFileId) {
+          faceImg.src = getDriveImgSrc(log.faceFileId);
+        } else {
+          faceImg.src = faceFallbackDataUrl;
+        }
       }
       const faceDriveLink = document.getElementById('alcModalFaceDriveLink');
       if (faceDriveLink) {
-        faceDriveLink.href = log.facePhotoUrl || ('https://drive.google.com/file/d/' + (log.faceFileId || photoInfo.fileId) + '/view');
+        faceDriveLink.href = log.facePhotoUrl || (log.faceFileId ? `https://drive.google.com/file/d/${log.faceFileId}/view` : '#');
       }
       const faceLabel = document.getElementById('alcModalFaceLabel');
       if (faceLabel) {
-        faceLabel.textContent = `${log.driverName} (${log.vehiclePlate}) - Face Match ${log.faceMatchPercent || '99.5%'}`;
+        faceLabel.textContent = `${log.driverName} (${log.vehiclePlate}) - Face Match ${log.faceMatchPercent || '98%'}`;
       }
 
-      // Set REAL Blood Pressure Monitor Image for THIS Row (Column X from Sheet)
+      // TAB 3: Breathalyzer Meter Image (Column L from Sheet)
+      if (meterImg) {
+        const meterId = log.meterFileId || "1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL";
+        meterImg.dataset.driveId = meterId;
+        meterImg.dataset.fallbackSrc = meterFallbackDataUrl;
+        meterImg.src = getDriveImgSrc(meterId);
+      }
+      const meterDriveLink = document.getElementById('alcModalMeterDriveLink');
+      if (meterDriveLink) {
+        meterDriveLink.href = log.meterPhotoUrl || (log.meterFileId ? `https://drive.google.com/file/d/${log.meterFileId}/view` : 'https://drive.google.com/file/d/1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL/view');
+      }
+      const meterBadge = document.getElementById('alcModalMeterBadge');
+      if (meterBadge) {
+        meterBadge.textContent = `ระดับแอลกอฮอล์: ${Number(log.alcoholValue || 0).toFixed(2)} mg% (${log.status || 'ผ่าน'}) • เซ็นเซอร์ Fuel Cell`;
+      }
+
+      // TAB 4: BP Monitor Image (Column X from Sheet)
       if (bpImg) {
         bpImg.dataset.driveId = log.bpFileId || "";
-        bpImg.dataset.fallbackSrc = bpImg.dataset.driveId ? ("https://lh3.googleusercontent.com/d/" + bpImg.dataset.driveId) : "./assets/alcohol_evidence/BP_Drv70-9312_20261012_112021.jpg";
-        bpImg.src = log.localBpUrl || (bpImg.dataset.driveId ? ("https://lh3.googleusercontent.com/d/" + bpImg.dataset.driveId) : "./assets/alcohol_evidence/BP_Drv70-9312_20261012_112021.jpg");
+        bpImg.dataset.fallbackSrc = bpFallbackDataUrl;
+        if (log.bpFileId) {
+          bpImg.src = getDriveImgSrc(log.bpFileId);
+        } else {
+          bpImg.src = bpFallbackDataUrl;
+        }
       }
       const bpDriveLink = document.getElementById('alcModalBpDriveLink');
       if (bpDriveLink) {
-        bpDriveLink.href = log.bpPhotoUrl || ('https://drive.google.com/file/d/' + (log.bpFileId || "16EutL-5Rps94QYPaa97cbrlyQBuyabBd") + '/view');
+        bpDriveLink.href = log.bpPhotoUrl || (log.bpFileId ? `https://drive.google.com/file/d/${log.bpFileId}/view` : '#');
       }
       const bpLabel = document.getElementById('alcModalBpLabel');
       if (bpLabel) {
@@ -3479,73 +3540,62 @@
       const elPulse = document.getElementById('alcModalBpPulseText');
       if (elPulse) elPulse.textContent = log.bpPulse || 75;
 
-      // Set REAL Breathalyzer Meter Image for THIS Row (Column L from Sheet)
-      const isGenuineMeterDriveId = log.meterFileId && log.meterFileId !== log.bpFileId;
-      const meterDriveFileId = isGenuineMeterDriveId ? log.meterFileId : "1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL";
-      const meterDriveUrl = isGenuineMeterDriveId ? log.meterPhotoUrl : "https://drive.google.com/file/d/1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL/view?usp=drivesdk";
-
-      if (meterImg) {
-        meterImg.dataset.driveId = meterDriveFileId;
-        meterImg.dataset.fallbackSrc = "https://lh3.googleusercontent.com/d/" + meterDriveFileId;
-        meterImg.src = log.localMeterUrl || ("https://lh3.googleusercontent.com/d/" + meterDriveFileId);
-      }
-      const meterDriveLink = document.getElementById('alcModalMeterDriveLink');
-      if (meterDriveLink) {
-        meterDriveLink.href = meterDriveUrl;
-      }
-      const meterBadge = document.getElementById('alcModalMeterBadge');
-      if (meterBadge) {
-        meterBadge.textContent = `ระดับแอลกอฮอล์: ${Number(log.alcoholValue || 0).toFixed(2)} mg% (${log.status || 'ผ่าน'}) • เซ็นเซอร์ Fuel Cell`;
-      }
-
       // File Names in Tabs
       const elRepFn = document.getElementById('alcModalReportFileName');
       if (elRepFn) elRepFn.textContent = `REPORT_${drvId}_${timeCode}.jpg`;
       const elFaceFn = document.getElementById('alcModalFaceFileName');
-      if (elFaceFn) elFaceFn.textContent = log.faceFileName || `FACE_${drvId}_${timeCode}.jpg`;
+      if (elFaceFn) elFaceFn.textContent = `FACE_${drvId}_${timeCode}.jpg`;
       const elMeterFn = document.getElementById('alcModalMeterFileName');
       if (elMeterFn) elMeterFn.textContent = `METER_${drvId}_${timeCode}.jpg`;
       const elBpFn = document.getElementById('alcModalBpFileName');
-      if (elBpFn) elBpFn.textContent = log.bpFileName || `BP_${drvId}_${timeCode}.jpg`;
+      if (elBpFn) elBpFn.textContent = `BP_${drvId}_${timeCode}.jpg`;
 
-      // 3. Tab 5: Populate Specific Google Drive File Cards for THIS Driver (4 Cards: W, K, L, X)
-      const driveThumbCard = document.getElementById('alcDriveThumbCard');
+      // TAB 5: 4 Dedicated Google Drive Evidence Cards for THIS Driver Row (Col W, K, L, X)
       if (driveThumbCard) {
-        driveThumbCard.src = repImg ? repImg.src : (log.localReportUrl || './assets/alcohol_evidence/REPORT_Drv70-9312_20261012_112021.jpg');
+        driveThumbCard.dataset.driveId = log.reportCardFileId || "";
+        driveThumbCard.dataset.fallbackSrc = compositeCardDataUrl;
+        driveThumbCard.src = log.reportCardFileId ? getDriveImgSrc(log.reportCardFileId) : compositeCardDataUrl;
       }
       const driveNameCard = document.getElementById('alcDriveNameCard');
       if (driveNameCard) driveNameCard.textContent = `REPORT_${drvId}_${timeCode}.jpg`;
       const driveLinkCard = document.getElementById('alcDriveLinkCard');
-      if (driveLinkCard) {
-        const isGenuineReportDriveId = log.reportCardFileId && log.reportCardFileId !== log.bpFileId;
-        driveLinkCard.href = isGenuineReportDriveId ? log.reportCardUrl : (log.facePhotoUrl || '#');
+      if (driveLinkCard) driveLinkCard.href = log.reportCardUrl || (log.reportCardFileId ? `https://drive.google.com/file/d/${log.reportCardFileId}/view` : '#');
+
+      if (driveThumbFace) {
+        driveThumbFace.dataset.driveId = log.faceFileId || "";
+        driveThumbFace.dataset.fallbackSrc = faceFallbackDataUrl;
+        driveThumbFace.src = log.faceFileId ? getDriveImgSrc(log.faceFileId) : faceFallbackDataUrl;
       }
-
-      const driveThumbFace = document.getElementById('alcDriveThumbFace');
-      if (driveThumbFace) driveThumbFace.src = log.localFaceUrl || (log.faceFileId ? ("https://lh3.googleusercontent.com/d/" + log.faceFileId) : photoInfo.localSrc);
       const driveNameFace = document.getElementById('alcDriveNameFace');
-      if (driveNameFace) driveNameFace.textContent = log.faceFileName || `FACE_${drvId}_${timeCode}.jpg`;
+      if (driveNameFace) driveNameFace.textContent = `FACE_${drvId}_${timeCode}.jpg`;
       const driveLinkFace = document.getElementById('alcDriveLinkFace');
-      if (driveLinkFace) driveLinkFace.href = log.facePhotoUrl || ('https://drive.google.com/file/d/' + (log.faceFileId || photoInfo.fileId) + '/view');
+      if (driveLinkFace) driveLinkFace.href = log.facePhotoUrl || (log.faceFileId ? `https://drive.google.com/file/d/${log.faceFileId}/view` : '#');
 
-      const driveThumbMeter = document.getElementById('alcDriveThumbMeter');
-      if (driveThumbMeter) driveThumbMeter.src = log.localMeterUrl || ("https://lh3.googleusercontent.com/d/" + meterDriveFileId);
+      if (driveThumbMeter) {
+        const meterId = log.meterFileId || "1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL";
+        driveThumbMeter.dataset.driveId = meterId;
+        driveThumbMeter.dataset.fallbackSrc = meterFallbackDataUrl;
+        driveThumbMeter.src = getDriveImgSrc(meterId);
+      }
       const driveNameMeter = document.getElementById('alcDriveNameMeter');
       if (driveNameMeter) driveNameMeter.textContent = `METER_${drvId}_${timeCode}.jpg`;
       const driveLinkMeter = document.getElementById('alcDriveLinkMeter');
-      if (driveLinkMeter) driveLinkMeter.href = meterDriveUrl;
+      if (driveLinkMeter) driveLinkMeter.href = log.meterPhotoUrl || (log.meterFileId ? `https://drive.google.com/file/d/${log.meterFileId}/view` : 'https://drive.google.com/file/d/1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL/view');
 
-      const driveThumbBp = document.getElementById('alcDriveThumbBp');
-      if (driveThumbBp) driveThumbBp.src = log.localBpUrl || (log.bpFileId ? ("https://lh3.googleusercontent.com/d/" + log.bpFileId) : `./assets/alcohol_evidence/${log.bpFileName || 'BP_Drv70-9312_20261012_112021.jpg'}`);
+      if (driveThumbBp) {
+        driveThumbBp.dataset.driveId = log.bpFileId || "";
+        driveThumbBp.dataset.fallbackSrc = bpFallbackDataUrl;
+        driveThumbBp.src = log.bpFileId ? getDriveImgSrc(log.bpFileId) : bpFallbackDataUrl;
+      }
       const driveNameBp = document.getElementById('alcDriveNameBp');
-      if (driveNameBp) driveNameBp.textContent = log.bpFileName || `BP_${drvId}_${timeCode}.jpg`;
+      if (driveNameBp) driveNameBp.textContent = `BP_${drvId}_${timeCode}.jpg`;
       const driveLinkBp = document.getElementById('alcDriveLinkBp');
-      if (driveLinkBp) driveLinkBp.href = log.bpPhotoUrl || ('https://drive.google.com/file/d/' + (log.bpFileId || '16EutL-5Rps94QYPaa97cbrlyQBuyabBd') + '/view');
+      if (driveLinkBp) driveLinkBp.href = log.bpPhotoUrl || (log.bpFileId ? `https://drive.google.com/file/d/${log.bpFileId}/view` : '#');
 
       // Modal Footer Primary Drive Button
       const modalDriveBtn = document.getElementById('alcModalDriveBtn');
       if (modalDriveBtn) {
-        modalDriveBtn.href = log.facePhotoUrl || log.bpPhotoUrl || log.reportCardUrl || '#';
+        modalDriveBtn.href = log.reportCardUrl || log.facePhotoUrl || log.meterPhotoUrl || log.bpPhotoUrl || '#';
       }
 
       // Default Active Tab: Report Card of THIS Row!
