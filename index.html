@@ -1180,10 +1180,14 @@
         </div>
       </div>
 
-      <!-- Tab Switcher inside Modal (Check-in Camera Photos First) -->
+      <!-- Tab Switcher inside Modal (Report Card First) -->
       <div class="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs mb-3.5">
-        <button type="button" onclick="switchAlcModalTab('face')" id="alcTabBtnFace"
+        <button type="button" onclick="switchAlcModalTab('card')" id="alcTabBtnCard"
                 class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm">
+          <i class="fa-solid fa-id-card mr-1 text-purple-500"></i> ใบรับรองผลรวม (Report Card)
+        </button>
+        <button type="button" onclick="switchAlcModalTab('face')" id="alcTabBtnFace"
+                class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-blue-600">
           <i class="fa-solid fa-user-check mr-1 text-emerald-500"></i> รูปถ่าย Check-in ใบหน้า 1:1
         </button>
         <button type="button" onclick="switchAlcModalTab('meter')" id="alcTabBtnMeter"
@@ -1193,10 +1197,6 @@
         <button type="button" onclick="switchAlcModalTab('bp')" id="alcTabBtnBp"
                 class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-blue-600">
           <i class="fa-solid fa-heart-pulse mr-1 text-rose-500"></i> รูปถ่าย เครื่องวัดความดันจริง
-        </button>
-        <button type="button" onclick="switchAlcModalTab('card')" id="alcTabBtnCard"
-                class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-blue-600">
-          <i class="fa-solid fa-id-card mr-1 text-purple-500"></i> ใบรับรองผลรวม (Report Card)
         </button>
         <button type="button" onclick="switchAlcModalTab('drive')" id="alcTabBtnDrive"
                 class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-amber-500">
@@ -1221,15 +1221,15 @@
         </div>
         <div class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
           <i class="fa-solid fa-circle-check text-emerald-500"></i>
-          <span>แสดงหลักฐานตรงตาม Google Sheet เฉพาะของพนักงานท่านนี้เท่านั้น</span>
+          <span>แสดงหลักฐานตรงตาม Google Sheet เฉพาะของข้อมูลแถวนี้ (Row)</span>
         </div>
       </div>
 
       <!-- Tab Content Area -->
       <div class="flex-1 overflow-y-auto space-y-3 pr-1">
         
-        <!-- Tab 4: Composite Report Card (Digital + High-Res Image) -->
-        <div id="alcTabContentCard" class="hidden space-y-3">
+        <!-- Tab 1: Composite Report Card (Digital + High-Res Image - DEFAULT ACTIVE) -->
+        <div id="alcTabContentCard" class="space-y-3">
           <!-- High-Res Inspection Certificate Image directly loaded -->
           <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 shadow-xl space-y-2 text-center">
             <div class="flex items-center justify-between text-xs px-2 text-slate-300">
@@ -1250,8 +1250,8 @@
           </div>
         </div>
 
-        <!-- Tab 1: Face Photo Check-in (Live Camera Image from Google Drive - DEFAULT ACTIVE) -->
-        <div id="alcTabContentFace" class="space-y-3">
+        <!-- Tab 2: Face Photo Check-in (Live Camera Image from Google Drive) -->
+        <div id="alcTabContentFace" class="hidden space-y-3">
           <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
             <div class="flex items-center justify-between text-xs px-2 text-slate-300">
               <span class="font-bold flex items-center gap-1.5 text-emerald-400">
@@ -2028,6 +2028,10 @@
           }
         } catch(e){}
 
+        if (appState.alcoholLogs && appState.alcoholLogs.length > 0) {
+          preloadAllEvidencePhotos(appState.alcoholLogs);
+        }
+
         renderAllTables();
 
         if (showToast) {
@@ -2456,8 +2460,30 @@
     };
 
     window.cachedDriverPhotoImgs = {};
+    window.cachedFaceImgs = {};
+    window.cachedBpImgs = {};
     window.cachedMeterImg = new Image();
     window.cachedMeterImg.src = "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg";
+    window.cachedMeter1735Img = new Image();
+    window.cachedMeter1735Img.src = "./assets/alcohol_evidence/METER_DRV73-1735_20261012_114310.jpg";
+
+    function preloadAllEvidencePhotos(logs) {
+      if (!logs || !Array.isArray(logs)) return;
+      logs.forEach(log => {
+        if (log.localFaceUrl && !window.cachedFaceImgs[log.localFaceUrl]) {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.src = log.localFaceUrl;
+          window.cachedFaceImgs[log.localFaceUrl] = img;
+        }
+        if (log.localBpUrl && !window.cachedBpImgs[log.localBpUrl]) {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.src = log.localBpUrl;
+          window.cachedBpImgs[log.localBpUrl] = img;
+        }
+      });
+    }
 
     function getDriverPhotoInfo(log) {
       if (!log) return { fileId: "1UJcGYbTRV92w1gFiPSNhic1sTBPLNWDe", localSrc: "./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg", cdnSrc: "https://lh3.googleusercontent.com/d/1UJcGYbTRV92w1gFiPSNhic1sTBPLNWDe" };
@@ -2512,10 +2538,11 @@
       ctx.fillRect(x, y, w, h);
 
       const info = getDriverPhotoInfo(log);
-      const preloadedImg = window.cachedDriverPhotoImgs[info.fileId];
+      const faceUrl = (log && log.localFaceUrl) ? log.localFaceUrl : info.localSrc;
+      const preloadedImg = (faceUrl && window.cachedFaceImgs[faceUrl]) || window.cachedDriverPhotoImgs[info.fileId];
 
       if (preloadedImg && preloadedImg.complete && preloadedImg.naturalWidth > 0) {
-        // Draw real camera photograph directly from Google Drive
+        // Draw real camera photograph directly from Google Drive / Local
         ctx.drawImage(preloadedImg, x, y, w, h);
       } else {
         ctx.fillStyle = "#1E293B";
@@ -2556,7 +2583,7 @@
       ctx.save();
       ctx.clip();
 
-      const meterImg = window.cachedMeterImg;
+      const meterImg = (log && log.driverName === 'พิศมัย พลเยี่ยม') ? window.cachedMeter1735Img : window.cachedMeterImg;
       if (meterImg && meterImg.complete && meterImg.naturalWidth > 0) {
         ctx.drawImage(meterImg, x, y, w, h);
         ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
@@ -2615,6 +2642,23 @@
 
       ctx.save();
       ctx.clip();
+
+      const bpUrl = log ? log.localBpUrl : null;
+      const preloadedBp = bpUrl ? window.cachedBpImgs[bpUrl] : null;
+
+      if (preloadedBp && preloadedBp.complete && preloadedBp.naturalWidth > 0) {
+        // Draw authentic photograph of the BP monitor from camera!
+        ctx.drawImage(preloadedBp, x, y, w, h);
+        ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+        ctx.fillRect(x, y + h - 28, w, 28);
+        ctx.fillStyle = "#38BDF8";
+        ctx.font = "bold 11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`✓ ${log.bpSys}/${log.bpDia} mmHg (${log.bpPulse || 75} bpm)`, x + w/2, y + h - 10);
+        ctx.restore();
+        return;
+      }
+
       ctx.fillStyle = "#F8FAFC";
       ctx.fillRect(x, y, w, h);
 
@@ -2628,7 +2672,7 @@
       ctx.fillStyle = "#1E40AF";
       ctx.font = "bold 12px sans-serif";
       ctx.textAlign = "left";
-      ctx.fillText("OMRON", x + 30, y + 36);
+      ctx.fillText("DIGITAL BP", x + 30, y + 36);
 
       drawRoundedRect(ctx, x + 25, y + 46, w - 50, 115, 8);
       ctx.fillStyle = "#E2E8F0";
@@ -2637,9 +2681,9 @@
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      const sys = log.bpSys || 97;
-      const dia = log.bpDia || 70;
-      const pulse = log.bpPulse || 86;
+      const sys = log ? (log.bpSys || 118) : 118;
+      const dia = log ? (log.bpDia || 78) : 78;
+      const pulse = log ? (log.bpPulse || 72) : 72;
 
       ctx.fillStyle = "#0F172A";
       ctx.font = "bold 30px monospace";
@@ -2734,17 +2778,17 @@
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      const bpSys = log.bpSys || 113;
-      const bpDia = log.bpDia || 65;
-      const bpPulse = log.bpPulse || 76;
-      const bpStatus = log.bpStatus || "ความดันปกติ";
-      const isOverallPass = (log.overallStatus || "พร้อมปฏิบัติหน้าที่ขับขี่").includes("พร้อม");
-      const driverName = log.driverName || "พิทยา แคนถา";
-      const email = log.email || "kaeochom8@gmail.com";
-      const plate = log.vehiclePlate || "70-9312มค.";
-      const gpsText = log.gpsCoordinates || "13.7563, 100.5018 (SCG JWD วังน้อย)";
-      const timeText = log.timestamp || "12/10/2569 11:20:21";
-      const faceMatch = log.faceMatchPercent || "99.9%";
+      const bpSys = log ? (log.bpSys || 118) : 118;
+      const bpDia = log ? (log.bpDia || 78) : 78;
+      const bpPulse = log ? (log.bpPulse || 72) : 72;
+      const bpStatus = log ? (log.bpStatus || "ความดันปกติ") : "ความดันปกติ";
+      const isOverallPass = log ? ((log.overallStatus || "พร้อมปฏิบัติหน้าที่ขับขี่").includes("พร้อม") || (log.overallStatus || '').includes('ผ่าน')) : true;
+      const driverName = log ? (log.driverName || "พนักงานขับรถขนส่ง") : "พนักงานขับรถขนส่ง";
+      const email = log ? (log.email || "-") : "-";
+      const plate = log ? (log.vehiclePlate || "-") : "-";
+      const gpsText = log ? (log.gpsCoordinates || "13.7563, 100.5018 (สถานีตรวจ TTMK)") : "13.7563, 100.5018 (สถานีตรวจ TTMK)";
+      const timeText = log ? (log.timestamp || "-") : "-";
+      const faceMatch = log ? (log.faceMatchPercent || "99.5%") : "99.5%";
 
       // Row 1: Alcohol
       const r1Y = boxY + 40;
@@ -2979,34 +3023,13 @@
       } else if (typeof index === 'object' && index !== null) {
         log = index;
       } else {
-        log = appState.alcoholLogs[0] || {
-          driverName: "พิทยา แคนถา",
-          driverId: "DRV-012",
-          vehiclePlate: "70-9312มค.",
-          email: "kaeochom8@gmail.com",
-          phone: "092-5389099",
-          timestamp: "12/10/2026 11:20:21",
-          gpsCoordinates: "13.7563, 100.5018 (จุดตรวจ SCG JWD วังน้อย)",
-          bpSys: 113,
-          bpDia: 65,
-          bpPulse: 76,
-          alcoholValue: 0.00,
-          status: "ผ่าน",
-          bpStatus: "ความดันปกติ",
-          overallStatus: "ผ่านพร้อมปฏิบัติงาน",
-          faceMatchPercent: "99.9%",
-          bpPhotoUrl: "https://drive.google.com/file/d/16EutL-5Rps94QYPaa97cbrlyQBuyabBd/view?usp=drivesdk",
-          facePhotoUrl: "https://drive.google.com/file/d/1UJcGYbTRV92w1gFiPSNhic1sTBPLNWDe/view?usp=drivesdk",
-          localBpUrl: "./assets/alcohol_evidence/BP_Drv70-9312_20261012_112021.jpg",
-          localFaceUrl: "./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg",
-          localMeterUrl: "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg"
-        };
+        log = appState.alcoholLogs[0];
       }
       if (!log) return;
 
       window.currentModalAlcoholLog = log;
 
-      // 1. Header Information
+      // 1. Header Information for THIS Row
       const elDrv = document.getElementById('alcModalDriverName');
       if (elDrv) elDrv.textContent = log.driverName;
       const elPlate = document.getElementById('alcModalPlate');
@@ -3014,9 +3037,9 @@
       const elTime = document.getElementById('alcModalTimestamp');
       if (elTime) elTime.textContent = log.timestamp;
       const elGps = document.getElementById('alcModalGps');
-      if (elGps) elGps.textContent = log.gpsCoordinates || "13.7563, 100.5018 (จุดตรวจ SCG JWD วังน้อย)";
+      if (elGps) elGps.textContent = log.gpsCoordinates || "13.7563, 100.5018 (จุดตรวจ TTMK)";
 
-      // Context Banner (Only THIS driver)
+      // Context Banner for THIS Row
       const activeDrv = document.getElementById('alcModalActiveDriverName');
       if (activeDrv) activeDrv.textContent = log.driverName;
       const activePlate = document.getElementById('alcModalActivePlate');
@@ -3031,18 +3054,45 @@
       if (driveRecordId) driveRecordId.textContent = `${log.driverId || ''} • ${log.timestamp}`;
 
       const timeCode = (log.timestamp || "").replace(/[^0-9]/g, '').slice(0, 14) || "20261012_112021";
-      const drvId = (log.driverId || "DRV-012").replace(/\s+/g, '_');
+      const drvId = (log.driverId || "DRV").replace(/[\s\.]+/g, '_');
 
-      // 2. Direct Evidence Retrieval from Drive / Local
+      // 2. Direct Evidence Retrieval from Drive / Local for THIS Row
       const photoInfo = getDriverPhotoInfo(log);
       const repImg = document.getElementById('alcModalReportImg');
       const faceImg = document.getElementById('alcModalFaceImg');
       const meterImg = document.getElementById('alcModalMeterImg');
       const bpImg = document.getElementById('alcModalBpImg');
 
-      // Set REAL Face Image
+      // Set Composite Report Card for THIS Row
+      if (repImg) {
+        if (log.localReportUrl) {
+          repImg.src = log.localReportUrl;
+        } else {
+          repImg.src = renderCompositeCardToDataUrl(log);
+          const faceUrl = log.localFaceUrl;
+          const bpUrl = log.localBpUrl;
+          const faceImgObj = faceUrl ? window.cachedFaceImgs[faceUrl] : null;
+          const bpImgObj = bpUrl ? window.cachedBpImgs[bpUrl] : null;
+          if (faceImgObj && (!faceImgObj.complete || faceImgObj.naturalWidth === 0)) {
+            faceImgObj.onload = () => {
+              if (window.currentModalAlcoholLog === log && repImg) {
+                repImg.src = renderCompositeCardToDataUrl(log);
+              }
+            };
+          }
+          if (bpImgObj && (!bpImgObj.complete || bpImgObj.naturalWidth === 0)) {
+            bpImgObj.onload = () => {
+              if (window.currentModalAlcoholLog === log && repImg) {
+                repImg.src = renderCompositeCardToDataUrl(log);
+              }
+            };
+          }
+        }
+      }
+
+      // Set REAL Face Image for THIS Row
       if (faceImg) {
-        faceImg.src = log.localFaceUrl || "./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg";
+        faceImg.src = log.localFaceUrl || photoInfo.localSrc;
         faceImg.dataset.driveId = log.faceFileId || photoInfo.fileId;
         faceImg.dataset.fallbackSrc = "https://lh3.googleusercontent.com/d/" + (log.faceFileId || photoInfo.fileId);
       }
@@ -3052,10 +3102,10 @@
       }
       const faceLabel = document.getElementById('alcModalFaceLabel');
       if (faceLabel) {
-        faceLabel.textContent = `${log.driverName} (${log.vehiclePlate}) - Face Match ${log.faceMatchPercent || '99.9%'}`;
+        faceLabel.textContent = `${log.driverName} (${log.vehiclePlate}) - Face Match ${log.faceMatchPercent || '99.5%'}`;
       }
 
-      // Set REAL Blood Pressure Monitor Image
+      // Set REAL Blood Pressure Monitor Image for THIS Row
       if (bpImg) {
         const bpSrc = log.localBpUrl || `./assets/alcohol_evidence/${log.bpFileName || 'BP_Drv70-9312_20261012_112021.jpg'}`;
         bpImg.src = bpSrc;
@@ -3072,7 +3122,7 @@
       }
       const bpBadge = document.getElementById('alcModalBpStatusBadge');
       if (bpBadge) {
-        bpBadge.textContent = `SYS: ${log.bpSys} / DIA: ${log.bpDia} / PULSE: ${log.bpPulse || 76}`;
+        bpBadge.textContent = `SYS: ${log.bpSys} / DIA: ${log.bpDia} / PULSE: ${log.bpPulse || 75}`;
         if ((log.bpStatus || '').includes('สูง') || Number(log.bpDia) >= 90) {
           bpBadge.className = "px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/40";
         } else {
@@ -3084,9 +3134,9 @@
       const elDia = document.getElementById('alcModalBpDiaText');
       if (elDia) elDia.textContent = log.bpDia;
       const elPulse = document.getElementById('alcModalBpPulseText');
-      if (elPulse) elPulse.textContent = log.bpPulse || 76;
+      if (elPulse) elPulse.textContent = log.bpPulse || 75;
 
-      // Set REAL Meter Image (Authentic Fuel Cell Breathalyzer Photo)
+      // Set REAL Meter Image for THIS Row
       if (meterImg) {
         meterImg.src = log.localMeterUrl || "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg";
         meterImg.dataset.driveId = log.meterFileId || "16EutL-5Rps94QYPaa97cbrlyQBuyabBd";
@@ -3095,11 +3145,6 @@
       const meterBadge = document.getElementById('alcModalMeterBadge');
       if (meterBadge) {
         meterBadge.textContent = `ระดับแอลกอฮอล์: ${Number(log.alcoholValue || 0).toFixed(2)} mg% (${log.status || 'ผ่าน'}) • เซ็นเซอร์ Fuel Cell`;
-      }
-
-      // Set Composite Report Card
-      if (repImg) {
-        repImg.src = log.localReportUrl || "./assets/alcohol_evidence/REPORT_Drv70-9312_20261012_112021.jpg";
       }
 
       // File Names in Tabs
@@ -3114,14 +3159,14 @@
 
       // 3. Tab 5: Populate Specific Google Drive File Cards for THIS Driver
       const driveThumbCard = document.getElementById('alcDriveThumbCard');
-      if (driveThumbCard) driveThumbCard.src = repImg ? repImg.src : "./assets/alcohol_evidence/REPORT_Drv70-9312_20261012_112021.jpg";
+      if (driveThumbCard) driveThumbCard.src = repImg ? repImg.src : (log.localReportUrl || './assets/alcohol_evidence/REPORT_Drv70-9312_20261012_112021.jpg');
       const driveNameCard = document.getElementById('alcDriveNameCard');
       if (driveNameCard) driveNameCard.textContent = `REPORT_${drvId}_${timeCode}.jpg`;
       const driveLinkCard = document.getElementById('alcDriveLinkCard');
       if (driveLinkCard) driveLinkCard.href = log.reportCardUrl || log.facePhotoUrl || '#';
 
       const driveThumbFace = document.getElementById('alcDriveThumbFace');
-      if (driveThumbFace) driveThumbFace.src = log.localFaceUrl || "./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg";
+      if (driveThumbFace) driveThumbFace.src = log.localFaceUrl || photoInfo.localSrc;
       const driveNameFace = document.getElementById('alcDriveNameFace');
       if (driveNameFace) driveNameFace.textContent = log.faceFileName || `FACE_${drvId}_${timeCode}.jpg`;
       const driveLinkFace = document.getElementById('alcDriveLinkFace');
@@ -3140,8 +3185,8 @@
         modalDriveBtn.href = log.facePhotoUrl || log.bpPhotoUrl || log.reportCardUrl || '#';
       }
 
-      // Default Active Tab: Camera Check-in Face Photo 1:1
-      switchAlcModalTab('face');
+      // Default Active Tab: Report Card of THIS Row!
+      switchAlcModalTab('card');
       document.getElementById('alcoholEvidenceModal').classList.remove('hidden');
     }
 
