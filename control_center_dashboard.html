@@ -2016,6 +2016,18 @@
           } catch(e){}
         }
 
+        // Query GAS Web App for live alcohol logs (Google Sheet: Alcohol_Logs)
+        try {
+          const gasAlcResp = await fetch(`${CONFIG.GAS_URL}?action=listAlcoholLogs`);
+          if (gasAlcResp.ok) {
+            const alcData = await gasAlcResp.json();
+            if (alcData.logs && alcData.logs.length > 0) {
+              appState.alcoholLogs = alcData.logs;
+              loaded = true;
+            }
+          }
+        } catch(e){}
+
         // Query GAS Web App for live driver updates
         try {
           const gasResp = await fetch(`${CONFIG.GAS_URL}?action=listDrivers`);
@@ -3063,10 +3075,19 @@
       const meterImg = document.getElementById('alcModalMeterImg');
       const bpImg = document.getElementById('alcModalBpImg');
 
-      // Set Composite Report Card for THIS Row
+      // Clear retry flags on modal opening
+      [repImg, faceImg, meterImg, bpImg].forEach(img => {
+        if (img) delete img.dataset.hasRetried;
+      });
+
+      // Set Composite Report Card for THIS Row (Column W from Sheet)
       if (repImg) {
+        repImg.dataset.driveId = log.reportCardFileId || "";
+        repImg.dataset.fallbackSrc = log.reportCardFileId ? ("https://lh3.googleusercontent.com/d/" + log.reportCardFileId) : "";
         if (log.localReportUrl) {
           repImg.src = log.localReportUrl;
+        } else if (log.reportCardFileId) {
+          repImg.src = "https://lh3.googleusercontent.com/d/" + log.reportCardFileId;
         } else {
           repImg.src = renderCompositeCardToDataUrl(log);
           const faceUrl = log.localFaceUrl;
@@ -3090,11 +3111,11 @@
         }
       }
 
-      // Set REAL Face Image for THIS Row
+      // Set REAL Face Image for THIS Row (Column K from Sheet)
       if (faceImg) {
-        faceImg.src = log.localFaceUrl || photoInfo.localSrc;
-        faceImg.dataset.driveId = log.faceFileId || photoInfo.fileId;
-        faceImg.dataset.fallbackSrc = "https://lh3.googleusercontent.com/d/" + (log.faceFileId || photoInfo.fileId);
+        faceImg.dataset.driveId = log.faceFileId || photoInfo.fileId || "";
+        faceImg.dataset.fallbackSrc = faceImg.dataset.driveId ? ("https://lh3.googleusercontent.com/d/" + faceImg.dataset.driveId) : "";
+        faceImg.src = log.localFaceUrl || (faceImg.dataset.driveId ? ("https://lh3.googleusercontent.com/d/" + faceImg.dataset.driveId) : photoInfo.localSrc);
       }
       const faceDriveLink = document.getElementById('alcModalFaceDriveLink');
       if (faceDriveLink) {
@@ -3105,12 +3126,11 @@
         faceLabel.textContent = `${log.driverName} (${log.vehiclePlate}) - Face Match ${log.faceMatchPercent || '99.5%'}`;
       }
 
-      // Set REAL Blood Pressure Monitor Image for THIS Row
+      // Set REAL Blood Pressure Monitor Image for THIS Row (Column X from Sheet)
       if (bpImg) {
-        const bpSrc = log.localBpUrl || `./assets/alcohol_evidence/${log.bpFileName || 'BP_Drv70-9312_20261012_112021.jpg'}`;
-        bpImg.src = bpSrc;
-        bpImg.dataset.driveId = log.bpFileId || "16EutL-5Rps94QYPaa97cbrlyQBuyabBd";
-        bpImg.dataset.fallbackSrc = "https://lh3.googleusercontent.com/d/" + (log.bpFileId || "16EutL-5Rps94QYPaa97cbrlyQBuyabBd");
+        bpImg.dataset.driveId = log.bpFileId || "";
+        bpImg.dataset.fallbackSrc = bpImg.dataset.driveId ? ("https://lh3.googleusercontent.com/d/" + bpImg.dataset.driveId) : "./assets/alcohol_evidence/BP_Drv70-9312_20261012_112021.jpg";
+        bpImg.src = log.localBpUrl || (bpImg.dataset.driveId ? ("https://lh3.googleusercontent.com/d/" + bpImg.dataset.driveId) : "./assets/alcohol_evidence/BP_Drv70-9312_20261012_112021.jpg");
       }
       const bpDriveLink = document.getElementById('alcModalBpDriveLink');
       if (bpDriveLink) {
@@ -3136,11 +3156,11 @@
       const elPulse = document.getElementById('alcModalBpPulseText');
       if (elPulse) elPulse.textContent = log.bpPulse || 75;
 
-      // Set REAL Meter Image for THIS Row
+      // Set REAL Breathalyzer Meter Image for THIS Row (Column L from Sheet)
       if (meterImg) {
-        meterImg.src = log.localMeterUrl || "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg";
-        meterImg.dataset.driveId = log.meterFileId || "16EutL-5Rps94QYPaa97cbrlyQBuyabBd";
-        meterImg.dataset.fallbackSrc = "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg";
+        meterImg.dataset.driveId = log.meterFileId || "";
+        meterImg.dataset.fallbackSrc = log.meterFileId ? ("https://lh3.googleusercontent.com/d/" + log.meterFileId) : "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg";
+        meterImg.src = log.localMeterUrl || (log.meterFileId ? ("https://lh3.googleusercontent.com/d/" + log.meterFileId) : "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg");
       }
       const meterBadge = document.getElementById('alcModalMeterBadge');
       if (meterBadge) {

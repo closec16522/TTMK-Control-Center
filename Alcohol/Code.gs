@@ -429,6 +429,15 @@ function doGet(e) {
     })).setMimeType(ContentService.MimeType.JSON);
   }
 
+  // ดึงประวัติการตรวจวัดแอลกอฮอล์และความดันทั้งหมดจากชีต Alcohol_Logs
+  if (action === "listAlcoholLogs" || action === "getAlcoholLogs") {
+    var logs = getAllAlcoholLogs();
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true,
+      logs: logs
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
   return ContentService.createTextOutput(JSON.stringify({
     success: true,
     system: "ระบบตรวจวัดแอลกอฮอล์และความพร้อมพนักงาน หจก. ทั่วไทยขนส่งมงคล",
@@ -559,6 +568,54 @@ function getAllDrivers() {
         department: data[i][(colMap["Department"] || 6) - 1],
         hasMasterFace: colMap["Master_Face_URL"] ? !!data[i][colMap["Master_Face_URL"] - 1] : false,
         status: data[i][(colMap["Status"] || 7) - 1]
+      });
+    }
+    return list;
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * ดึงประวัติการตรวจวัดแอลกอฮอล์และความดันทั้งหมดจากชีต Alcohol_Logs
+ */
+function getAllAlcoholLogs() {
+  try {
+    var ss = getAppSpreadsheet();
+    var sheet = ss.getSheetByName(SHEET_LOGS);
+    if (!sheet) return [];
+    
+    var colMap = getColumnIndexMap(sheet);
+    var data = sheet.getDataRange().getValues();
+    var list = [];
+    for (var i = 1; i < data.length; i++) {
+      var row = data[i];
+      if (!row[0] && !row[1] && !row[3]) continue;
+      list.push({
+        timestamp: row[(colMap["Timestamp"] || 1) - 1],
+        date: row[(colMap["Date"] || 2) - 1],
+        time: row[(colMap["Time"] || 3) - 1],
+        driverId: row[(colMap["Driver_ID"] || 4) - 1],
+        driverName: row[(colMap["Driver_Name"] || 5) - 1],
+        email: row[(colMap["Email"] || 6) - 1],
+        phone: row[(colMap["Phone"] || 7) - 1],
+        vehiclePlate: row[(colMap["Vehicle_Plate"] || 8) - 1],
+        alcoholValue: row[(colMap["Alcohol_Value"] || 9) - 1],
+        status: row[(colMap["Status"] || 10) - 1],
+        facePhotoUrl: colMap["Face_Photo_URL"] ? row[colMap["Face_Photo_URL"] - 1] : "",
+        meterPhotoUrl: colMap["Meter_Photo_URL"] ? row[colMap["Meter_Photo_URL"] - 1] : "",
+        gpsCoordinates: colMap["GPS_Coordinates"] ? row[colMap["GPS_Coordinates"] - 1] : "",
+        googleMapsLink: colMap["Google_Maps_Link"] ? row[colMap["Google_Maps_Link"] - 1] : "",
+        verificationMethod: colMap["Verification_Method"] ? row[colMap["Verification_Method"] - 1] : "",
+        remarks: colMap["Remarks"] ? row[colMap["Remarks"] - 1] : "",
+        bpSys: colMap["BP_SYS"] ? row[colMap["BP_SYS"] - 1] : 0,
+        bpDia: colMap["BP_DIA"] ? row[colMap["BP_DIA"] - 1] : 0,
+        bpPulse: colMap["BP_Pulse"] ? row[colMap["BP_Pulse"] - 1] : 0,
+        bpStatus: colMap["BP_Status"] ? row[colMap["BP_Status"] - 1] : "",
+        overallStatus: colMap["Overall_Status"] ? row[colMap["Overall_Status"] - 1] : "",
+        faceMatchPercent: colMap["Face_Match_Percent"] ? row[colMap["Face_Match_Percent"] - 1] : "",
+        reportCardUrl: colMap["Report_Card_URL"] ? row[colMap["Report_Card_URL"] - 1] : "",
+        bpPhotoUrl: colMap["BP_Photo_URL"] ? row[colMap["BP_Photo_URL"] - 1] : ""
       });
     }
     return list;
