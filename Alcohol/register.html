@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ลงทะเบียนพนักงานและบันทึกใบหน้าต้นแบบ | หจก. ทั่วไทยขนส่งมงคล</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Face-api.js for 128-d Face Descriptors -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-lg sticky top-0 z-40">
+    <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="index.html" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+          <i class="fa-solid fa-arrow-left text-sm"></i>
+        </a>
+        <div>
+          <h1 class="font-bold text-base leading-tight">หจก. ทั่วไทยขนส่งมงคล</h1>
+          <p class="text-xs text-blue-200">ลงทะเบียนพนักงาน & ถ่ายรูปใบหน้าต้นแบบ (Master Face)</p>
+        </div>
+      </div>
+      <a href="index.html" class="text-xs text-blue-300 hover:text-white px-2.5 py-1 rounded-lg bg-blue-800/60 border border-blue-400/30 transition flex items-center space-x-1">
+        <i class="fa-solid fa-shield-halved text-[11px]"></i>
+        <span>ไปหน้าตรวจวัด</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Form Content -->
+  <main class="max-w-2xl mx-auto w-full px-4 py-5 flex-1 space-y-4">
+
+    <!-- Notice Card -->
+    <div class="bg-blue-50 border-l-4 border-blue-600 p-3.5 rounded-r-xl shadow-sm flex items-start space-x-3 text-xs text-blue-900">
+      <i class="fa-solid fa-circle-info text-blue-600 text-base mt-0.5"></i>
+      <div>
+        <strong class="font-semibold text-blue-950">วัตถุประสงค์การลงทะเบียน:</strong>
+        บันทึกรูปถ่ายใบหน้าตรง (Master Profile) 1 ครั้ง เพื่อใช้เป็นเกณฑ์เปรียบเทียบใบหน้า 1:1 กับระบบ AI ตรวจสอบพนักงานก่อนเป่าแอลกอฮอล์ทุกครั้ง
+      </div>
+    </div>
+
+    <!-- Search / Switch Mode Bar -->
+    <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span id="regModeBadge" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200 flex items-center space-x-1.5">
+            <i id="regModeIcon" class="fa-solid fa-user-plus text-[10px]"></i>
+            <span id="regModeText">โหมด: ลงทะเบียนพนักงานใหม่</span>
+          </span>
+        </div>
+        <button type="button" id="btnResetToNewMode" onclick="resetFormToNewMode()" class="hidden text-xs text-slate-500 hover:text-slate-800 font-medium underline cursor-pointer">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i> ล้างฟอร์ม / สลับเป็นลงทะเบียนใหม่
+        </button>
+      </div>
+
+      <!-- Quick Lookup Form -->
+      <div class="flex gap-2">
+        <div class="relative flex-1">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+          <input type="text" id="lookupDriverInput" placeholder="ใส่อีเมลพนักงาน เพื่อดึงข้อมูลเดิมมาแก้ไขหรือถ่ายรูปใหม่"
+                 class="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+        <button type="button" id="btnLookupDriver" onclick="handleLookupDriverClick()"
+                class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-semibold rounded-xl transition shadow flex items-center space-x-1.5 cursor-pointer">
+          <i class="fa-solid fa-search text-[11px]"></i>
+          <span>ดึงข้อมูลเดิม</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Registration Card -->
+    <section class="glass-panel p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+
+      <!-- Form Inputs -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="font-semibold text-slate-700">รหัสพนักงาน (Driver ID) *</label>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-bold flex items-center shadow-2xs">
+              <i class="fa-solid fa-wand-magic-sparkles mr-1 text-emerald-600"></i>รันอัตโนมัติ (Auto)
+            </span>
+          </div>
+          <div class="relative">
+            <input type="text" id="regDriverId" placeholder="กำลังสร้างรหัสอัตโนมัติ..." readonly
+                   class="w-full pl-3 pr-22 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none bg-slate-100 text-blue-900 font-mono font-bold tracking-wider">
+            <button type="button" id="btnEditDriverId" onclick="toggleEditDriverId()" 
+                    class="absolute right-1.5 top-1.5 px-2 py-1 bg-white hover:bg-slate-50 text-slate-600 rounded-lg text-[10px] border border-slate-200 transition shadow-xs cursor-pointer" title="คลิกเพื่อแก้ไขรหัสเองถ้าต้องการ">
+              <i class="fa-solid fa-pen-to-square"></i> กำหนดเอง
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="font-semibold text-slate-700 block mb-1">ชื่อ - นามสกุล พนักงาน *</label>
+          <input type="text" id="regDriverName" placeholder="เช่น นายสมชาย ใจดี"
+                 class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div>
+          <label class="font-semibold text-slate-700 block mb-1">อีเมล (ใช้ Login ตรวจสอบ) *</label>
+          <input type="email" id="regEmail" placeholder="เช่น somchai@gmail.com"
+                 class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div>
+          <label class="font-semibold text-slate-700 block mb-1">เบอร์โทรศัพท์ติดต่อ</label>
+          <input type="tel" id="regPhone" placeholder="เช่น 081-234-5678"
+                 class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div>
+          <label class="font-semibold text-slate-700 block mb-1">ทะเบียนรถประจำตัว</label>
+          <input type="text" id="regPlate" placeholder="เช่น 70-8899 กทม."
+                 class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div>
+          <label class="font-semibold text-slate-700 block mb-1">สังกัด / แผนกขนส่ง</label>
+          <select id="regDept" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+            <option value="แผนกขนส่งด่วนพิเศษ">แผนกขนส่งด่วนพิเศษ</option>
+            <option value="แผนกขนส่งสินค้าทั่วไป">แผนกขนส่งสินค้าทั่วไป</option>
+            <option value="แผนกขนส่งสายเหนือ">แผนกขนส่งสายเหนือ</option>
+            <option value="แผนกขนส่งสายอีสาน">แผนกขนส่งสายอีสาน</option>
+            <option value="แผนกขนส่งสายใต้">แผนกขนส่งสายใต้</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Master Face Capture Camera Box -->
+      <div class="pt-2 border-t border-slate-200">
+        <label class="font-bold text-slate-800 text-xs block mb-1">
+          <i class="fa-solid fa-camera text-blue-600 mr-1"></i> ถ่ายภาพใบหน้าต้นแบบ (บังคับถ่ายสดจากกล้องหน้า ห้ามเลือกรูปจากเครื่อง)
+        </label>
+        <p class="text-[11px] text-slate-500 mb-3">กรุณามองตรงหน้ากล้อง ไม่สวมหมวก แว่นตาดำ หรือหน้ากากอนามัย</p>
+
+        <!-- Existing Master Face Preview (Shown in Edit Mode) -->
+        <div id="existingMasterSection" class="hidden mb-3 p-3 bg-amber-50 rounded-xl border border-amber-200">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-amber-900 flex items-center">
+              <i class="fa-solid fa-id-badge mr-1.5 text-amber-600"></i> รูปใบหน้าต้นแบบปัจจุบันในระบบ
+            </span>
+            <span class="text-[10px] px-2 py-0.5 rounded-md bg-amber-200/70 text-amber-800 font-semibold">มีรูปในระบบแล้ว</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <img id="existingMasterImg" src="" alt="Current Master Face" class="w-16 h-20 object-cover rounded-lg border border-amber-300 shadow-sm bg-slate-800">
+            <div class="text-[11px] text-slate-600 flex-1 space-y-1">
+              <p class="font-medium text-slate-800">มีรูปต้นแบบเดิมอยู่ในระบบแล้ว</p>
+              <p class="text-slate-500">หากต้องการแก้ไขเฉพาะข้อมูลชื่อ/เบอร์โทร/ทะเบียนรถ สามารถกดบันทึกได้ทันทีโดยไม่ต้องถ่ายรูปใหม่</p>
+              <p class="text-blue-700 font-semibold">หรือหากต้องการอัปเดตใบหน้าใหม่ ให้กดปุ่ม "เปิดกล้องหน้าสด" ด้านล่าง</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative w-full aspect-[3/4] max-w-xs mx-auto bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center border-2 border-slate-300">
+          <video id="masterFaceVideo" autoplay playsinline muted class="w-full h-full object-cover camera-mirror"></video>
+          <img id="masterFaceImg" class="w-full h-full object-cover hidden" alt="Master Face Preview">
+          
+          <div id="masterFaceReticle" class="face-guide"></div>
+
+          <!-- Camera Open Prompt -->
+          <div id="masterCameraPrompt" class="absolute inset-0 bg-slate-900/85 flex flex-col items-center justify-center text-center p-4 text-white">
+            <div class="w-12 h-12 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl mb-2">
+              <i class="fa-solid fa-camera"></i>
+            </div>
+            <p class="text-xs font-semibold mb-3">เปิดกล้องหน้าเพื่อบันทึกใบหน้าต้นแบบ</p>
+            <button type="button" id="btnStartMasterCamera" onclick="startMasterCamera()"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-semibold rounded-xl shadow transition flex items-center space-x-1.5 cursor-pointer">
+              <i class="fa-solid fa-video"></i>
+              <span>เปิดกล้องหน้าสด</span>
+            </button>
+            <button type="button" onclick="showCameraPermissionGuideModal()" class="mt-2.5 text-[11px] text-amber-300 hover:text-amber-200 underline inline-flex items-center cursor-pointer">
+              <i class="fa-solid fa-circle-question mr-1"></i> กล้องไม่เปิด / เผลอกดบล็อก? แตะดูวิธีแก้
+            </button>
+          </div>
+
+          <!-- AI Feature Extracting Overlay -->
+          <div id="masterAiExtracting" class="hidden absolute inset-0 bg-slate-900/80 flex flex-col items-center justify-center text-center p-4 text-white">
+            <i class="fa-solid fa-spinner fa-spin text-3xl text-blue-400 mb-2"></i>
+            <span class="text-xs font-semibold">AI กำลังวิเคราะห์จุดเด่นใบหน้า...</span>
+            <span class="text-[10px] text-slate-300 mt-1">สกัด 128-d Vector Descriptors</span>
+          </div>
+        </div>
+
+        <!-- Camera Controls -->
+        <div class="flex justify-center space-x-3 mt-3 max-w-xs mx-auto">
+          <button type="button" id="btnCaptureMaster" onclick="captureMasterFace()" disabled
+                  class="flex-1 py-2.5 px-4 bg-slate-300 text-slate-500 font-bold rounded-xl text-xs transition shadow flex items-center justify-center space-x-2 cursor-not-allowed">
+            <i class="fa-solid fa-camera"></i>
+            <span>กดถ่ายรูปใบหน้า</span>
+          </button>
+          <button type="button" id="btnRetakeMaster" onclick="retakeMasterFace()" class="hidden py-2 px-3 bg-amber-100 hover:bg-amber-200 text-amber-800 font-medium rounded-xl text-xs transition">
+            <i class="fa-solid fa-arrows-rotate mr-1"></i> ถ่ายใหม่
+          </button>
+        </div>
+        <div class="text-center mt-2">
+          <button type="button" onclick="showCameraPermissionGuideModal()" class="text-[11px] text-slate-500 hover:text-blue-600 inline-flex items-center transition cursor-pointer">
+            <i class="fa-solid fa-circle-question mr-1 text-amber-500"></i> กล้องไม่เปิด / เผลอกดบล็อกกล้อง? แตะดูวิธีเปิดสิทธิ์
+          </button>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="pt-3 border-t border-slate-200">
+        <button type="button" id="btnSubmitRegistration" onclick="submitRegistration()"
+                class="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2 cursor-pointer active:scale-95">
+          <i id="btnSubmitIcon" class="fa-solid fa-user-check text-base"></i>
+          <span id="btnSubmitText">บันทึกการลงทะเบียนพนักงาน</span>
+        </button>
+      </div>
+
+    </section>
+
+    <!-- Canvas (Hidden) -->
+    <canvas id="regCanvas" class="hidden"></canvas>
+  </main>
+
+  <!-- Clean Footer (No Google Sheet ID) -->
+  <footer class="bg-slate-900 text-slate-400 text-center py-4 px-4 text-xs border-t border-slate-800 mt-6">
+    <div class="max-w-2xl mx-auto space-y-1">
+      <p class="font-medium text-slate-300">
+        copyright , Mr.Taweesak.kom (0623285963)
+      </p>
+      <p class="text-[11px] text-slate-500">
+        หจก. ทั่วไทยขนส่งมงคล &bull; ระบบบริหารจัดการข้อมูลพนักงานขับรถ
+      </p>
+    </div>
+  </footer>
+
+  <script src="register.js?v=20261004_01"></script>
+</body>
+</html>

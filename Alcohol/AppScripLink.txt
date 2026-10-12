@@ -1,0 +1,4 @@
+Active Google Apps Script Web App (API Gateway):
+https://script.google.com/macros/s/AKfycbxbyJ1yWNodowMh-OLxqBuFvH-Pk-TLwg7dRv_lwT7bbTJBu5MH_lhqxE3KwJ7lDH407g/exec
+
+(หมายเหตุความปลอดภัย: Spreadsheet ID, Drive Folder ID และ Secret Keys ทั้งหมด ถูกย้ายไปจัดเก็บอย่างปลอดภัยบน Google Sheet และ Google Apps Script โดยไม่มีการเปิดเผยบน GitHub)

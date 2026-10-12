@@ -1,30 +1,41 @@
-# 🚚 TTMK Control Center Dashboard
+# 🚚 หจก. ทั่วไทยขนส่งมงคล (TTMK)
+## ศูนย์ควบคุมการขนส่งและ TSM Safety Enterprise Platform
 
-ระบบบริหารจัดการและควบคุมระบบขนส่ง TTMK Control Center Dashboard พัฒนาด้วย HTML, Tailwind CSS, Font Awesome, Chart.js และ SweetAlert2 พร้อมระบบเชื่อมต่อฐานข้อมูล Google Sheets และ Google Drive แบบ Real-time
-
----
-
-## 🗄️ การสร้างตารางฐานข้อมูลบน Google Sheet (ID: `19Ve3nx5crTV4JJu05ZPqDI_04pBVOkRLNcf7wxfzC8o`)
-
-### ขั้นตอนสร้างตารางฐานข้อมูลอัตโนมัติ 7 แท็บ:
-1. เปิด **Google Sheet**: `https://docs.google.com/spreadsheets/d/19Ve3nx5crTV4JJu05ZPqDI_04pBVOkRLNcf7wxfzC8o/edit`
-2. คลิกเมนู **ส่วนขยาย (Extensions)** ➔ **Apps Script**
-3. คัดลอกโค้ดทั้งหมดในไฟล์ `google_apps_script.gs` วางลงในไฟล์ `Code.gs`
-4. ที่เมนูดร็อปดาวน์ฟังก์ชันด้านบน เลือก **`setupInitialDatabase`** แล้วกดปุ่ม **`Run (เรียกใช้)`**
-   👉 *ระบบจะสร้างตารางฐานข้อมูล 7 แท็บ พร้อมหัวข้อสีสันสวยงามและข้อมูลเริ่มต้นลง Google Sheet ทันที!*
-5. กดปุ่ม **Deploy (ทำให้ใช้งานได้)** ➔ **New deployment (การทำให้ใช้งานได้ใหม่)**
-   - ประเภท: **Web App (แอปเว็บ)**
-   - Execute as: **Me (ฉัน)**
-   - Who has access: **Anyone (ทุกคน)**
-6. คัดลอก URL Web App ที่ได้ นำมาวางในตัวแปร `WEB_APP_URL` ในไฟล์ `index.html`
+ระบบบริหารจัดการกองยานพาหนะและควบคุมความปลอดภัย TSM ครบวงจร พัฒนาด้วยมาตรฐานดีไซน์และ Template เดียวกับระบบ **Smart Inspection (Alcohol Check)** รองรับการทำงานแบบเรียบลื่น (60fps Butter-Smooth) และเชื่อมโยงฐานข้อมูลจริงแบบ Multi-Cloud ผ่าน Google Spreadsheet และ Google Drive
 
 ---
 
-## 📋 แท็บตารางฐานข้อมูลที่ถูกสร้างใน Google Sheet:
-1. **`Inspections`**: บันทึกผลสุ่มตรวจความปลอดภัยประจำวัน
-2. **`Maintenance`**: บันทึกงานซ่อมบำรุง + ลิงก์รูปถ่ายใบเสร็จและจุดซ่อมใน Google Drive
-3. **`SCG_Alerts`**: บันทึกการแจ้งเตือนด่วน (Fatigue / Overspeed / Route Dev.)
-4. **`Expenses`**: บันทึกการเบิกจ่ายค่าน้ำมันและค่าใช้จ่ายรายทาง
-5. **`Vehicles`**: คลังข้อมูลทะเบียนรถและกำหนด PM
-6. **`Employees`**: คลังข้อมูลพนักงานผขร.
-7. **`Master_Data`**: บันทึกการตั้งค่าตัวเลือกในระบบ (ประเภทรถ / ประเภทงาน) และ LINE Token
+### 🌐 ที่อยู่และลิงก์ระบบภายใน Local Server (`http://localhost:3000/`)
+
+| ระบบ | ลิงก์ภายในระบบ | รายละเอียดการทำงาน |
+| :--- | :--- | :--- |
+| **🏢 TTMK Control Center (ศูนย์ควบคุมหลัก)** | [`http://localhost:3000/`](http://localhost:3000/) | หน้าแดชบอร์ดหลัก ออกแบบด้วย Template แบบเดียวกับ Smart Inspection มี 6 แท็บทำงาน |
+| **🍺 ระบบตรวจวัดแอลกอฮอล์และสุขภาพ** | [`http://localhost:3000/Alcohol/index.html`](http://localhost:3000/Alcohol/index.html) | ตรวจจับใบหน้า 1:1, AI OCR หน้าปัดเครื่องเป่า, ตรวจวัดความดัน SYS/DIA |
+| **🚛 ระบบตรวจสภาพรถ 6 ล้อ 3D** | [`http://localhost:3000/CheckTruck/index.html`](http://localhost:3000/CheckTruck/index.html) | Digital Twin 3D Inspection มาตรฐาน F-CAM-032_r3 ส่งออกรายงาน PDF รายวัน/รายเดือน |
+| **👤 ลงทะเบียนพนักงานขับรถใหม่** | [`http://localhost:3000/Alcohol/register.html`](http://localhost:3000/Alcohol/register.html) | ถ่ายรูปใบหน้าต้นแบบ 1:1 และบันทึกข้อมูลเข้า Google Sheet ทันที |
+
+---
+
+### 🗄️ การเชื่อมต่อฐานข้อมูล Google Spreadsheet & Google Drive จริง
+
+- **Google Spreadsheet ID**: `1JM-i8_nrGR7-VDEY82QZ5l5JMJTIBOIsuqOSQSrcD3Y`
+  - **`Registered_Drivers`**: ฐานข้อมูลพนักงานขับรถจริงทั้งหมด 20 ราย พร้อมรูปต้นแบบ 1:1
+  - **`Alcohol_Logs`**: ประวัติการเป่าแอลกอฮอล์และค่าความดันโลหิตรายวัน
+  - **`Truck_Inspection_Logs`**: รายการตรวจเช็กสภาพรถ 6 ล้อ และผลการตรวจ 15 จุด
+  - **`System_Config`**: ค่าตั้งค่าระบบ (Admin Passcode, Notification Tokens, Google Drive Folder IDs)
+- **Google Drive Folder ID (ข้อมูลการตรวจวัดแอลกอฮอล์และความดัน)**:
+  - `1tfKH6EOBFdG0c4Wm2MPO-R61NP5mAc0c`
+- **Google Drive Folder ID (ข้อมูลการตรวจสอบรถบรรทุก Report รายวันและรายเดือน)**:
+  - `1ryLhwkO1lnv-2qgLbDDl0XyVaq8S2Szs`
+
+---
+
+### 🚀 การเริ่มเซิร์ฟเวอร์พัฒนาในเครื่อง (Local Dev Server)
+
+ดับเบิลคลิกไฟล์ `start_dev_server.bat` หรือเปิด PowerShell แล้วสั่ง:
+```bash
+node server.js
+```
+เปิดบราวเซอร์ไปที่: `http://localhost:3000/`
+
+ลิขสิทธิ์ระบบ: **Mr.Taweesak.kom (062-3285963) - หจก. ทั่วไทยขนส่งมงคล**

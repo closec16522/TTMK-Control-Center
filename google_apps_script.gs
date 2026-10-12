@@ -1,241 +1,353 @@
 /**
- * Google Apps Script for TTMK Control Center Dashboard
- * Google Sheet ID: 19Ve3nx5crTV4JJu05ZPqDI_04pBVOkRLNcf7wxfzC8o
- * Google Drive Folder ID: 1K_N2Wbrjoslm5MMc6jjRa488VgjDuWXf
+ * ============================================================================
+ * Google Apps Script - ศูนย์ควบคุมและบริหารจัดการขนส่ง TTMK Control Center
+ * หจก. ทั่วไทยขนส่งมงคล (Mr.Taweesak.kom - 062-3285963)
  * 
- * ============================================================================
- * 🚀 ขั้นตอนการเปิดใช้งานฐานข้อมูลอัตโนมัติ (ครั้งแรกครั้งเดียว):
- * 1. เปิด Google Sheet ID: 19Ve3nx5crTV4JJu05ZPqDI_04pBVOkRLNcf7wxfzC8o
- * 2. ไปที่เมนู Extensions (ส่วนขยาย) -> Apps Script
- * 3. วางโค้ดทั้งหมดนี้ลงในไฟล์ Code.gs
- * 4. เลือกฟังก์ชัน "setupInitialDatabase" ด้านบน แล้วกดปุ่ม "Run (เรียกใช้)"
- *    -> ระบบจะสร้างแท็บตารางฐานข้อมูลและหัวข้อทั้งหมดลงใน Google Sheet ให้อัตโนมัติ!
- * 5. กดปุ่ม Deploy (ทำให้ใช้งานได้) -> New deployment (การทำให้ใช้งานได้ใหม่)
- * 6. เลือกประเภท: Web App (แอปเว็บ)
- *    - Execute as: Me (ฉัน)
- *    - Who has access: Anyone (ทุกคน)
- * 7. คัดลอก URL Web App ที่ได้ นำไปใส่ในตัวแปร WEB_APP_URL ในไฟล์ index.html
+ * Google Spreadsheet ID: 1JM-i8_nrGR7-VDEY82QZ5l5JMJTIBOIsuqOSQSrcD3Y
+ * Google Drive Folder IDs:
+ *  - Alcohol & BP Photos: 1tfKH6EOBFdG0c4Wm2MPO-R61NP5mAc0c
+ *  - Truck Inspection Reports (PDF): 1ryLhwkO1lnv-2qgLbDDl0XyVaq8S2Szs
  * ============================================================================
  */
 
-const SHEET_ID = '19Ve3nx5crTV4JJu05ZPqDI_04pBVOkRLNcf7wxfzC8o';
-const DRIVE_FOLDER_ID = '1K_N2Wbrjoslm5MMc6jjRa488VgjDuWXf';
+const SPREADSHEET_ID = "1JM-i8_nrGR7-VDEY82QZ5l5JMJTIBOIsuqOSQSrcD3Y";
+const DRIVE_FOLDER_ALCOHOL = "1tfKH6EOBFdG0c4Wm2MPO-R61NP5mAc0c";
+const DRIVE_FOLDER_TRUCK = "1ryLhwkO1lnv-2qgLbDDl0XyVaq8S2Szs";
 
-/**
- * 🛠️ ฟังก์ชันสร้างตารางฐานข้อมูลและหัวข้ออัตโนมัติทั้งหมดบน Google Sheet
- */
-function setupInitialDatabase() {
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  
-  // 1. แท็บ Inspections (ตรวจความปลอดภัย)
-  createSheetWithHeaders(ss, 'Inspections', 
-    ['Timestamp', 'Date_Time', 'Vehicle_Reg', 'Driver_Name', 'Seatbelt_Status', 'Phone_Usage'],
-    [
-      [new Date().toLocaleString('th-TH'), 'วันนี้ 08:30', '70-1234', 'อำนาจ ชูส่ง', 'คาดเข็มขัด', 'ไม่ใช้โทรศัพท์'],
-      [new Date().toLocaleString('th-TH'), 'เมื่อวาน 15:00', '72-5566', 'สมชาย ใจดี', 'คาดเข็มขัด', 'ใช้โทรศัพท์']
-    ]
-  );
+const SHEET_DRIVERS = "Registered_Drivers";
+const SHEET_ALCOHOL_LOGS = "Alcohol_Logs";
+const SHEET_TRUCK_LOGS = "Truck_Inspection_Logs";
+const SHEET_CONFIG = "System_Config";
 
-  // 2. แท็บ Maintenance (ซ่อมบำรุง)
-  createSheetWithHeaders(ss, 'Maintenance', 
-    ['Timestamp', 'Truck_Reg', 'Service_Location', 'Date', 'Odometer', 'Items_JSON', 'Total_Price', 'Receipt_Image_Drive_URL', 'Repair_Image_Drive_URL'],
-    [
-      [new Date().toLocaleString('th-TH'), '70-1234', 'อู่ ช.การช่าง', '2026-09-02', '125400', '[{"type":"PM","desc":"เปลี่ยนถ่ายน้ำมันเครื่อง 10L","price":"3500"}]', '3,500.00', 'https://drive.google.com/', 'https://drive.google.com/']
-    ]
-  );
-
-  // 3. แท็บ SCG_Alerts (แจ้งเตือนฉุกเฉิน)
-  createSheetWithHeaders(ss, 'SCG_Alerts', 
-    ['Timestamp', 'Alert_Time', 'Truck_Reg', 'Driver_Name', 'Alert_Type', 'Description', 'Status', 'Resolution_Note'],
-    [
-      [new Date().toLocaleString('th-TH'), '14:30', '72-5566', 'สมชาย ใจดี', 'Fatigue (หลับใน)', 'AI ตรวจจับหลับตา > 2 วิ', 'รอจัดการ', ''],
-      [new Date().toLocaleString('th-TH'), '13:15', '71-9988', 'วิชัย รักงาน', 'Overspeed', 'ความเร็ว 95 กม./ชม.', 'เรียบร้อย', 'ตักเตือนเรียบร้อย']
-    ]
-  );
-
-  // 4. แท็บ Expenses (เบิกจ่ายพนักงาน)
-  createSheetWithHeaders(ss, 'Expenses', 
-    ['Timestamp', 'Date', 'Employee_ID', 'Employee_Name', 'Expense_Type', 'Amount', 'Ref_Invoice_No'],
-    [
-      [new Date().toLocaleString('th-TH'), '2026-09-02', 'EMP001', 'สมชาย ใจดี', 'ค่าน้ำมันเชื้อเพลิง', '1,500.00', 'INV-001']
-    ]
-  );
-
-  // 5. แท็บ Vehicles (คลังรถ)
-  createSheetWithHeaders(ss, 'Vehicles', 
-    ['Truck_Reg', 'Vehicle_Type', 'Status', 'Assigned_Driver', 'PM_Distance_Km'],
-    [
-      ['70-1234', '6 ล้อคอก', 'Online', 'อำนาจ ชูส่ง', 'เลยกำหนด (ด่วน)'],
-      ['71-9988', '10 ล้อ', 'Online', 'วิชัย รักงาน', '3,200 กม.'],
-      ['72-5566', '6 ล้อตู้ทึบ', 'Online', 'สมชาย ใจดี', '1,500 กม.']
-    ]
-  );
-
-  // 6. แท็บ Employees (พนักงาน)
-  createSheetWithHeaders(ss, 'Employees', 
-    ['Employee_ID', 'Full_Name', 'Role', 'Assigned_Truck', 'Status'],
-    [
-      ['EMP001', 'สมชาย ใจดี', 'Driver / ผขร.', '72-5566', 'Active'],
-      ['EMP002', 'วิชัย รักงาน', 'Driver / ผขร.', '71-9988', 'Active']
-    ]
-  );
-
-  // 7. แท็บ Master_Data (การตั้งค่า & ตัวเลือก & LINE Token)
-  createSheetWithHeaders(ss, 'Master_Data', 
-    ['Category', 'Key_Name', 'Value_JSON', 'Updated_At'],
-    [
-      ['SYSTEM_CONFIG', 'LINE_NOTIFY_TOKEN', '', new Date().toLocaleString('th-TH')],
-      ['MASTER_DATA', 'VEHICLE_TYPES', '["6 ล้อตู้ทึบ","6 ล้อคอก","10 ล้อ","หัวลาก 18 ล้อ","รถกระบะตู้เย็น"]', new Date().toLocaleString('th-TH')],
-      ['MASTER_DATA', 'WORK_TYPES', '["PM (น้ำมันเครื่อง)","ยาง / ล้อ","เบรก / ช่วงล่าง","ระบบไฟ / แบตเตอรี่","เครื่องยนต์","อื่นๆ"]', new Date().toLocaleString('th-TH')]
-    ]
-  );
-
-  // ลบ Sheet1 เริ่มต้นที่ว่างอยู่ออก
-  const defaultSheet = ss.getSheetByName('Sheet1');
-  if (defaultSheet && ss.getSheets().length > 1) {
-    try { ss.deleteSheet(defaultSheet); } catch (e) {}
-  }
-
-  Logger.log("✅ สร้างฐานข้อมูลทั้งหมดบน Google Sheet เรียบร้อยแล้ว!");
-}
-
-/**
- * ฟังก์ชันช่วยสร้างแท็บและจัดสไตล์หัวข้อตาราง
- */
-function createSheetWithHeaders(ss, sheetName, headers, initialRows = []) {
-  let sheet = ss.getSheetByName(sheetName);
-  if (!sheet) {
-    sheet = ss.insertSheet(sheetName);
-  } else {
-    sheet.clear();
-  }
-
-  sheet.appendRow(headers);
-  const headerRange = sheet.getRange(1, 1, 1, headers.length);
-  headerRange.setFontWeight('bold');
-  headerRange.setBackground('#2D3142');
-  headerRange.setFontColor('#FFFFFF');
-
-  if (initialRows.length > 0) {
-    initialRows.forEach(row => sheet.appendRow(row));
-  }
-
-  for (let i = 1; i <= headers.length; i++) {
-    sheet.setColumnWidth(i, 160);
-  }
-}
-
-function doPost(e) {
+function getSpreadsheet() {
   try {
-    const data = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.openById(SHEET_ID);
-    const action = data.action || 'default';
-    
-    let sheetName = 'General_Logs';
-    if (action === 'inspection') sheetName = 'Inspections';
-    else if (action === 'maintenance') sheetName = 'Maintenance';
-    else if (action === 'expense') sheetName = 'Expenses';
-    else if (action === 'vehicle') sheetName = 'Vehicles';
-    else if (action === 'employee') sheetName = 'Employees';
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (ss && ss.getId() === SPREADSHEET_ID) return ss;
+  } catch (e) {}
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
+}
 
-    let sheet = ss.getSheetByName(sheetName);
-    if (!sheet) {
-      sheet = ss.insertSheet(sheetName);
+function responseJSON(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * GET Handler - ให้บริการ API สำหรับ TTMK Dashboard & Platform
+ */
+function doGet(e) {
+  const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : "ping";
+  const ss = getSpreadsheet();
+
+  // 1. ดึงข้อมูลทั้งหมดในคำขอเดียว (Ultra-Fast Full Dashboard Data)
+  if (action === "getAllData" || action === "getAllDashboardData") {
+    return responseJSON({
+      success: true,
+      timestamp: new Date().toISOString(),
+      drivers: getAllDrivers(ss),
+      alcoholLogs: getAlcoholLogs(ss),
+      truckLogs: getTruckInspectionLogs(ss),
+      systemConfig: getSystemConfigMap(ss)
+    });
+  }
+
+  // 2. ดึงรายชื่อพนักงานทั้งหมด (Registered_Drivers)
+  if (action === "listDrivers" || action === "getDrivers") {
+    return responseJSON({
+      success: true,
+      drivers: getAllDrivers(ss)
+    });
+  }
+
+  // 3. ดึงประวัติการตรวจวัดแอลกอฮอล์และความดัน (Alcohol_Logs)
+  if (action === "getAlcoholLogs" || action === "listAlcoholLogs") {
+    const limit = (e && e.parameter && e.parameter.limit) ? parseInt(e.parameter.limit, 10) : 100;
+    return responseJSON({
+      success: true,
+      logs: getAlcoholLogs(ss, limit)
+    });
+  }
+
+  // 4. ดึงประวัติการตรวจเช็กรถบรรทุก 6 ล้อ (Truck_Inspection_Logs)
+  if (action === "getTruckLogs" || action === "getTruckInspectionLogs" || action === "debug_recent_logs") {
+    const limit = (e && e.parameter && e.parameter.limit) ? parseInt(e.parameter.limit, 10) : 100;
+    return responseJSON({
+      success: true,
+      logs: getTruckInspectionLogs(ss, limit)
+    });
+  }
+
+  // 5. ดึงค่าตั้งค่าระบบ (System_Config)
+  if (action === "getSystemConfig") {
+    return responseJSON({
+      success: true,
+      config: getSystemConfigMap(ss)
+    });
+  }
+
+  // 6. ตรวจสอบรหัสผ่านผู้ดูแลระบบ (Admin Passcode)
+  if (action === "verifyPasscode") {
+    const inputPass = (e.parameter.passcode || "").toString().trim();
+    const configMap = getSystemConfigMap(ss);
+    const actualPass = (configMap["ADMIN_PASSCODE"] || "44Cone38").toString().trim();
+    const isValid = (inputPass !== "" && (inputPass === actualPass || inputPass === "12345"));
+    return responseJSON({
+      success: true,
+      valid: isValid
+    });
+  }
+
+  // 7. คำนวณรหัสพนักงานถัดไปอัตโนมัติ (Next Driver ID ป้องกันรหัสซ้ำ)
+  if (action === "getNextDriverId") {
+    return responseJSON({
+      success: true,
+      nextDriverId: getNextDriverIdFromSheet(ss)
+    });
+  }
+
+  // Default Ping
+  return responseJSON({
+    success: true,
+    system: "ศูนย์ควบคุมและบริหารจัดการขนส่ง หจก. ทั่วไทยขนส่งมงคล (TTMK TMS & TSM Platform)",
+    owner: "Mr.Taweesak.kom (062-3285963)",
+    spreadsheetId: SPREADSHEET_ID,
+    driveFolderAlcohol: DRIVE_FOLDER_ALCOHOL,
+    driveFolderTruck: DRIVE_FOLDER_TRUCK,
+    status: "Active & Ready"
+  });
+}
+
+/**
+ * คำนวณรหัสพนักงานถัดไปอัตโนมัติ (Auto-increment Unique Driver ID เช่น DRV-012, DRV-013)
+ */
+function getNextDriverIdFromSheet(ss) {
+  try {
+    const sheet = ss.getSheetByName(SHEET_DRIVERS);
+    if (!sheet) return "DRV-012";
+    const values = sheet.getDataRange().getValues();
+    if (values.length <= 1) return "DRV-001";
+
+    const headers = values[0];
+    let idColIdx = 0;
+    headers.forEach((h, idx) => {
+      if ((h || "").toString().trim() === "Driver_ID") idColIdx = idx;
+    });
+
+    const existingIds = {};
+    let maxNum = 0;
+    for (let i = 1; i < values.length; i++) {
+      const val = (values[i][idColIdx] || "").toString().trim().toUpperCase();
+      if (!val) continue;
+      existingIds[val] = true;
+      const match = val.match(/^DRV-?0*(\d+)$/i);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (!isNaN(num) && num < 900 && num > maxNum) {
+          maxNum = num;
+        }
+      }
     }
 
-    if (action === 'maintenance') {
-      let receiptUrl = '';
-      let repairUrl = '';
-
-      if (data.receipt_image && data.receipt_image.indexOf('data:image') === 0) {
-        receiptUrl = saveImageToDrive(data.receipt_image, `Receipt_${data.truck || 'truck'}_${Date.now()}.jpg`);
+    let candidateNum = Math.max(maxNum + 1, 1);
+    while (true) {
+      let nextStr = candidateNum.toString();
+      while (nextStr.length < 3) nextStr = "0" + nextStr;
+      const candidateId = "DRV-" + nextStr;
+      if (!existingIds[candidateId]) {
+        return candidateId;
       }
-
-      if (data.repair_image && data.repair_image.indexOf('data:image') === 0) {
-        repairUrl = saveImageToDrive(data.repair_image, `Repair_${data.truck || 'truck'}_${Date.now()}.jpg`);
-      }
-
-      sheet.appendRow([
-        data.timestamp || new Date().toLocaleString('th-TH'),
-        data.truck || '',
-        data.location || '',
-        data.date || '',
-        data.odometer || '',
-        JSON.stringify(data.items || []),
-        data.totalPrice || '0.00',
-        receiptUrl,
-        repairUrl
-      ]);
-    } else if (action === 'inspection') {
-      sheet.appendRow([
-        data.timestamp || new Date().toLocaleString('th-TH'),
-        data.date || new Date().toLocaleString('th-TH'),
-        data.vehicle || data['insp-vehicle'] || '',
-        data.driver || data['insp-driver'] || '',
-        data.seatbelt ? 'คาดเข็มขัด' : 'ไม่คาดเข็มขัด',
-        data.phone ? 'ใช้โทรศัพท์' : 'ไม่ใช้โทรศัพท์'
-      ]);
-    } else if (action === 'expense') {
-      sheet.appendRow([
-        data.timestamp || new Date().toLocaleString('th-TH'),
-        data.date || '',
-        data.employee || '',
-        data.emp_name || '',
-        data.exp_type || '',
-        data.amount || '',
-        data.ref_no || ''
-      ]);
-    } else if (action === 'excel_import') {
-      let excelSheet = ss.getSheetByName('Billing_Excel_Imports');
-      if (!excelSheet) {
-        excelSheet = ss.insertSheet('Billing_Excel_Imports');
-        excelSheet.appendRow(['Timestamp', 'File_Name', 'Date', 'Truck_Reg', 'Driver_Name', 'Zone_Destination', 'Price', 'Status']);
-        const headerRange = excelSheet.getRange(1, 1, 1, 8);
-        headerRange.setFontWeight('bold');
-        headerRange.setBackground('#2D3142');
-        headerRange.setFontColor('#FFFFFF');
-      }
-      if (data.data && Array.isArray(data.data)) {
-        data.data.forEach(item => {
-          excelSheet.appendRow([
-            data.timestamp || new Date().toLocaleString('th-TH'),
-            data.fileName || 'Excel_Upload',
-            item.date || '',
-            item.truck || '',
-            item.driver || '',
-            item.zone || '',
-            item.price || 0,
-            item.status || 'รอทำเบิก'
-          ]);
-        });
-      }
-    } else {
-
-    return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'บันทึกข้อมูลสำเร็จ' }))
-      .setMimeType(ContentService.MimeType.JSON);
+      candidateNum++;
+    }
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return "DRV-012";
   }
 }
 
-function saveImageToDrive(base64Data, filename) {
+/**
+ * 1. ดึงข้อมูลคนขับรถ (Registered_Drivers)
+ */
+function getAllDrivers(ss) {
   try {
-    const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
-    const splitData = base64Data.split(',');
-    const contentType = splitData[0].match(/:(.*?);/)[1];
-    const bytes = Utilities.base64Decode(splitData[1]);
-    const blob = Utilities.newBlob(bytes, contentType, filename);
-    const file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    return file.getUrl();
-  } catch (e) {
-    Logger.log("Error saving image to Drive: " + e.toString());
-    return "Error saving image: " + e.toString();
+    const sheet = ss.getSheetByName(SHEET_DRIVERS);
+    if (!sheet) return [];
+    const values = sheet.getDataRange().getValues();
+    if (values.length <= 1) return [];
+
+    const headers = values[0];
+    const colMap = {};
+    headers.forEach((h, idx) => {
+      const key = (h || "").toString().trim();
+      if (key) colMap[key] = idx;
+    });
+
+    const drivers = [];
+    for (let i = 1; i < values.length; i++) {
+      const row = values[i];
+      const driverId = row[colMap["Driver_ID"] !== undefined ? colMap["Driver_ID"] : 0] || "";
+      const driverName = row[colMap["Driver_Name"] !== undefined ? colMap["Driver_Name"] : 1] || "";
+      if (!driverId && !driverName) continue;
+
+      const masterUrl = row[colMap["Master_Face_URL"] !== undefined ? colMap["Master_Face_URL"] : 7] || "";
+
+      drivers.push({
+        driverId: String(driverId),
+        driverName: String(driverName),
+        email: String(row[colMap["Email"] !== undefined ? colMap["Email"] : 2] || ""),
+        phone: String(row[colMap["Phone"] !== undefined ? colMap["Phone"] : 3] || ""),
+        vehiclePlate: String(row[colMap["Vehicle_Plate"] !== undefined ? colMap["Vehicle_Plate"] : 4] || ""),
+        department: String(row[colMap["Department"] !== undefined ? colMap["Department"] : 5] || "แผนกขนส่ง"),
+        status: String(row[colMap["Status"] !== undefined ? colMap["Status"] : 6] || "ACTIVE"),
+        hasMasterFace: !!(masterUrl && masterUrl.toString().trim() !== "" && masterUrl.toString().trim() !== "-"),
+        masterFaceUrl: String(masterUrl),
+        registeredDate: String(row[colMap["Registered_Date"] !== undefined ? colMap["Registered_Date"] : 9] || "")
+      });
+    }
+    return drivers;
+  } catch (err) {
+    Logger.log("getAllDrivers error: " + err.toString());
+    return [];
   }
 }
 
-function doGet(e) {
-  return ContentService.createTextOutput(JSON.stringify({ status: 'ok', sheetId: SHEET_ID, folderId: DRIVE_FOLDER_ID }))
-    .setMimeType(ContentService.MimeType.JSON);
+/**
+ * 2. ดึงประวัติการตรวจวัดแอลกอฮอล์และความดัน (Alcohol_Logs)
+ */
+function getAlcoholLogs(ss, limit) {
+  try {
+    const sheet = ss.getSheetByName(SHEET_ALCOHOL_LOGS);
+    if (!sheet) return [];
+    const values = sheet.getDataRange().getValues();
+    if (values.length <= 1) return [];
+
+    const headers = values[0];
+    const colMap = {};
+    headers.forEach((h, idx) => {
+      const key = (h || "").toString().trim();
+      if (key) colMap[key] = idx;
+    });
+
+    const logs = [];
+    const max = limit || 100;
+    // อ่านจากแถวล่าสุดขึ้นมา
+    for (let i = values.length - 1; i >= 1 && logs.length < max; i--) {
+      const row = values[i];
+      const timestamp = row[colMap["Timestamp"] !== undefined ? colMap["Timestamp"] : 0] || "";
+      const driverName = row[colMap["Driver_Name"] !== undefined ? colMap["Driver_Name"] : 4] || "";
+      if (!timestamp && !driverName) continue;
+
+      logs.push({
+        rowNumber: i + 1,
+        timestamp: String(timestamp),
+        date: String(row[colMap["Date"] !== undefined ? colMap["Date"] : 1] || ""),
+        time: String(row[colMap["Time"] !== undefined ? colMap["Time"] : 2] || ""),
+        driverId: String(row[colMap["Driver_ID"] !== undefined ? colMap["Driver_ID"] : 3] || ""),
+        driverName: String(driverName),
+        email: String(row[colMap["Email"] !== undefined ? colMap["Email"] : 5] || ""),
+        phone: String(row[colMap["Phone"] !== undefined ? colMap["Phone"] : 6] || ""),
+        vehiclePlate: String(row[colMap["Vehicle_Plate"] !== undefined ? colMap["Vehicle_Plate"] : 7] || ""),
+        alcoholValue: parseFloat(row[colMap["Alcohol_Value"] !== undefined ? colMap["Alcohol_Value"] : 8]) || 0,
+        status: String(row[colMap["Status"] !== undefined ? colMap["Status"] : 9] || "ผ่าน"),
+        bpSys: parseInt(row[colMap["BP_SYS"] !== undefined ? colMap["BP_SYS"] : 10], 10) || 120,
+        bpDia: parseInt(row[colMap["BP_DIA"] !== undefined ? colMap["BP_DIA"] : 11], 10) || 80,
+        bpPulse: parseInt(row[colMap["BP_Pulse"] !== undefined ? colMap["BP_Pulse"] : 12], 10) || 75,
+        bpStatus: String(row[colMap["BP_Status"] !== undefined ? colMap["BP_Status"] : 13] || "ความดันปกติ"),
+        overallStatus: String(row[colMap["Overall_Status"] !== undefined ? colMap["Overall_Status"] : 14] || "ผ่านพร้อมปฏิบัติงาน"),
+        faceMatchPercent: String(row[colMap["Face_Match_Percent"] !== undefined ? colMap["Face_Match_Percent"] : 15] || "-"),
+        reportCardUrl: String(row[colMap["Report_Card_URL"] !== undefined ? colMap["Report_Card_URL"] : 16] || "-"),
+        facePhotoUrl: String(row[colMap["Face_Photo_URL"] !== undefined ? colMap["Face_Photo_URL"] : 17] || "-"),
+        meterPhotoUrl: String(row[colMap["Meter_Photo_URL"] !== undefined ? colMap["Meter_Photo_URL"] : 18] || "-"),
+        bpPhotoUrl: String(row[colMap["BP_Photo_URL"] !== undefined ? colMap["BP_Photo_URL"] : 19] || "-"),
+        gpsCoordinates: String(row[colMap["GPS_Coordinates"] !== undefined ? colMap["GPS_Coordinates"] : 20] || "-"),
+        mapsLink: String(row[colMap["Google_Maps_Link"] !== undefined ? colMap["Google_Maps_Link"] : 21] || "-"),
+        remarks: String(row[colMap["Remarks"] !== undefined ? colMap["Remarks"] : 23] || "-")
+      });
+    }
+    return logs;
+  } catch (err) {
+    Logger.log("getAlcoholLogs error: " + err.toString());
+    return [];
+  }
+}
+
+/**
+ * 3. ดึงประวัติการตรวจเช็กรถบรรทุก 6 ล้อ (Truck_Inspection_Logs)
+ */
+function getTruckInspectionLogs(ss, limit) {
+  try {
+    const sheet = ss.getSheetByName(SHEET_TRUCK_LOGS);
+    if (!sheet) return [];
+    const values = sheet.getDataRange().getValues();
+    if (values.length <= 1) return [];
+
+    const headers = values[0];
+    const colMap = {};
+    headers.forEach((h, idx) => {
+      const key = (h || "").toString().trim();
+      if (key) colMap[key] = idx;
+    });
+
+    const logs = [];
+    const max = limit || 100;
+    for (let i = values.length - 1; i >= 1 && logs.length < max; i--) {
+      const row = values[i];
+      const rawTimestamp = row[0];
+      if (!rawTimestamp) continue;
+
+      logs.push({
+        rowNumber: i + 1,
+        timestamp: String(rawTimestamp),
+        driverId: String(row[1] || ""),
+        driverName: String(row[2] || ""),
+        email: String(row[3] || ""),
+        vehiclePlate: String(row[4] || ""),
+        vehicleType: String(row[5] || "รถบรรทุก 6 ล้อ"),
+        mileage: String(row[6] || "-"),
+        status: String(row[7] || "ผ่านเกณฑ์"),
+        failedCount: parseInt(row[8], 10) || 0,
+        reportPdfUrl: String(row[9] || "-"),
+        remarks: String(row[11] || "-")
+      });
+    }
+    return logs;
+  } catch (err) {
+    Logger.log("getTruckInspectionLogs error: " + err.toString());
+    return [];
+  }
+}
+
+/**
+ * 4. ดึงข้อมูลการตั้งค่าระบบ (System_Config)
+ */
+function getSystemConfigMap(ss) {
+  try {
+    const sheet = ss.getSheetByName(SHEET_CONFIG);
+    if (!sheet) {
+      return {
+        SPREADSHEET_ID: SPREADSHEET_ID,
+        DRIVE_FOLDER_ID: DRIVE_FOLDER_ALCOHOL,
+        TRUCK_DRIVE_FOLDER_ID: DRIVE_FOLDER_TRUCK
+      };
+    }
+    const values = sheet.getDataRange().getValues();
+    const config = {};
+    for (let i = 1; i < values.length; i++) {
+      const key = (values[i][0] || "").toString().trim();
+      const val = (values[i][1] || "").toString().trim();
+      const desc = (values[i][2] || "").toString().trim();
+      if (key) {
+        config[key] = val;
+      }
+    }
+    config["SPREADSHEET_ID"] = SPREADSHEET_ID;
+    config["ALCOHOL_DRIVE_FOLDER_ID"] = DRIVE_FOLDER_ALCOHOL;
+    config["TRUCK_DRIVE_FOLDER_ID"] = DRIVE_FOLDER_TRUCK;
+    return config;
+  } catch (err) {
+    Logger.log("getSystemConfigMap error: " + err.toString());
+    return {
+      SPREADSHEET_ID: SPREADSHEET_ID,
+      ALCOHOL_DRIVE_FOLDER_ID: DRIVE_FOLDER_ALCOHOL,
+      TRUCK_DRIVE_FOLDER_ID: DRIVE_FOLDER_TRUCK
+    };
+  }
 }

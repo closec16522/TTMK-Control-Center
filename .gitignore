@@ -1,0 +1,39 @@
+# Git Ignore for TTMK Control Center
+
+# Portable Tools & Binary Archives
+MinGit/
+File/
+**/.git_subrepo/
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary and Scratch Files
+*.png
+*.tmp
+*.log
+*.csv
+drive_folder_raw.html
+drive_files_extracted.json
+parsed_drive_files.json
+gas_alcohol_logs.json
+
+# Maintenance & Scratch Scripts
+check_live_drivers.js
+fix_all_duplicate_driver_ids.js
+download_all_drive_evidence.js
+download_real_bp.js
+find_files.js
+make_relative_paths.js
+parse_drive.js
+update_index_html.js
+update_server_js.js
+build_alcohol_logs.js
+generate_evidence_assets.js
+clean_json.js
+
+# Generated PDF Samples
+CheckTruck/*.pdf
