@@ -35,5 +35,3 @@ build_alcohol_logs.js
 generate_evidence_assets.js
 clean_json.js
 
-# Generated PDF Samples
-CheckTruck/*.pdf

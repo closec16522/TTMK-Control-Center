@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>หจก.ทั่วไทยขนส่งมงคล | TTMK Control Center Dashboard & TSM Safety Platform</title>
 
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚛</text></svg>">
+
+  <!-- Suppress Tailwind Play CDN development warning -->
+  <script>
+    (function() {
+      const _origWarn = console.warn;
+      console.warn = function(...args) {
+        if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+        _origWarn.apply(console, args);
+      };
+    })();
+  </script>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -1583,7 +1597,7 @@
                 </a>
               </div>
             </div>
-            <iframe id="truckModalPdfIframe" src="./CheckTruck/downloaded_all_trucks.pdf" class="w-full h-[580px] bg-slate-100 border-0"></iframe>
+            <iframe id="truckModalPdfIframe" src="about:blank" data-src="./CheckTruck/downloaded_all_trucks.pdf" class="w-full h-[580px] bg-slate-100 border-0"></iframe>
           </div>
         </div>
 
@@ -1743,7 +1757,7 @@
               </a>
             </div>
           </div>
-          <iframe id="monthlyModalPdfIframe" src="./CheckTruck/downloaded_monthly.pdf" class="w-full h-[540px] bg-slate-100 border-0"></iframe>
+          <iframe id="monthlyModalPdfIframe" src="about:blank" data-src="./CheckTruck/downloaded_monthly.pdf" class="w-full h-[540px] bg-slate-100 border-0"></iframe>
         </div>
       </div>
 
@@ -1884,19 +1898,23 @@
       try {
         let loaded = false;
 
-        // Try local server endpoint first
-        try {
-          const resp = await fetch('api/all-data');
-          if (resp.ok) {
-            const data = await resp.json();
-            if (data.drivers && data.drivers.length > 0) {
-              appState.drivers = data.drivers;
-              appState.alcoholLogs = data.alcoholLogs || [];
-              appState.truckLogs = data.truckLogs || [];
-              loaded = true;
+        // Determine environment: only call local backend endpoint if running on localhost / dev server
+        const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname) || (window.location.port !== '' && !window.location.hostname.endsWith('github.io'));
+
+        if (isLocalHost) {
+          try {
+            const resp = await fetch('api/all-data');
+            if (resp.ok) {
+              const data = await resp.json();
+              if (data.drivers && data.drivers.length > 0) {
+                appState.drivers = data.drivers;
+                appState.alcoholLogs = data.alcoholLogs || [];
+                appState.truckLogs = data.truckLogs || [];
+                loaded = true;
+              }
             }
-          }
-        } catch(e){}
+          } catch(e){}
+        }
 
         // Fallback for GitHub Pages static hosting: fetch alcohol_logs_enriched.json
         if (!loaded || !appState.alcoholLogs || appState.alcoholLogs.length === 0) {
@@ -3152,6 +3170,10 @@
       if (!btnCheck || !btnPdf || !contentCheck || !contentPdf) return;
 
       if (tab === 'pdf') {
+        const pIframe = document.getElementById('truckModalPdfIframe');
+        if (pIframe && (!pIframe.src || pIframe.src === '' || pIframe.src.endsWith('about:blank'))) {
+          pIframe.src = pIframe.dataset.src || './CheckTruck/downloaded_all_trucks.pdf';
+        }
         btnCheck.className = "flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-amber-600";
         btnPdf.className = "flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-sm";
         contentCheck.classList.add('hidden');
@@ -3165,6 +3187,10 @@
     }
 
     function openMonthlyReportModal() {
+      const mIframe = document.getElementById('monthlyModalPdfIframe');
+      if (mIframe && (!mIframe.src || mIframe.src === '' || mIframe.src.endsWith('about:blank'))) {
+        mIframe.src = mIframe.dataset.src || './CheckTruck/downloaded_monthly.pdf';
+      }
       const select = document.getElementById('calendarPlateFilter');
       const plate = select ? select.value : "70-8899 กทม.";
       const drv = appState.drivers.find(d => d.vehiclePlate === plate) || { driverName: "นายทวีศักดิ์ คำปก (Mr.Taweesak)" };
