@@ -1362,17 +1362,17 @@
               </span>
             </div>
 
-            <!-- 3 Dedicated Cards for Driver's Specific Drive Evidence Files -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- 4 Dedicated Cards for Driver's Specific Drive Evidence Files (Columns W, K, L, X) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               
-              <!-- Drive File 1: Report Card -->
+              <!-- Drive File 1: Report Card (Column W) -->
               <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-3 hover:border-blue-500/50 transition">
                 <div>
                   <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs font-bold text-blue-400 flex items-center gap-1.5">
-                      <i class="fa-solid fa-file-shield text-sm"></i> ใบรับรองผลตรวจรวม
+                    <span class="text-xs font-bold text-blue-400 flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-file-shield text-sm"></i> ใบรับรองผลรวม (Col W)
                     </span>
-                    <span class="text-[10px] text-slate-400">Google Drive</span>
+                    <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('card')">
                     <img id="alcDriveThumbCard" src="" alt="Thumbnail ใบรับรอง" class="max-h-full max-w-full object-contain rounded" />
@@ -1383,20 +1383,20 @@
                   <button type="button" onclick="switchAlcModalTab('card')" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition text-center">
                     ดูในการ์ด
                   </button>
-                  <a id="alcDriveLinkCard" href="#" target="_blank" class="py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1">
-                    <i class="fa-brands fa-google-drive"></i> เปิดใน Drive
+                  <a id="alcDriveLinkCard" href="#" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1">
+                    <i class="fa-brands fa-google-drive"></i> เปิด Drive
                   </a>
                 </div>
               </div>
 
-              <!-- Drive File 2: Face Photo -->
+              <!-- Drive File 2: Face Photo (Column K) -->
               <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-3 hover:border-emerald-500/50 transition">
                 <div>
                   <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                      <i class="fa-solid fa-camera text-sm"></i> ภาพถ่ายใบหน้าจริง 1:1
+                    <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-camera text-sm"></i> ภาพใบหน้า 1:1 (Col K)
                     </span>
-                    <span class="text-[10px] text-slate-400">Google Drive</span>
+                    <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('face')">
                     <img id="alcDriveThumbFace" src="" alt="Thumbnail ใบหน้า" class="max-h-full max-w-full object-contain rounded" />
@@ -1407,20 +1407,44 @@
                   <button type="button" onclick="switchAlcModalTab('face')" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition text-center">
                     ดูรูปขยาย
                   </button>
-                  <a id="alcDriveLinkFace" href="#" target="_blank" class="py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1">
-                    <i class="fa-brands fa-google-drive"></i> เปิดใน Drive
+                  <a id="alcDriveLinkFace" href="#" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1">
+                    <i class="fa-brands fa-google-drive"></i> เปิด Drive
                   </a>
                 </div>
               </div>
 
-              <!-- Drive File 3: BP Monitor Photo -->
+              <!-- Drive File 3: Meter Photo (Column L) -->
+              <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-3 hover:border-amber-500/50 transition">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-gauge-high text-sm"></i> เครื่องเป่าแอลฯ (Col L)
+                    </span>
+                    <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
+                  </div>
+                  <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('meter')">
+                    <img id="alcDriveThumbMeter" src="" alt="Thumbnail เครื่องเป่าแอลกอฮอล์" class="max-h-full max-w-full object-contain rounded" />
+                  </div>
+                  <p class="text-[11px] text-slate-300 mt-2 truncate font-mono" id="alcDriveNameMeter">METER_PHOTO.jpg</p>
+                </div>
+                <div class="pt-2 border-t border-slate-800/80 flex items-center gap-2">
+                  <button type="button" onclick="switchAlcModalTab('meter')" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition text-center">
+                    ดูรูปขยาย
+                  </button>
+                  <a id="alcDriveLinkMeter" href="#" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition flex items-center gap-1">
+                    <i class="fa-brands fa-google-drive"></i> เปิด Drive
+                  </a>
+                </div>
+              </div>
+
+              <!-- Drive File 4: BP Monitor Photo (Column X) -->
               <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between space-y-3 hover:border-rose-500/50 transition">
                 <div>
                   <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs font-bold text-rose-400 flex items-center gap-1.5">
-                      <i class="fa-solid fa-heart-pulse text-sm"></i> ภาพจอวัดความดัน
+                    <span class="text-xs font-bold text-rose-400 flex items-center gap-1.5 truncate">
+                      <i class="fa-solid fa-heart-pulse text-sm"></i> เครื่องวัดความดัน (Col X)
                     </span>
-                    <span class="text-[10px] text-slate-400">Google Drive</span>
+                    <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('bp')">
                     <img id="alcDriveThumbBp" src="" alt="Thumbnail ความดัน" class="max-h-full max-w-full object-contain rounded" />
@@ -1431,8 +1455,8 @@
                   <button type="button" onclick="switchAlcModalTab('bp')" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition text-center">
                     ดูรูปขยาย
                   </button>
-                  <a id="alcDriveLinkBp" href="#" target="_blank" class="py-1.5 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition flex items-center gap-1">
-                    <i class="fa-brands fa-google-drive"></i> เปิดใน Drive
+                  <a id="alcDriveLinkBp" href="#" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition flex items-center gap-1">
+                    <i class="fa-brands fa-google-drive"></i> เปิด Drive
                   </a>
                 </div>
               </div>
@@ -1443,7 +1467,7 @@
             <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-400 flex flex-wrap items-center justify-between gap-2">
               <span class="flex items-center gap-2">
                 <i class="fa-solid fa-link text-blue-400"></i>
-                <span>ลิงก์ไฟล์หลักฐานทั้งหมด อ้างอิงตาม Column ใน Sheet <b>Alcohol_Logs</b> (คอลัมน์ K, W, X)</span>
+                <span>ลิงก์ไฟล์หลักฐานทั้งหมด อ้างอิงตาม Column ใน Sheet <b>Alcohol_Logs</b> (คอลัมน์ K = ภาพถ่ายใบหน้าจริง 1:1, L = รูปถ่ายเครื่องเป่าแอลกอฮอล์, W = ใบรับรองผลตรวจรวม, X = รูปถ่ายเครื่องวัดความดัน)</span>
               </span>
               <span class="text-slate-400 font-mono text-[11px]" id="alcDriveRecordId">-</span>
             </div>
@@ -3082,11 +3106,12 @@
 
       // Set Composite Report Card for THIS Row (Column W from Sheet)
       if (repImg) {
-        repImg.dataset.driveId = log.reportCardFileId || "";
-        repImg.dataset.fallbackSrc = log.reportCardFileId ? ("https://lh3.googleusercontent.com/d/" + log.reportCardFileId) : "";
+        const isGenuineReportDriveId = log.reportCardFileId && log.reportCardFileId !== log.bpFileId;
+        repImg.dataset.driveId = isGenuineReportDriveId ? log.reportCardFileId : "";
+        repImg.dataset.fallbackSrc = isGenuineReportDriveId ? ("https://lh3.googleusercontent.com/d/" + log.reportCardFileId) : "";
         if (log.localReportUrl) {
           repImg.src = log.localReportUrl;
-        } else if (log.reportCardFileId) {
+        } else if (isGenuineReportDriveId) {
           repImg.src = "https://lh3.googleusercontent.com/d/" + log.reportCardFileId;
         } else {
           repImg.src = renderCompositeCardToDataUrl(log);
@@ -3177,23 +3202,35 @@
       const elBpFn = document.getElementById('alcModalBpFileName');
       if (elBpFn) elBpFn.textContent = log.bpFileName || `BP_${drvId}_${timeCode}.jpg`;
 
-      // 3. Tab 5: Populate Specific Google Drive File Cards for THIS Driver
+      // 3. Tab 5: Populate Specific Google Drive File Cards for THIS Driver (4 Cards: W, K, L, X)
       const driveThumbCard = document.getElementById('alcDriveThumbCard');
-      if (driveThumbCard) driveThumbCard.src = repImg ? repImg.src : (log.localReportUrl || './assets/alcohol_evidence/REPORT_Drv70-9312_20261012_112021.jpg');
+      if (driveThumbCard) {
+        driveThumbCard.src = repImg ? repImg.src : (log.localReportUrl || './assets/alcohol_evidence/REPORT_Drv70-9312_20261012_112021.jpg');
+      }
       const driveNameCard = document.getElementById('alcDriveNameCard');
       if (driveNameCard) driveNameCard.textContent = `REPORT_${drvId}_${timeCode}.jpg`;
       const driveLinkCard = document.getElementById('alcDriveLinkCard');
-      if (driveLinkCard) driveLinkCard.href = log.reportCardUrl || log.facePhotoUrl || '#';
+      if (driveLinkCard) {
+        const isGenuineReportDriveId = log.reportCardFileId && log.reportCardFileId !== log.bpFileId;
+        driveLinkCard.href = isGenuineReportDriveId ? log.reportCardUrl : (log.facePhotoUrl || '#');
+      }
 
       const driveThumbFace = document.getElementById('alcDriveThumbFace');
-      if (driveThumbFace) driveThumbFace.src = log.localFaceUrl || photoInfo.localSrc;
+      if (driveThumbFace) driveThumbFace.src = log.localFaceUrl || (log.faceFileId ? ("https://lh3.googleusercontent.com/d/" + log.faceFileId) : photoInfo.localSrc);
       const driveNameFace = document.getElementById('alcDriveNameFace');
       if (driveNameFace) driveNameFace.textContent = log.faceFileName || `FACE_${drvId}_${timeCode}.jpg`;
       const driveLinkFace = document.getElementById('alcDriveLinkFace');
       if (driveLinkFace) driveLinkFace.href = log.facePhotoUrl || ('https://drive.google.com/file/d/' + (log.faceFileId || photoInfo.fileId) + '/view');
 
+      const driveThumbMeter = document.getElementById('alcDriveThumbMeter');
+      if (driveThumbMeter) driveThumbMeter.src = log.localMeterUrl || (log.meterFileId ? ("https://lh3.googleusercontent.com/d/" + log.meterFileId) : "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg");
+      const driveNameMeter = document.getElementById('alcDriveNameMeter');
+      if (driveNameMeter) driveNameMeter.textContent = `METER_${drvId}_${timeCode}.jpg`;
+      const driveLinkMeter = document.getElementById('alcDriveLinkMeter');
+      if (driveLinkMeter) driveLinkMeter.href = log.meterPhotoUrl || (log.meterFileId ? ('https://drive.google.com/file/d/' + log.meterFileId + '/view') : '#');
+
       const driveThumbBp = document.getElementById('alcDriveThumbBp');
-      if (driveThumbBp) driveThumbBp.src = log.localBpUrl || `./assets/alcohol_evidence/${log.bpFileName || 'BP_Drv70-9312_20261012_112021.jpg'}`;
+      if (driveThumbBp) driveThumbBp.src = log.localBpUrl || (log.bpFileId ? ("https://lh3.googleusercontent.com/d/" + log.bpFileId) : `./assets/alcohol_evidence/${log.bpFileName || 'BP_Drv70-9312_20261012_112021.jpg'}`);
       const driveNameBp = document.getElementById('alcDriveNameBp');
       if (driveNameBp) driveNameBp.textContent = log.bpFileName || `BP_${drvId}_${timeCode}.jpg`;
       const driveLinkBp = document.getElementById('alcDriveLinkBp');
