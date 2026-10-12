@@ -2154,8 +2154,8 @@
           googleMapsLink,
           verificationMethod,
           remarks,
-          localFaceUrl: ./assets/alcohol_evidence/FACE__.jpg,
-          localBpUrl: ./assets/alcohol_evidence/BP__.jpg,
+          localFaceUrl: './assets/alcohol_evidence/FACE_' + driverId + '_' + faceFileId + '.jpg',
+          localBpUrl: './assets/alcohol_evidence/BP_' + driverId + '_' + bpFileId + '.jpg',
           localMeterUrl: './assets/alcohol_evidence/METER_DRV70-9312_1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL.jpg',
           localReportUrl: './assets/alcohol_evidence/REPORT_DRV73-1735_12102026114310.jpg'
         });
@@ -2207,7 +2207,7 @@
 
         // Query Google Sheet directly via GViz (live real-time sync when sheet is public/viewable)
         try {
-          const gvizResp = await fetch(https://docs.google.com/spreadsheets/d//gviz/tq?tqx=out:json&sheet=Alcohol_Logs);
+          const gvizResp = await fetch(`https://docs.google.com/spreadsheets/d/${CONFIG.SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Alcohol_Logs`);
           if (gvizResp.ok) {
             const gvizText = await gvizResp.text();
             const startIdx = gvizText.indexOf('{');
