@@ -27,7 +27,11 @@
     "gpsCoordinates": "-",
     "googleMapsLink": "-",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_1_20261012153206.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_1_20261012153206.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_1_20261012153206.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_1_20261012153206.jpg"
   },
   {
     "timestamp": "2026-10-12 12:06:54",
@@ -57,7 +61,11 @@
     "gpsCoordinates": "-",
     "googleMapsLink": "-",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_20261012120654.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_20261012120654.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_20261012120654.jpg",
+    "localBpUrl": ""
   },
   {
     "timestamp": "2026-10-12 11:43:10",
@@ -87,7 +95,11 @@
     "gpsCoordinates": "14.583573, 100.973791",
     "googleMapsLink": "https://maps.google.com/?q=14.583573,100.973791",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV73-1735_20261012114310.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV73-1735_20261012114310.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV73-1735_20261012114310.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV73-1735_20261012114310.jpg"
   },
   {
     "timestamp": "2026-10-12 11:20:21",
@@ -117,7 +129,11 @@
     "gpsCoordinates": "13.652611, 100.273830",
     "googleMapsLink": "https://maps.google.com/?q=13.652611,100.273830",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_Drv70-9312มค._20261012112021.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_Drv70-9312มค._20261012112021.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_Drv70-9312มค._20261012112021.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_Drv70-9312มค._20261012112021.jpg"
   },
   {
     "timestamp": "2026-10-12 8:00:31",
@@ -147,7 +163,11 @@
     "gpsCoordinates": "13.550160, 100.335959",
     "googleMapsLink": "https://maps.google.com/?q=13.550160,100.335959",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_2026101280031.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_2026101280031.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_2026101280031.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_2026101280031.jpg"
   },
   {
     "timestamp": "2026-10-12 6:44:25",
@@ -177,7 +197,11 @@
     "gpsCoordinates": "13.668866, 100.085465",
     "googleMapsLink": "https://maps.google.com/?q=13.668866,100.085465",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_2026101264425.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_2026101264425.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_2026101264425.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_2026101264425.jpg"
   },
   {
     "timestamp": "2026-10-12 6:36:56",
@@ -207,7 +231,11 @@
     "gpsCoordinates": "-",
     "googleMapsLink": "-",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_2026101263656.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_2026101263656.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_2026101263656.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_2026101263656.jpg"
   },
   {
     "timestamp": "2026-10-12 5:38:52",
@@ -237,7 +265,11 @@
     "gpsCoordinates": "-",
     "googleMapsLink": "-",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_2026101253852.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_2026101253852.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_2026101253852.jpg",
+    "localBpUrl": ""
   },
   {
     "timestamp": "2026-10-11 16:01:54",
@@ -267,7 +299,11 @@
     "gpsCoordinates": "13.687629, 100.260151",
     "googleMapsLink": "https://maps.google.com/?q=13.687629,100.260151",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV730819_20261011160154.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV730819_20261011160154.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV730819_20261011160154.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV730819_20261011160154.jpg"
   },
   {
     "timestamp": "2026-10-11 16:00:06",
@@ -297,7 +333,11 @@
     "gpsCoordinates": "13.679859, 100.282196",
     "googleMapsLink": "https://maps.google.com/?q=13.679859,100.282196",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_Drv70-9312มค._20261011160006.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_Drv70-9312มค._20261011160006.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_Drv70-9312มค._20261011160006.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_Drv70-9312มค._20261011160006.jpg"
   },
   {
     "timestamp": "2026-10-11 11:16:41",
@@ -327,7 +367,11 @@
     "gpsCoordinates": "13.720240, 99.894002",
     "googleMapsLink": "https://maps.google.com/?q=13.720240,99.894002",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_20261011111641.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_20261011111641.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_20261011111641.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_20261011111641.jpg"
   },
   {
     "timestamp": "2026-10-11 11:12:23",
@@ -357,7 +401,11 @@
     "gpsCoordinates": "13.720234, 99.893736",
     "googleMapsLink": "https://maps.google.com/?q=13.720234,99.893736",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_20261011111223.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_20261011111223.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_20261011111223.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_20261011111223.jpg"
   },
   {
     "timestamp": "2026-10-11 11:05:32",
@@ -387,7 +435,11 @@
     "gpsCoordinates": "13.720190, 99.893970",
     "googleMapsLink": "https://maps.google.com/?q=13.720190,99.893970",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_20261011110532.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_20261011110532.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_20261011110532.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_20261011110532.jpg"
   },
   {
     "timestamp": "2026-10-11 10:55:31",
@@ -417,7 +469,11 @@
     "gpsCoordinates": "13.720223, 99.893721",
     "googleMapsLink": "https://maps.google.com/?q=13.720223,99.893721",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_20261011105531.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_20261011105531.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_20261011105531.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_20261011105531.jpg"
   },
   {
     "timestamp": "2026-10-11 10:55:01",
@@ -447,7 +503,11 @@
     "gpsCoordinates": "13.720176, 99.893967",
     "googleMapsLink": "https://maps.google.com/?q=13.720176,99.893967",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_71-8686_20261011105501.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_71-8686_20261011105501.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_71-8686_20261011105501.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_71-8686_20261011105501.jpg"
   },
   {
     "timestamp": "2026-10-11 10:53:38",
@@ -477,7 +537,11 @@
     "gpsCoordinates": "-",
     "googleMapsLink": "-",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_20261011105338.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_20261011105338.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_20261011105338.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_20261011105338.jpg"
   },
   {
     "timestamp": "2026-10-11 10:52:16",
@@ -507,7 +571,11 @@
     "gpsCoordinates": "13.720226, 99.893741",
     "googleMapsLink": "https://maps.google.com/?q=13.720226,99.893741",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_20261011105216.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_20261011105216.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_20261011105216.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_20261011105216.jpg"
   },
   {
     "timestamp": "2026-10-11 10:50:50",
@@ -537,7 +605,11 @@
     "gpsCoordinates": "13.720292, 99.893944",
     "googleMapsLink": "https://maps.google.com/?q=13.720292,99.893944",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_20261011105050.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_20261011105050.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_20261011105050.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_20261011105050.jpg"
   },
   {
     "timestamp": "2026-10-11 10:47:48",
@@ -567,7 +639,11 @@
     "gpsCoordinates": "13.720292, 99.893944",
     "googleMapsLink": "https://maps.google.com/?q=13.720292,99.893944",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_20261011104748.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_20261011104748.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_20261011104748.jpg",
+    "localBpUrl": ""
   },
   {
     "timestamp": "2026-10-11 10:38:44",
@@ -597,7 +673,11 @@
     "gpsCoordinates": "-",
     "googleMapsLink": "-",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_20261011103844.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_20261011103844.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_20261011103844.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV-003_20261011103844.jpg"
   },
   {
     "timestamp": "2026-10-09 7:28:31",
@@ -627,7 +707,11 @@
     "gpsCoordinates": "13.550648, 100.335870",
     "googleMapsLink": "https://maps.google.com/?q=13.550648,100.335870",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV-003_2026100972831.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV-003_2026100972831.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV-003_2026100972831.jpg",
+    "localBpUrl": ""
   },
   {
     "timestamp": "2026-10-06 2:17:25",
@@ -657,7 +741,11 @@
     "gpsCoordinates": "13.692567, 99.928439",
     "googleMapsLink": "https://maps.google.com/?q=13.692567,99.928439",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_1_2026100621725.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_1_2026100621725.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_1_2026100621725.jpg",
+    "localBpUrl": ""
   },
   {
     "timestamp": "2026-10-05 13:22:27",
@@ -687,7 +775,11 @@
     "gpsCoordinates": "13.717955, 99.901377",
     "googleMapsLink": "https://maps.google.com/?q=13.717955,99.901377",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_1_20261005132227.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_1_20261005132227.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_1_20261005132227.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_1_20261005132227.jpg"
   },
   {
     "timestamp": "2026-10-05 13:20:53",
@@ -717,7 +809,11 @@
     "gpsCoordinates": "13.717955, 99.901377",
     "googleMapsLink": "https://maps.google.com/?q=13.717955,99.901377",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_1_20261005132053.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_1_20261005132053.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_1_20261005132053.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_1_20261005132053.jpg"
   },
   {
     "timestamp": "2026-10-05 12:36:40",
@@ -747,7 +843,11 @@
     "gpsCoordinates": "14.583951, 100.974049",
     "googleMapsLink": "https://maps.google.com/?q=14.583951,100.974049",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_DRV73-1735_20261005123640.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_DRV73-1735_20261005123640.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_DRV73-1735_20261005123640.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_DRV73-1735_20261005123640.jpg"
   },
   {
     "timestamp": "2026-10-01 18:21:14",
@@ -777,7 +877,11 @@
     "gpsCoordinates": "13.717847, 99.901072",
     "googleMapsLink": "https://maps.google.com/?q=13.717847,99.901072",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_1_20261001182114.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_1_20261001182114.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_1_20261001182114.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_1_20261001182114.jpg"
   },
   {
     "timestamp": "2026-10-01 18:20:18",
@@ -807,6 +911,10 @@
     "gpsCoordinates": "13.717847, 99.901072",
     "googleMapsLink": "https://maps.google.com/?q=13.717847,99.901072",
     "verificationMethod": "Face 1:1 Matching, AI OCR & Health BP",
-    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน"
+    "remarks": "ตรวจก่อนปฏิบัติหน้าที่ประจำวัน",
+    "localReportUrl": "./assets/alcohol_evidence/REPORT_1_20261001182018.jpg",
+    "localFaceUrl": "./assets/alcohol_evidence/FACE_1_20261001182018.jpg",
+    "localMeterUrl": "./assets/alcohol_evidence/METER_1_20261001182018.jpg",
+    "localBpUrl": "./assets/alcohol_evidence/BP_1_20261001182018.jpg"
   }
 ]

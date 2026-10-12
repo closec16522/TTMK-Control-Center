@@ -53,17 +53,40 @@
   <script>
     window.handleEvidenceImgError = function(img) {
       if (!img) return;
+      img.referrerPolicy = "no-referrer";
       const step = parseInt(img.dataset.retryStep || "0", 10);
       const driveId = img.dataset.driveId;
-      if (step === 0 && driveId) {
+      const localUrl = img.dataset.localUrl;
+      const fallbackSrc = img.dataset.fallbackSrc;
+
+      // Step 0: Try local downloaded authentic file if we haven't yet
+      if (step === 0 && localUrl && img.src !== localUrl) {
         img.dataset.retryStep = "1";
-        img.src = "https://drive.google.com/thumbnail?id=" + driveId + "&sz=w1000";
-      } else if (step === 1 && driveId) {
+        img.src = localUrl;
+        return;
+      }
+      // Step 1: Try Google Drive high-res thumbnail with no-referrer
+      if (step <= 1 && driveId) {
         img.dataset.retryStep = "2";
-        img.src = "https://drive.google.com/uc?export=view&id=" + driveId;
-      } else if (step <= 2 && img.dataset.fallbackSrc) {
+        img.src = "https://drive.google.com/thumbnail?id=" + driveId + "&sz=w1200";
+        return;
+      }
+      // Step 2: Try Google Drive lh3 CDN with no-referrer
+      if (step === 2 && driveId) {
         img.dataset.retryStep = "3";
-        img.src = img.dataset.fallbackSrc;
+        img.src = "https://lh3.googleusercontent.com/d/" + driveId;
+        return;
+      }
+      // Step 3: Try Google Drive uc export view
+      if (step === 3 && driveId) {
+        img.dataset.retryStep = "4";
+        img.src = "https://drive.google.com/uc?export=view&id=" + driveId;
+        return;
+      }
+      // Step 4: Final fallback to canvas
+      if (step <= 4 && fallbackSrc) {
+        img.dataset.retryStep = "5";
+        img.src = fallbackSrc;
       }
     };
   </script>
@@ -1323,6 +1346,7 @@
             <div class="rounded-xl overflow-hidden bg-slate-900 border border-slate-800 p-1 flex justify-center">
               <img id="alcModalReportImg" src="./assets/alcohol_evidence/REPORT_Drv70-9312_20261012_112021.jpg"
                    alt="ใบรับรองตรวจแอลกอฮอล์ TSM"
+                   referrerpolicy="no-referrer"
                    onerror="handleEvidenceImgError(this)"
                    class="max-h-[500px] w-auto object-contain rounded-lg shadow-lg" />
             </div>
@@ -1344,6 +1368,7 @@
             <div class="rounded-xl overflow-hidden bg-slate-900 border-2 border-emerald-500/60 p-2 flex flex-col items-center max-w-md mx-auto shadow-2xl">
               <img id="alcModalFaceImg" src="./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg"
                    alt="ภาพถ่ายใบหน้าคนขับ Check-in จริงจาก Google Drive"
+                   referrerpolicy="no-referrer"
                    onerror="handleEvidenceImgError(this)"
                    class="max-h-[460px] w-auto object-contain rounded-lg shadow-lg border border-slate-800" />
               <div class="mt-2.5 flex items-center justify-center gap-2">
@@ -1373,6 +1398,7 @@
             <div class="rounded-xl overflow-hidden bg-slate-900 border-2 border-blue-500/60 p-2 flex flex-col items-center max-w-md mx-auto shadow-2xl">
               <img id="alcModalMeterImg" src="./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg"
                    alt="ภาพถ่ายเครื่องเป่าแอลกอฮอล์จริงจากจุดตรวจ"
+                   referrerpolicy="no-referrer"
                    onerror="handleEvidenceImgError(this)"
                    class="max-h-[460px] w-auto object-contain rounded-lg shadow-lg border border-slate-800" />
               <div class="mt-2.5 flex items-center justify-center gap-2">
@@ -1405,6 +1431,7 @@
             <div class="rounded-xl overflow-hidden bg-slate-900 border-2 border-rose-500/60 p-2 flex flex-col items-center max-w-md mx-auto shadow-2xl">
               <img id="alcModalBpImg" src="./assets/alcohol_evidence/BP_Drv70-9312_20261012_112021.jpg"
                    alt="ภาพถ่ายจอเครื่องวัดความดันจริงจาก Google Drive"
+                   referrerpolicy="no-referrer"
                    onerror="handleEvidenceImgError(this)"
                    class="max-h-[460px] w-auto object-contain rounded-lg shadow-lg border border-slate-800" />
               <div class="mt-2.5 flex items-center justify-center gap-2">
@@ -1459,7 +1486,7 @@
                     <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('card')">
-                    <img id="alcDriveThumbCard" src="" alt="Thumbnail ใบรับรอง" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
+                    <img id="alcDriveThumbCard" src="" alt="Thumbnail ใบรับรอง" referrerpolicy="no-referrer" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
                   </div>
                   <p class="text-[11px] text-slate-300 mt-2 truncate font-mono" id="alcDriveNameCard">REPORT_CARD.jpg</p>
                 </div>
@@ -1483,7 +1510,7 @@
                     <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('face')">
-                    <img id="alcDriveThumbFace" src="" alt="Thumbnail ใบหน้า" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
+                    <img id="alcDriveThumbFace" src="" alt="Thumbnail ใบหน้า" referrerpolicy="no-referrer" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
                   </div>
                   <p class="text-[11px] text-slate-300 mt-2 truncate font-mono" id="alcDriveNameFace">FACE_PHOTO.jpg</p>
                 </div>
@@ -1507,7 +1534,7 @@
                     <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('meter')">
-                    <img id="alcDriveThumbMeter" src="" alt="Thumbnail เครื่องเป่าแอลกอฮอล์" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
+                    <img id="alcDriveThumbMeter" src="" alt="Thumbnail เครื่องเป่าแอลกอฮอล์" referrerpolicy="no-referrer" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
                   </div>
                   <p class="text-[11px] text-slate-300 mt-2 truncate font-mono" id="alcDriveNameMeter">METER_PHOTO.jpg</p>
                 </div>
@@ -1531,7 +1558,7 @@
                     <span class="text-[10px] text-slate-400 flex-shrink-0">Drive</span>
                   </div>
                   <div class="h-40 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-1 cursor-pointer" onclick="switchAlcModalTab('bp')">
-                    <img id="alcDriveThumbBp" src="" alt="Thumbnail ความดัน" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
+                    <img id="alcDriveThumbBp" src="" alt="Thumbnail ความดัน" referrerpolicy="no-referrer" class="max-h-full max-w-full object-contain rounded" onerror="handleEvidenceImgError(this)" />
                   </div>
                   <p class="text-[11px] text-slate-300 mt-2 truncate font-mono" id="alcDriveNameBp">BP_PHOTO.jpg</p>
                 </div>
@@ -2170,6 +2197,14 @@
         const bpFileId = extractDriveId(bpPhotoUrl);
         const reportCardFileId = extractDriveId(reportCardUrl);
 
+        const timeCode = (timestamp || "").replace(/[^0-9]/g, '').slice(0, 14);
+        const cleanDrvId = (driverId || "DRV").replace(/[\s\.]+/g, '_');
+        const existingEnriched = (appState.alcoholLogs || []).find(x => x.timestamp === timestamp && x.vehiclePlate === vehiclePlate);
+        const localReportUrl = existingEnriched?.localReportUrl || `./assets/alcohol_evidence/REPORT_${cleanDrvId}_${timeCode}.jpg`;
+        const localFaceUrl = existingEnriched?.localFaceUrl || `./assets/alcohol_evidence/FACE_${cleanDrvId}_${timeCode}.jpg`;
+        const localMeterUrl = existingEnriched?.localMeterUrl || `./assets/alcohol_evidence/METER_${cleanDrvId}_${timeCode}.jpg`;
+        const localBpUrl = existingEnriched?.localBpUrl || (bpFileId ? `./assets/alcohol_evidence/BP_${cleanDrvId}_${timeCode}.jpg` : '');
+
         result.push({
           timestamp,
           date,
@@ -2191,6 +2226,10 @@
           meterFileId,
           bpFileId,
           reportCardFileId,
+          localReportUrl,
+          localFaceUrl,
+          localMeterUrl,
+          localBpUrl,
           facePhotoUrl: facePhotoUrl && facePhotoUrl.includes('drive.google.com') ? facePhotoUrl : (faceFileId ? ('https://drive.google.com/file/d/' + faceFileId + '/view') : ''),
           meterPhotoUrl: meterPhotoUrl && meterPhotoUrl.includes('drive.google.com') ? meterPhotoUrl : (meterFileId ? ('https://drive.google.com/file/d/' + meterFileId + '/view') : ''),
           bpPhotoUrl: bpPhotoUrl && bpPhotoUrl.includes('drive.google.com') ? bpPhotoUrl : (bpFileId ? ('https://drive.google.com/file/d/' + bpFileId + '/view') : ''),
@@ -2837,25 +2876,35 @@
     window.cachedDriverPhotoImgs = {};
     window.cachedFaceImgs = {};
     window.cachedBpImgs = {};
-    window.cachedMeterImg = new Image();
-    window.cachedMeterImg.src = "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg";
-    window.cachedMeter1735Img = new Image();
-    window.cachedMeter1735Img.src = "./assets/alcohol_evidence/METER_DRV73-1735_20261012_114310.jpg";
+    window.cachedMeterImgs = {};
+    window.cachedReportImgs = {};
 
     function preloadAllEvidencePhotos(logs) {
       if (!logs || !Array.isArray(logs)) return;
       logs.forEach(log => {
         if (log.localFaceUrl && !window.cachedFaceImgs[log.localFaceUrl]) {
           const img = new Image();
-          img.crossOrigin = "anonymous";
+          img.referrerPolicy = "no-referrer";
           img.src = log.localFaceUrl;
           window.cachedFaceImgs[log.localFaceUrl] = img;
         }
+        if (log.localMeterUrl && !window.cachedMeterImgs[log.localMeterUrl]) {
+          const img = new Image();
+          img.referrerPolicy = "no-referrer";
+          img.src = log.localMeterUrl;
+          window.cachedMeterImgs[log.localMeterUrl] = img;
+        }
         if (log.localBpUrl && !window.cachedBpImgs[log.localBpUrl]) {
           const img = new Image();
-          img.crossOrigin = "anonymous";
+          img.referrerPolicy = "no-referrer";
           img.src = log.localBpUrl;
           window.cachedBpImgs[log.localBpUrl] = img;
+        }
+        if (log.localReportUrl && !window.cachedReportImgs[log.localReportUrl]) {
+          const img = new Image();
+          img.referrerPolicy = "no-referrer";
+          img.src = log.localReportUrl;
+          window.cachedReportImgs[log.localReportUrl] = img;
         }
       });
     }
@@ -2958,9 +3007,10 @@
       ctx.save();
       ctx.clip();
 
-      const meterImg = (log && log.driverName === 'พิศมัย พลเยี่ยม') ? window.cachedMeter1735Img : window.cachedMeterImg;
-      if (meterImg && meterImg.complete && meterImg.naturalWidth > 0) {
-        ctx.drawImage(meterImg, x, y, w, h);
+      const meterUrl = log ? log.localMeterUrl : null;
+      const preloadedMeter = meterUrl ? window.cachedMeterImgs[meterUrl] : null;
+      if (preloadedMeter && preloadedMeter.complete && preloadedMeter.naturalWidth > 0) {
+        ctx.drawImage(preloadedMeter, x, y, w, h);
         ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
         ctx.fillRect(x, y + h - 28, w, 28);
         ctx.fillStyle = "#34D399";
@@ -3431,9 +3481,15 @@
       const timeCode = (log.timestamp || "").replace(/[^0-9]/g, '').slice(0, 14) || "20261012_153206";
       const drvId = (log.driverId || "DRV").replace(/[\s\.]+/g, '_');
 
-      function getDriveImgSrc(fileId) {
-        if (!fileId) return "";
-        return "https://lh3.googleusercontent.com/d/" + fileId;
+      const expectedReportUrl = log.localReportUrl || `./assets/alcohol_evidence/REPORT_${drvId}_${timeCode}.jpg`;
+      const expectedFaceUrl = log.localFaceUrl || `./assets/alcohol_evidence/FACE_${drvId}_${timeCode}.jpg`;
+      const expectedMeterUrl = log.localMeterUrl || `./assets/alcohol_evidence/METER_${drvId}_${timeCode}.jpg`;
+      const expectedBpUrl = log.localBpUrl || (log.bpFileId ? `./assets/alcohol_evidence/BP_${drvId}_${timeCode}.jpg` : '');
+
+      function resolveEvidenceSrc(localUrl, fileId, fallbackCanvas) {
+        if (localUrl) return localUrl;
+        if (fileId) return "https://drive.google.com/thumbnail?id=" + fileId + "&sz=w1200";
+        return fallbackCanvas;
       }
 
       const repImg = document.getElementById('alcModalReportImg');
@@ -3462,24 +3518,20 @@
 
       // TAB 1: Composite Report Card (Column W from Sheet)
       if (repImg) {
+        repImg.referrerPolicy = "no-referrer";
         repImg.dataset.driveId = log.reportCardFileId || "";
+        repImg.dataset.localUrl = expectedReportUrl;
         repImg.dataset.fallbackSrc = compositeCardDataUrl;
-        if (log.reportCardFileId) {
-          repImg.src = getDriveImgSrc(log.reportCardFileId);
-        } else {
-          repImg.src = compositeCardDataUrl;
-        }
+        repImg.src = resolveEvidenceSrc(expectedReportUrl, log.reportCardFileId, compositeCardDataUrl);
       }
 
       // TAB 2: Face 1:1 Image (Column K from Sheet)
       if (faceImg) {
+        faceImg.referrerPolicy = "no-referrer";
         faceImg.dataset.driveId = log.faceFileId || "";
+        faceImg.dataset.localUrl = expectedFaceUrl;
         faceImg.dataset.fallbackSrc = faceFallbackDataUrl;
-        if (log.faceFileId) {
-          faceImg.src = getDriveImgSrc(log.faceFileId);
-        } else {
-          faceImg.src = faceFallbackDataUrl;
-        }
+        faceImg.src = resolveEvidenceSrc(expectedFaceUrl, log.faceFileId, faceFallbackDataUrl);
       }
       const faceDriveLink = document.getElementById('alcModalFaceDriveLink');
       if (faceDriveLink) {
@@ -3493,9 +3545,11 @@
       // TAB 3: Breathalyzer Meter Image (Column L from Sheet)
       if (meterImg) {
         const meterId = log.meterFileId || "1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL";
+        meterImg.referrerPolicy = "no-referrer";
         meterImg.dataset.driveId = meterId;
+        meterImg.dataset.localUrl = expectedMeterUrl;
         meterImg.dataset.fallbackSrc = meterFallbackDataUrl;
-        meterImg.src = getDriveImgSrc(meterId);
+        meterImg.src = resolveEvidenceSrc(expectedMeterUrl, meterId, meterFallbackDataUrl);
       }
       const meterDriveLink = document.getElementById('alcModalMeterDriveLink');
       if (meterDriveLink) {
@@ -3508,13 +3562,11 @@
 
       // TAB 4: BP Monitor Image (Column X from Sheet)
       if (bpImg) {
+        bpImg.referrerPolicy = "no-referrer";
         bpImg.dataset.driveId = log.bpFileId || "";
+        bpImg.dataset.localUrl = expectedBpUrl;
         bpImg.dataset.fallbackSrc = bpFallbackDataUrl;
-        if (log.bpFileId) {
-          bpImg.src = getDriveImgSrc(log.bpFileId);
-        } else {
-          bpImg.src = bpFallbackDataUrl;
-        }
+        bpImg.src = resolveEvidenceSrc(expectedBpUrl, log.bpFileId, bpFallbackDataUrl);
       }
       const bpDriveLink = document.getElementById('alcModalBpDriveLink');
       if (bpDriveLink) {
@@ -3552,9 +3604,11 @@
 
       // TAB 5: 4 Dedicated Google Drive Evidence Cards for THIS Driver Row (Col W, K, L, X)
       if (driveThumbCard) {
+        driveThumbCard.referrerPolicy = "no-referrer";
         driveThumbCard.dataset.driveId = log.reportCardFileId || "";
+        driveThumbCard.dataset.localUrl = expectedReportUrl;
         driveThumbCard.dataset.fallbackSrc = compositeCardDataUrl;
-        driveThumbCard.src = log.reportCardFileId ? getDriveImgSrc(log.reportCardFileId) : compositeCardDataUrl;
+        driveThumbCard.src = resolveEvidenceSrc(expectedReportUrl, log.reportCardFileId, compositeCardDataUrl);
       }
       const driveNameCard = document.getElementById('alcDriveNameCard');
       if (driveNameCard) driveNameCard.textContent = `REPORT_${drvId}_${timeCode}.jpg`;
@@ -3562,9 +3616,11 @@
       if (driveLinkCard) driveLinkCard.href = log.reportCardUrl || (log.reportCardFileId ? `https://drive.google.com/file/d/${log.reportCardFileId}/view` : '#');
 
       if (driveThumbFace) {
+        driveThumbFace.referrerPolicy = "no-referrer";
         driveThumbFace.dataset.driveId = log.faceFileId || "";
+        driveThumbFace.dataset.localUrl = expectedFaceUrl;
         driveThumbFace.dataset.fallbackSrc = faceFallbackDataUrl;
-        driveThumbFace.src = log.faceFileId ? getDriveImgSrc(log.faceFileId) : faceFallbackDataUrl;
+        driveThumbFace.src = resolveEvidenceSrc(expectedFaceUrl, log.faceFileId, faceFallbackDataUrl);
       }
       const driveNameFace = document.getElementById('alcDriveNameFace');
       if (driveNameFace) driveNameFace.textContent = `FACE_${drvId}_${timeCode}.jpg`;
@@ -3573,9 +3629,11 @@
 
       if (driveThumbMeter) {
         const meterId = log.meterFileId || "1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL";
+        driveThumbMeter.referrerPolicy = "no-referrer";
         driveThumbMeter.dataset.driveId = meterId;
+        driveThumbMeter.dataset.localUrl = expectedMeterUrl;
         driveThumbMeter.dataset.fallbackSrc = meterFallbackDataUrl;
-        driveThumbMeter.src = getDriveImgSrc(meterId);
+        driveThumbMeter.src = resolveEvidenceSrc(expectedMeterUrl, meterId, meterFallbackDataUrl);
       }
       const driveNameMeter = document.getElementById('alcDriveNameMeter');
       if (driveNameMeter) driveNameMeter.textContent = `METER_${drvId}_${timeCode}.jpg`;
@@ -3583,9 +3641,11 @@
       if (driveLinkMeter) driveLinkMeter.href = log.meterPhotoUrl || (log.meterFileId ? `https://drive.google.com/file/d/${log.meterFileId}/view` : 'https://drive.google.com/file/d/1Dnse95n8BhGgdt4CPlt6-m3FfaktLjdL/view');
 
       if (driveThumbBp) {
+        driveThumbBp.referrerPolicy = "no-referrer";
         driveThumbBp.dataset.driveId = log.bpFileId || "";
+        driveThumbBp.dataset.localUrl = expectedBpUrl;
         driveThumbBp.dataset.fallbackSrc = bpFallbackDataUrl;
-        driveThumbBp.src = log.bpFileId ? getDriveImgSrc(log.bpFileId) : bpFallbackDataUrl;
+        driveThumbBp.src = resolveEvidenceSrc(expectedBpUrl, log.bpFileId, bpFallbackDataUrl);
       }
       const driveNameBp = document.getElementById('alcDriveNameBp');
       if (driveNameBp) driveNameBp.textContent = `BP_${drvId}_${timeCode}.jpg`;
