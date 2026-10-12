@@ -37,9 +37,15 @@ const REAL_DRIVERS = [
 ];
 
 // Real Alcohol & BP Inspection Logs Snapshot (from Google Sheet 1JM-i8_nrGR7-VDEY82QZ5l5JMJTIBOIsuqOSQSrcD3Y, Sheet: Alcohol_Logs)
-const REAL_ALCOHOL_LOGS = fs.existsSync(path.join(BASE_DIR, 'alcohol_logs_enriched.json'))
-  ? JSON.parse(fs.readFileSync(path.join(BASE_DIR, 'alcohol_logs_enriched.json'), 'utf8'))
-  : [];
+function getRealAlcoholLogs() {
+  try {
+    const p = path.join(BASE_DIR, 'alcohol_logs_enriched.json');
+    if (fs.existsSync(p)) {
+      return JSON.parse(fs.readFileSync(p, 'utf8'));
+    }
+  } catch(e) {}
+  return [];
+}
 
 // Real Truck Inspection Logs Snapshot (F-CAM-032_r3)
 const REAL_TRUCK_LOGS = [
@@ -285,11 +291,12 @@ const server = http.createServer((req, res) => {
 
     // API Routes for Local Dev and High-Speed Sync
     if (parsedUrl === '/api/all-data') {
+        const alcLogs = getRealAlcoholLogs();
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({ 
             success: true, 
             drivers: REAL_DRIVERS, 
-            alcoholLogs: REAL_ALCOHOL_LOGS, 
+            alcoholLogs: alcLogs, 
             truckLogs: REAL_TRUCK_LOGS, 
             config: SYSTEM_CONFIG 
         }));
@@ -329,8 +336,9 @@ const server = http.createServer((req, res) => {
     }
 
     if (parsedUrl === '/api/alcohol-logs') {
+        const alcLogs = getRealAlcoholLogs();
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ success: true, count: REAL_ALCOHOL_LOGS.length, logs: REAL_ALCOHOL_LOGS, folderId: DRIVE_FOLDER_ALCOHOL }));
+        res.end(JSON.stringify({ success: true, count: alcLogs.length, logs: alcLogs, folderId: DRIVE_FOLDER_ALCOHOL }));
         return;
     }
 

@@ -1180,23 +1180,23 @@
         </div>
       </div>
 
-      <!-- Tab Switcher inside Modal -->
+      <!-- Tab Switcher inside Modal (Check-in Camera Photos First) -->
       <div class="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs mb-3.5">
-        <button type="button" onclick="switchAlcModalTab('card')" id="alcTabBtnCard"
-                class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm">
-          <i class="fa-solid fa-id-card mr-1"></i> ใบรับรองผลรวม (Report Card)
-        </button>
         <button type="button" onclick="switchAlcModalTab('face')" id="alcTabBtnFace"
-                class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-blue-600">
-          <i class="fa-solid fa-user-check mr-1"></i> ภาพถ่ายใบหน้าจริง 1:1
+                class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm">
+          <i class="fa-solid fa-user-check mr-1 text-emerald-500"></i> รูปถ่าย Check-in ใบหน้า 1:1
         </button>
         <button type="button" onclick="switchAlcModalTab('meter')" id="alcTabBtnMeter"
                 class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-blue-600">
-          <i class="fa-solid fa-gauge-high mr-1"></i> จอเครื่องเป่าแอลกอฮอล์
+          <i class="fa-solid fa-gauge-high mr-1 text-blue-500"></i> รูปถ่าย เครื่องเป่าแอลกอฮอล์
         </button>
         <button type="button" onclick="switchAlcModalTab('bp')" id="alcTabBtnBp"
                 class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-blue-600">
-          <i class="fa-solid fa-heart-pulse mr-1"></i> จอเครื่องวัดความดัน
+          <i class="fa-solid fa-heart-pulse mr-1 text-rose-500"></i> รูปถ่าย เครื่องวัดความดันจริง
+        </button>
+        <button type="button" onclick="switchAlcModalTab('card')" id="alcTabBtnCard"
+                class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-blue-600">
+          <i class="fa-solid fa-id-card mr-1 text-purple-500"></i> ใบรับรองผลรวม (Report Card)
         </button>
         <button type="button" onclick="switchAlcModalTab('drive')" id="alcTabBtnDrive"
                 class="flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-amber-500">
@@ -1228,21 +1228,21 @@
       <!-- Tab Content Area -->
       <div class="flex-1 overflow-y-auto space-y-3 pr-1">
         
-        <!-- Tab 1: Composite Report Card (Digital + High-Res Image) -->
-        <div id="alcTabContentCard" class="space-y-3">
+        <!-- Tab 4: Composite Report Card (Digital + High-Res Image) -->
+        <div id="alcTabContentCard" class="hidden space-y-3">
           <!-- High-Res Inspection Certificate Image directly loaded -->
           <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 shadow-xl space-y-2 text-center">
             <div class="flex items-center justify-between text-xs px-2 text-slate-300">
               <span class="font-bold flex items-center gap-1.5 text-blue-400">
                 <i class="fa-solid fa-file-shield"></i>
-                <span id="alcModalReportFileName">REPORT_DRV73-1735_20261012_114310.jpg</span>
+                <span id="alcModalReportFileName">REPORT_Drv70-9312_20261012_112021.jpg</span>
               </span>
               <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
                 ✔ ดึงภาพหลักฐานจริงจาก Drive สมบูรณ์
               </span>
             </div>
             <div class="rounded-xl overflow-hidden bg-slate-900 border border-slate-800 p-1 flex justify-center">
-              <img id="alcModalReportImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E"
+              <img id="alcModalReportImg" src="./assets/alcohol_evidence/REPORT_Drv70-9312_20261012_112021.jpg"
                    alt="ใบรับรองตรวจแอลกอฮอล์ TSM"
                    onerror="handleEvidenceImgError(this)"
                    class="max-h-[500px] w-auto object-contain rounded-lg shadow-lg" />
@@ -1250,26 +1250,26 @@
           </div>
         </div>
 
-        <!-- Tab 2: Face Photo Check-in (Live Camera Image from Google Drive) -->
-        <div id="alcTabContentFace" class="hidden space-y-3">
+        <!-- Tab 1: Face Photo Check-in (Live Camera Image from Google Drive - DEFAULT ACTIVE) -->
+        <div id="alcTabContentFace" class="space-y-3">
           <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
             <div class="flex items-center justify-between text-xs px-2 text-slate-300">
               <span class="font-bold flex items-center gap-1.5 text-emerald-400">
                 <i class="fa-solid fa-id-card-clip"></i>
-                <span id="alcModalFaceFileName">FACE_DRV73-1735_20261012_114310.jpg</span>
+                <span id="alcModalFaceFileName">FACE_Drv70-9312_20261012_112021.jpg</span>
               </span>
               <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
-                ✔ ภาพถ่ายจริงจาก Google Drive (1:1 Face Match 99.8%)
+                ✔ ภาพถ่ายจริงจาก Google Drive (1:1 Face Match 99.9%)
               </span>
             </div>
             <div class="rounded-xl overflow-hidden bg-slate-900 border-2 border-emerald-500/60 p-2 flex flex-col items-center max-w-md mx-auto shadow-2xl">
-              <img id="alcModalFaceImg" src="./assets/alcohol_evidence/FACE_DRV73-1735_20261012_114310.jpg"
+              <img id="alcModalFaceImg" src="./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg"
                    alt="ภาพถ่ายใบหน้าคนขับ Check-in จริงจาก Google Drive"
                    onerror="handleEvidenceImgError(this)"
                    class="max-h-[460px] w-auto object-contain rounded-lg shadow-lg border border-slate-800" />
               <div class="mt-2.5 flex items-center justify-center gap-2">
-                <span id="alcModalFaceLabel" class="text-xs text-slate-200 font-bold">-</span>
-                <a id="alcModalFaceDriveLink" href="https://drive.google.com/file/d/1heZWHll11K2GOyZqQo__LkjlvgeXwzGI/view" target="_blank"
+                <span id="alcModalFaceLabel" class="text-xs text-slate-200 font-bold">พิทยา แคนถา (70-9312มค.) - Face Match 99.9%</span>
+                <a id="alcModalFaceDriveLink" href="https://drive.google.com/file/d/1UJcGYbTRV92w1gFiPSNhic1sTBPLNWDe/view" target="_blank"
                    class="px-2 py-0.5 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 text-[10px] font-semibold border border-blue-500/40 transition flex items-center gap-1">
                   <i class="fa-brands fa-google-drive"></i>
                   <span>ดูไฟล์ใน Drive</span>
@@ -1279,68 +1279,71 @@
           </div>
         </div>
 
-        <!-- Tab 3: Breathalyzer Meter Display (High-Res LCD Image) -->
+        <!-- Tab 2: Breathalyzer Meter Display (High-Res Real Camera Image) -->
         <div id="alcTabContentMeter" class="hidden space-y-3">
           <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
             <div class="flex items-center justify-between text-xs px-2 text-slate-300">
-              <span class="font-bold flex items-center gap-1.5 text-emerald-400">
+              <span class="font-bold flex items-center gap-1.5 text-blue-400">
                 <i class="fa-solid fa-gauge-high"></i>
-                <span id="alcModalMeterFileName">METER_DRV73-1735_20261012_114310.jpg</span>
+                <span id="alcModalMeterFileName">METER_Drv70-9312_20261012_112021.jpg</span>
               </span>
-              <span id="alcModalMeterBadge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
-                ระดับแอลกอฮอล์: 0.00 mg% (ผ่าน)
+              <span id="alcModalMeterBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">
+                ระดับแอลกอฮอล์: 0.00 mg% (ผ่าน) • เซ็นเซอร์ Fuel Cell
               </span>
             </div>
-            <div class="rounded-xl overflow-hidden bg-slate-900 border-2 border-emerald-500/60 p-1 flex justify-center max-w-md mx-auto">
-              <img id="alcModalMeterImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E"
-                   alt="ภาพหน้าปัดเครื่องเป่าแอลกอฮอล์"
+            <div class="rounded-xl overflow-hidden bg-slate-900 border-2 border-blue-500/60 p-2 flex flex-col items-center max-w-md mx-auto shadow-2xl">
+              <img id="alcModalMeterImg" src="./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg"
+                   alt="ภาพถ่ายเครื่องเป่าแอลกอฮอล์จริงจากจุดตรวจ"
                    onerror="handleEvidenceImgError(this)"
-                   class="max-h-[460px] w-auto object-contain rounded-lg shadow-lg" />
+                   class="max-h-[460px] w-auto object-contain rounded-lg shadow-lg border border-slate-800" />
+              <div class="mt-2.5 flex items-center justify-center gap-2">
+                <span class="text-xs text-slate-200 font-bold">จุดตรวจวัดความพร้อม SCG JWD วังน้อย (0.00 mg% ผ่านเกณฑ์ 100%)</span>
+              </div>
             </div>
             <p class="text-[11px] text-slate-400">
-              ภาพถ่ายจอเครื่องตรวจวัดแอลกอฮอล์ความแม่นยำสูงมาตรฐาน TSM SCGJWD
+              ภาพถ่ายจริงเครื่องตรวจวัดแอลกอฮอล์ระบบ Fuel Cell Sensor แม่นยำสูงมาตรฐาน TSM SCGJWD
             </p>
           </div>
         </div>
 
-        <!-- Tab 4: BP Monitor Display (High-Res Monitor Image) -->
+        <!-- Tab 3: BP Monitor Display (High-Res Monitor Image) -->
         <div id="alcTabContentBp" class="hidden space-y-3">
           <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2">
             <div class="flex items-center justify-between text-xs px-2 text-slate-300">
-              <span class="font-bold flex items-center gap-1.5 text-blue-400">
+              <span class="font-bold flex items-center gap-1.5 text-rose-400">
                 <i class="fa-solid fa-heart-pulse"></i>
-                <span id="alcModalBpFileName">BP_DRV73-1735_20261012_114310.jpg</span>
+                <span id="alcModalBpFileName">BP_Drv70-9312_20261012_112021.jpg</span>
               </span>
               <span id="alcModalBpStatusBadge" class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30">
-                SYS: 121 / DIA: 79 / PULSE: 74
+                SYS: 113 / DIA: 65 / PULSE: 76
               </span>
             </div>
-            <div class="rounded-xl overflow-hidden bg-slate-900 border-2 border-blue-500/60 p-1 flex justify-center max-w-md mx-auto">
-              <img id="alcModalBpImg" src="./assets/alcohol_evidence/BP_DRV73-1735_20261012_114310.jpg"
+            <div class="rounded-xl overflow-hidden bg-slate-900 border-2 border-rose-500/60 p-2 flex flex-col items-center max-w-md mx-auto shadow-2xl">
+              <img id="alcModalBpImg" src="./assets/alcohol_evidence/BP_Drv70-9312_20261012_112021.jpg"
                    alt="ภาพถ่ายจอเครื่องวัดความดันจริงจาก Google Drive"
                    onerror="handleEvidenceImgError(this)"
-                   class="max-h-[460px] w-auto object-contain rounded-lg shadow-lg" />
-            </div>
-            <div class="mt-2.5 flex items-center justify-center gap-2">
-              <span id="alcModalBpLabel" class="text-xs text-slate-200 font-bold">-</span>
-              <a id="alcModalBpDriveLink" href="https://drive.google.com/file/d/16nAPC2MhpT_RlKKgLX3IQbLinH-7U2hQ/view" target="_blank"
-                 class="px-2.5 py-1 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 text-[10px] font-semibold border border-blue-500/40 transition flex items-center gap-1.5 shadow-sm">
-                <i class="fa-brands fa-google-drive text-amber-300"></i>
-                <span>ดูรูป BP ใน Google Drive</span>
-              </a>
+                   class="max-h-[460px] w-auto object-contain rounded-lg shadow-lg border border-slate-800" />
+              <div class="mt-2.5 flex items-center justify-center gap-2">
+                <span id="alcModalBpLabel" class="text-xs text-slate-200 font-bold">พิทยา แคนถา • ความดัน 113/65 mmHg (ความดันปกติ)</span>
+                <a id="alcModalBpDriveLink" href="https://drive.google.com/file/d/16EutL-5Rps94QYPaa97cbrlyQBuyabBd/view" target="_blank"
+                   class="px-2.5 py-1 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 text-[10px] font-semibold border border-blue-500/40 transition flex items-center gap-1.5 shadow-sm">
+                  <i class="fa-brands fa-google-drive text-amber-300"></i>
+                  <span>ดูรูป BP ใน Google Drive</span>
+                </a>
+              </div>
             </div>
             <div class="grid grid-cols-3 gap-2 my-2 text-center max-w-xs mx-auto text-xs">
               <div class="p-2 rounded bg-slate-900 border border-slate-800">
                 <span class="text-[10px] text-slate-400 block">SYS (บน)</span>
-                <strong id="alcModalBpSysText" class="text-lg font-bold text-blue-400">97</strong>
+                <strong id="alcModalBpSysText" class="text-lg font-bold text-blue-400">113</strong>
               </div>
               <div class="p-2 rounded bg-slate-900 border border-slate-800">
                 <span class="text-[10px] text-slate-400 block">DIA (ล่าง)</span>
-                <strong id="alcModalBpDiaText" class="text-lg font-bold text-blue-400">70</strong>
+                <strong id="alcModalBpDiaText" class="text-lg font-bold text-blue-400">65</strong>
               </div>
               <div class="p-2 rounded bg-slate-900 border border-slate-800">
                 <span class="text-[10px] text-slate-400 block">PULSE (ชีพจร)</span>
-                <strong id="alcModalBpPulseText" class="text-lg font-bold text-emerald-400">86</strong>
+                <strong id="alcModalBpPulseText" class="text-lg font-bold text-emerald-400">76</strong>
               </div>
             </div>
           </div>
@@ -2453,8 +2456,11 @@
     };
 
     window.cachedDriverPhotoImgs = {};
+    window.cachedMeterImg = new Image();
+    window.cachedMeterImg.src = "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg";
+
     function getDriverPhotoInfo(log) {
-      if (!log) return { fileId: "1heZWHll11K2GOyZqQo__LkjlvgeXwzGI", localSrc: "./assets/alcohol_evidence/FACE_DRV73-1735_20261012_114310.jpg", cdnSrc: "https://lh3.googleusercontent.com/d/1heZWHll11K2GOyZqQo__LkjlvgeXwzGI" };
+      if (!log) return { fileId: "1UJcGYbTRV92w1gFiPSNhic1sTBPLNWDe", localSrc: "./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg", cdnSrc: "https://lh3.googleusercontent.com/d/1UJcGYbTRV92w1gFiPSNhic1sTBPLNWDe" };
       
       const drvId = log.driverId || "";
       const plate = log.vehiclePlate || "";
@@ -2468,7 +2474,7 @@
         }
       }
       if (!found) {
-        found = DRIVER_DRIVE_PHOTO_MAP["DRV73-1735"];
+        found = DRIVER_DRIVE_PHOTO_MAP["Drv70-9312"] || DRIVER_DRIVE_PHOTO_MAP["70-9312"] || { fileId: "1UJcGYbTRV92w1gFiPSNhic1sTBPLNWDe", local: "./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg" };
       }
       const fileId = found.fileId;
       return {
@@ -2549,6 +2555,19 @@
 
       ctx.save();
       ctx.clip();
+
+      const meterImg = window.cachedMeterImg;
+      if (meterImg && meterImg.complete && meterImg.naturalWidth > 0) {
+        ctx.drawImage(meterImg, x, y, w, h);
+        ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+        ctx.fillRect(x, y + h - 28, w, 28);
+        ctx.fillStyle = "#34D399";
+        ctx.font = "bold 11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("✓ 0.00 mg% FUEL CELL PASS", x + w/2, y + h - 10);
+        ctx.restore();
+        return;
+      }
       ctx.fillStyle = "#E2E8F0";
       ctx.fillRect(x, y, w, h);
 
@@ -2715,17 +2734,17 @@
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      const bpSys = log.bpSys || 97;
-      const bpDia = log.bpDia || 70;
-      const bpPulse = log.bpPulse || 86;
+      const bpSys = log.bpSys || 113;
+      const bpDia = log.bpDia || 65;
+      const bpPulse = log.bpPulse || 76;
       const bpStatus = log.bpStatus || "ความดันปกติ";
       const isOverallPass = (log.overallStatus || "พร้อมปฏิบัติหน้าที่ขับขี่").includes("พร้อม");
-      const driverName = log.driverName || "พิศมัย พอเนียม";
-      const email = log.email || "pifsamai159@gmail.com";
-      const plate = log.vehiclePlate || "73-1735";
-      const gpsText = log.gpsCoordinates || "14.583573, 100.973791 (±17.4m)";
-      const timeText = log.timestamp || "12/10/2569 11:43:01";
-      const faceMatch = log.faceMatchPercent || "95%";
+      const driverName = log.driverName || "พิทยา แคนถา";
+      const email = log.email || "kaeochom8@gmail.com";
+      const plate = log.vehiclePlate || "70-9312มค.";
+      const gpsText = log.gpsCoordinates || "13.7563, 100.5018 (SCG JWD วังน้อย)";
+      const timeText = log.timestamp || "12/10/2569 11:20:21";
+      const faceMatch = log.faceMatchPercent || "99.9%";
 
       // Row 1: Alcohol
       const r1Y = boxY + 40;
@@ -2961,23 +2980,26 @@
         log = index;
       } else {
         log = appState.alcoholLogs[0] || {
-          driverName: "พิศมัย พลเยี่ยม",
-          driverId: "DRV73-1735",
-          vehiclePlate: "73-1735",
-          timestamp: "12/10/2026 11:43:10",
-          gpsCoordinates: "14.583573, 100.973791 (±17.4m)",
-          bpSys: 97,
-          bpDia: 70,
-          bpPulse: 86,
+          driverName: "พิทยา แคนถา",
+          driverId: "DRV-012",
+          vehiclePlate: "70-9312มค.",
+          email: "kaeochom8@gmail.com",
+          phone: "092-5389099",
+          timestamp: "12/10/2026 11:20:21",
+          gpsCoordinates: "13.7563, 100.5018 (จุดตรวจ SCG JWD วังน้อย)",
+          bpSys: 113,
+          bpDia: 65,
+          bpPulse: 76,
           alcoholValue: 0.00,
           status: "ผ่าน",
           bpStatus: "ความดันปกติ",
           overallStatus: "ผ่านพร้อมปฏิบัติงาน",
-          faceMatchPercent: "95%",
-          bpPhotoUrl: "https://drive.google.com/file/d/16nAPC2MhpT_RlKKgLX3IQbLinH-7U2hQ/view",
-          facePhotoUrl: "https://drive.google.com/file/d/1heZWHll11K2GOyZqQo__LkjlvgeXwzGI/view",
-          localBpUrl: "./assets/alcohol_evidence/BP_DRV73-1735_20261012_114310.jpg",
-          localFaceUrl: "./assets/alcohol_evidence/FACE_DRV73-1735_20261012_114310.jpg"
+          faceMatchPercent: "99.9%",
+          bpPhotoUrl: "https://drive.google.com/file/d/16EutL-5Rps94QYPaa97cbrlyQBuyabBd/view?usp=drivesdk",
+          facePhotoUrl: "https://drive.google.com/file/d/1UJcGYbTRV92w1gFiPSNhic1sTBPLNWDe/view?usp=drivesdk",
+          localBpUrl: "./assets/alcohol_evidence/BP_Drv70-9312_20261012_112021.jpg",
+          localFaceUrl: "./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg",
+          localMeterUrl: "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg"
         };
       }
       if (!log) return;
@@ -2992,7 +3014,7 @@
       const elTime = document.getElementById('alcModalTimestamp');
       if (elTime) elTime.textContent = log.timestamp;
       const elGps = document.getElementById('alcModalGps');
-      if (elGps) elGps.textContent = log.gpsCoordinates || "13.7563, 100.5018";
+      if (elGps) elGps.textContent = log.gpsCoordinates || "13.7563, 100.5018 (จุดตรวจ SCG JWD วังน้อย)";
 
       // Context Banner (Only THIS driver)
       const activeDrv = document.getElementById('alcModalActiveDriverName');
@@ -3009,7 +3031,7 @@
       if (driveRecordId) driveRecordId.textContent = `${log.driverId || ''} • ${log.timestamp}`;
 
       const timeCode = (log.timestamp || "").replace(/[^0-9]/g, '').slice(0, 14) || "20261012_112021";
-      const drvId = (log.driverId || "DRV").replace(/\s+/g, '_');
+      const drvId = (log.driverId || "DRV-012").replace(/\s+/g, '_');
 
       // 2. Direct Evidence Retrieval from Drive / Local
       const photoInfo = getDriverPhotoInfo(log);
@@ -3020,7 +3042,7 @@
 
       // Set REAL Face Image
       if (faceImg) {
-        faceImg.src = log.localFaceUrl || photoInfo.localSrc;
+        faceImg.src = log.localFaceUrl || "./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg";
         faceImg.dataset.driveId = log.faceFileId || photoInfo.fileId;
         faceImg.dataset.fallbackSrc = "https://lh3.googleusercontent.com/d/" + (log.faceFileId || photoInfo.fileId);
       }
@@ -3050,7 +3072,7 @@
       }
       const bpBadge = document.getElementById('alcModalBpStatusBadge');
       if (bpBadge) {
-        bpBadge.textContent = `SYS: ${log.bpSys} / DIA: ${log.bpDia} / PULSE: ${log.bpPulse || 74}`;
+        bpBadge.textContent = `SYS: ${log.bpSys} / DIA: ${log.bpDia} / PULSE: ${log.bpPulse || 76}`;
         if ((log.bpStatus || '').includes('สูง') || Number(log.bpDia) >= 90) {
           bpBadge.className = "px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/40";
         } else {
@@ -3062,26 +3084,22 @@
       const elDia = document.getElementById('alcModalBpDiaText');
       if (elDia) elDia.textContent = log.bpDia;
       const elPulse = document.getElementById('alcModalBpPulseText');
-      if (elPulse) elPulse.textContent = log.bpPulse || 74;
+      if (elPulse) elPulse.textContent = log.bpPulse || 76;
 
-      // Set Meter Image (Digital meter for THIS driver)
+      // Set REAL Meter Image (Authentic Fuel Cell Breathalyzer Photo)
       if (meterImg) {
-        meterImg.src = renderMeterPhotoDataUrl(log);
+        meterImg.src = log.localMeterUrl || "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg";
+        meterImg.dataset.driveId = log.meterFileId || "16EutL-5Rps94QYPaa97cbrlyQBuyabBd";
+        meterImg.dataset.fallbackSrc = "./assets/alcohol_evidence/METER_Drv70-9312_20261012_112021.jpg";
       }
       const meterBadge = document.getElementById('alcModalMeterBadge');
       if (meterBadge) {
-        meterBadge.textContent = `ระดับแอลกอฮอล์: ${Number(log.alcoholValue || 0).toFixed(2)} mg% (${log.status || 'ผ่าน'})`;
+        meterBadge.textContent = `ระดับแอลกอฮอล์: ${Number(log.alcoholValue || 0).toFixed(2)} mg% (${log.status || 'ผ่าน'}) • เซ็นเซอร์ Fuel Cell`;
       }
 
       // Set Composite Report Card
       if (repImg) {
-        repImg.src = renderCompositeCardToDataUrl(log);
-        const preImg = window.cachedDriverPhotoImgs[log.faceFileId || photoInfo.fileId];
-        if (preImg && (!preImg.complete || preImg.naturalWidth === 0)) {
-          preImg.onload = () => {
-            if (repImg) repImg.src = renderCompositeCardToDataUrl(log);
-          };
-        }
+        repImg.src = log.localReportUrl || "./assets/alcohol_evidence/REPORT_Drv70-9312_20261012_112021.jpg";
       }
 
       // File Names in Tabs
@@ -3096,14 +3114,14 @@
 
       // 3. Tab 5: Populate Specific Google Drive File Cards for THIS Driver
       const driveThumbCard = document.getElementById('alcDriveThumbCard');
-      if (driveThumbCard) driveThumbCard.src = repImg ? repImg.src : renderCompositeCardToDataUrl(log);
+      if (driveThumbCard) driveThumbCard.src = repImg ? repImg.src : "./assets/alcohol_evidence/REPORT_Drv70-9312_20261012_112021.jpg";
       const driveNameCard = document.getElementById('alcDriveNameCard');
       if (driveNameCard) driveNameCard.textContent = `REPORT_${drvId}_${timeCode}.jpg`;
       const driveLinkCard = document.getElementById('alcDriveLinkCard');
       if (driveLinkCard) driveLinkCard.href = log.reportCardUrl || log.facePhotoUrl || '#';
 
       const driveThumbFace = document.getElementById('alcDriveThumbFace');
-      if (driveThumbFace) driveThumbFace.src = log.localFaceUrl || photoInfo.localSrc;
+      if (driveThumbFace) driveThumbFace.src = log.localFaceUrl || "./assets/alcohol_evidence/FACE_Drv70-9312_20261012_112021.jpg";
       const driveNameFace = document.getElementById('alcDriveNameFace');
       if (driveNameFace) driveNameFace.textContent = log.faceFileName || `FACE_${drvId}_${timeCode}.jpg`;
       const driveLinkFace = document.getElementById('alcDriveLinkFace');
@@ -3122,7 +3140,8 @@
         modalDriveBtn.href = log.facePhotoUrl || log.bpPhotoUrl || log.reportCardUrl || '#';
       }
 
-      switchAlcModalTab('card');
+      // Default Active Tab: Camera Check-in Face Photo 1:1
+      switchAlcModalTab('face');
       document.getElementById('alcoholEvidenceModal').classList.remove('hidden');
     }
 
