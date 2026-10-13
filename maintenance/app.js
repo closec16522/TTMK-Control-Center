@@ -1,8 +1,8 @@
 /**
  * =========================================================================
- * Mobile Driver App Logic - ระบบแจ้งซ่อมและบันทึกประวัติการบำรุงรักษา
+ * Mobile Driver App Logic - ระบบแจ้งซ่อมบำรุงรถบรรทุก 6 ล้อ TTMK
  * หจก. ทั่วไทยขนส่งมงคล (Mr.Taweesak.kom - 062-3285963)
- * Mobile-First UX for Line OA & Truck Drivers
+ * Mobile-First 2-Step Wizard & Auto-Registered Drivers Synchronization
  * =========================================================================
  */
 
@@ -10,13 +10,43 @@ const CONFIG = {
   SPREADSHEET_ID: "1JM-i8_nrGR7-VDEY82QZ5l5JMJTIBOIsuqOSQSrcD3Y",
   DRIVE_FOLDER_ID: "1YRkTR9dMz0PxKgF60edVF56Ckq909fMF",
   SHEET_NAME: "Maintenance_log",
+  DRIVERS_SHEET: "Registered_Drivers",
   DEFAULT_GAS_URL: "https://script.google.com/macros/s/AKfycbwvZxSw_p62y6ZwegF8iUiEdxyEJrF01yB37AumDHwgLcSFBoRSZUmwgvdtLJ-6hCFE/exec",
   STORAGE_KEY_LOGS: "TTMK_MAINTENANCE_LOGS",
-  STORAGE_KEY_DRIVER: "TTMK_SAVED_DRIVER_EMAIL"
+  STORAGE_KEY_DRIVER: "TTMK_SAVED_DRIVER_EMAIL",
+  STORAGE_KEY_GARAGES: "TTMK_SAVED_GARAGES"
 };
+
+// Known Fleet Plates mapping for clean display
+const FLEET_PLATES = [
+  { plate: "70-8899 กทม.", short: "70-8899", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "70-9312 กทม.", short: "70-9312", brand: "HINO", type: "รถบรรทุก 6 ล้อคอก (ดีเซล)" },
+  { plate: "72-1979 สระบุรี", short: "72-1979", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "72-8139 สระบุรี", short: "72-8139", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้แห้ง (ดีเซล)" },
+  { plate: "8กส1201 กทม.", short: "8กส1201", brand: "HINO", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "70-5544 กทม.", short: "70-5544", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "72-3199 สระบุรี", short: "72-3199", brand: "HINO", type: "รถบรรทุก 6 ล้อคอก (ดีเซล)" },
+  { plate: "71-6543 อยุธยา", short: "71-6543", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "73-2415 สระบุรี", short: "73-2415", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "71-9820 กทม.", short: "71-9820", brand: "HINO", type: "รถบรรทุก 6 ล้อคอก (ดีเซล)" },
+  { plate: "72-4411 นครปฐม", short: "72-4411", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้แห้ง (ดีเซล)" },
+  { plate: "73-9081 สระบุรี", short: "73-9081", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "70-1122 กทม.", short: "70-1122", brand: "HINO", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "72-9901 ฉะเชิงเทรา", short: "72-9901", brand: "ISUZU", type: "รถบรรทุก 6 ล้อคอก (ดีเซล)" },
+  { plate: "73-0819 สระบุรี", short: "73-0819", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "71-8686 สระบุรี", short: "71-8686", brand: "HINO", type: "รถบรรทุก 6 ล้อคอก (ดีเซล)" },
+  { plate: "70-4713 สระบุรี", short: "70-4713", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "73-1366 สระบุรี", short: "73-1366", brand: "HINO", type: "รถบรรทุก 6 ล้อคอก (ดีเซล)" },
+  { plate: "73-2705 สระบุรี", short: "73-2705", brand: "ISUZU", type: "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" },
+  { plate: "73-1735 สระบุรี", short: "73-1735", brand: "BYD T8", type: "รถบรรทุก 6 ล้อตู้ทึบ (EV 100%)" },
+  { plate: "72-8297 สระบุรี", short: "72-8297", brand: "BYD T8", type: "รถบรรทุก 6 ล้อคอกผ้าใบ (EV 100%)" },
+  { plate: "72-5079 สระบุรี", short: "72-5079", brand: "NEX Point", type: "รถบรรทุก 6 ล้อตู้แห้ง (EV 100%)" },
+  { plate: "61-5463 กทม.", short: "61-5463", brand: "NEX Point", type: "รถบรรทุก 6 ล้อตู้ทึบ (EV 100%)" }
+];
 
 // Application State
 const appState = {
+  currentStep: 1,
   partItems: [],
   capturedImages: {
     billPhoto: null,
@@ -25,16 +55,20 @@ const appState = {
   activeCameraStream: null,
   activeCameraTarget: null,
   cameraFacingMode: 'environment',
-  currentDriver: null
+  currentDriver: null,
+  registeredDrivers: [],
+  garagesList: []
 };
 
 // =========================================================================
 // 1. INITIALIZATION ON DOM READY
 // =========================================================================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initDateDefaults();
-  initDriverIdentity();
   initDefaultMobilePartCard();
+  await loadRegisteredDrivers();
+  await loadGaragesList();
+  initDriverIdentity();
 });
 
 function initDateDefaults() {
@@ -57,84 +91,304 @@ function generateNewTicketId() {
   return ticketId;
 }
 
-/**
- * ซิงก์ตัวตนพนักงานขับรถจากระบบความจำเดียวกันกับ CheckTruck และ Alcohol
- */
-function initDriverIdentity() {
-  let savedEmail = localStorage.getItem(CONFIG.STORAGE_KEY_DRIVER) || localStorage.getItem("TTMK_LAST_EMAIL");
-  let savedProfile = null;
-  try {
-    const raw = localStorage.getItem("TTMK_DRIVER_PROFILE");
-    if (raw) savedProfile = JSON.parse(raw);
-  } catch (e) {}
+// =========================================================================
+// 2. 2-STEP MOBILE WIZARD CONTROLLER
+// =========================================================================
 
-  if (savedProfile && savedProfile.email) {
-    applyDriverData(savedProfile);
-  } else if (savedEmail && savedEmail.trim().length > 3) {
-    applyDriverEmail(savedEmail.trim().toLowerCase());
-  } else {
-    updateDriverHeaderUI(null);
-  }
-}
+window.goToStep = function(step) {
+  if (step === 2) {
+    // Validate Step 1 inputs before advancing
+    const plate = document.getElementById("vehiclePlate")?.value?.trim();
+    const odo = document.getElementById("odometer")?.value?.trim();
+    const symptom = document.getElementById("symptomDescription")?.value?.trim();
 
-function applyDriverData(driver) {
-  appState.currentDriver = driver;
-  const nameInput = document.getElementById("driverName");
-  const emailInput = document.getElementById("driverEmail");
-  const phoneInput = document.getElementById("driverPhone");
-  const plateSelect = document.getElementById("vehiclePlate");
+    if (!plate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'กรุณาระบุทะเบียนรถ',
+        text: 'ระบบยังไม่พบข้อมูลทะเบียนรถ กรุณาเลือกหรือสลับคัน',
+        background: '#0f172a',
+        color: '#fff',
+        confirmButtonColor: '#f59e0b'
+      });
+      return;
+    }
 
-  if (nameInput) nameInput.value = driver.driverName || driver.name || "";
-  if (emailInput) emailInput.value = driver.email || "";
-  if (phoneInput) phoneInput.value = driver.phone || "";
+    if (!odo || Number(odo) <= 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'กรุณากรอกเลขไมล์ปัจจุบัน',
+        text: 'ระบุเลขไมล์สะสมของรถ เช่น 168450',
+        background: '#0f172a',
+        color: '#fff',
+        confirmButtonColor: '#f59e0b'
+      });
+      document.getElementById("odometer")?.focus();
+      return;
+    }
 
-  if (plateSelect && driver.vehiclePlate) {
-    for (let opt of plateSelect.options) {
-      if (opt.value.includes(driver.vehiclePlate) || driver.vehiclePlate.includes(opt.value)) {
-        plateSelect.value = opt.value;
-        break;
-      }
+    if (!symptom || symptom.length < 3) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'กรุณากรอกรายละเอียดอาการเสีย',
+        text: 'พิมพ์อธิบายปัญหาหรือข้อบกพร่องที่พบสั้นๆ',
+        background: '#0f172a',
+        color: '#fff',
+        confirmButtonColor: '#f59e0b'
+      });
+      document.getElementById("symptomDescription")?.focus();
+      return;
     }
   }
 
-  updateDriverHeaderUI(driver);
-}
+  appState.currentStep = step;
 
-function applyDriverEmail(email) {
-  const emailInput = document.getElementById("driverEmail");
-  if (emailInput) emailInput.value = email;
-  const username = email.split('@')[0];
-  const mockDriver = {
-    driverName: "พนักงานขับรถ " + username,
-    email: email,
-    phone: "062-3285963"
-  };
-  appState.currentDriver = mockDriver;
-  const nameInput = document.getElementById("driverName");
-  if (nameInput && !nameInput.value) nameInput.value = mockDriver.driverName;
-  updateDriverHeaderUI(mockDriver);
-}
+  const page1 = document.getElementById("stepPage1");
+  const page2 = document.getElementById("stepPage2");
+  const tabBtn1 = document.getElementById("stepTab1");
+  const tabBtn2 = document.getElementById("stepTab2");
 
-function updateDriverHeaderUI(driver) {
-  const headerName = document.getElementById("headerDriverName");
-  const dot = document.getElementById("driverStatusDot");
-  if (!driver || !driver.email) {
-    if (headerName) headerName.textContent = "ระบุคนขับ";
-    if (dot) dot.className = "w-2 h-2 rounded-full bg-slate-500";
+  if (step === 1) {
+    if (page1) page1.classList.remove("hidden");
+    if (page2) page2.classList.add("hidden");
+
+    if (tabBtn1) {
+      tabBtn1.className = "flex-1 py-1.5 px-2 rounded-xl text-center font-bold text-xs transition bg-amber-500 text-slate-950 shadow-md flex items-center justify-center gap-1.5";
+    }
+    if (tabBtn2) {
+      tabBtn2.className = "flex-1 py-1.5 px-2 rounded-xl text-center font-semibold text-xs transition text-slate-400 hover:text-white bg-slate-900 border border-slate-800 flex items-center justify-center gap-1.5";
+    }
   } else {
-    if (headerName) headerName.textContent = driver.driverName || driver.name || driver.email;
-    if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+    if (page1) page1.classList.add("hidden");
+    if (page2) page2.classList.remove("hidden");
+
+    if (tabBtn1) {
+      tabBtn1.className = "flex-1 py-1.5 px-2 rounded-xl text-center font-semibold text-xs transition text-slate-400 hover:text-white bg-slate-900 border border-slate-800 flex items-center justify-center gap-1.5";
+    }
+    if (tabBtn2) {
+      tabBtn2.className = "flex-1 py-1.5 px-2 rounded-xl text-center font-bold text-xs transition bg-amber-500 text-slate-950 shadow-md flex items-center justify-center gap-1.5";
+    }
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// =========================================================================
+// 3. REGISTERED DRIVERS & AUTO VEHICLE ASSIGNMENT (Sheet: Registered_Drivers)
+// =========================================================================
+
+async function loadRegisteredDrivers() {
+  try {
+    const res = await fetch(`https://docs.google.com/spreadsheets/d/${CONFIG.SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${CONFIG.DRIVERS_SHEET}`);
+    if (res.ok) {
+      const text = await res.text();
+      const startIdx = text.indexOf('{');
+      const endIdx = text.lastIndexOf('}');
+      if (startIdx >= 0 && endIdx >= 0) {
+        const json = JSON.parse(text.substring(startIdx, endIdx + 1));
+        const list = [];
+        (json.table.rows || []).forEach(r => {
+          const c = r.c;
+          if (!c) return;
+          const id = c[0] ? String(c[0].f || c[0].v || '').trim() : '';
+          const name = c[1] ? String(c[1].f || c[1].v || '').trim() : '';
+          const email = c[2] ? String(c[2].f || c[2].v || '').trim().toLowerCase() : '';
+          const phone = c[3] ? String(c[3].f || c[3].v || '').trim() : '';
+          const rawPlate = c[4] ? String(c[4].f || c[4].v || '').trim() : '';
+          const dept = c[5] ? String(c[5].f || c[5].v || '').trim() : '';
+          const status = c[6] ? String(c[6].f || c[6].v || '').trim() : 'ACTIVE';
+
+          if (name || email) {
+            list.push({
+              driverId: id,
+              driverName: name,
+              email: email,
+              phone: phone,
+              rawPlate: rawPlate,
+              department: dept,
+              status: status
+            });
+          }
+        });
+
+        if (list.length > 0) {
+          appState.registeredDrivers = list;
+          localStorage.setItem("TTMK_REGISTERED_DRIVERS_CACHE", JSON.stringify(list));
+          return list;
+        }
+      }
+    }
+  } catch(e) {
+    console.warn("GViz drivers load failed, checking cache:", e);
+  }
+
+  try {
+    const cached = localStorage.getItem("TTMK_REGISTERED_DRIVERS_CACHE");
+    if (cached) {
+      appState.registeredDrivers = JSON.parse(cached);
+      return appState.registeredDrivers;
+    }
+  } catch(e) {}
+
+  return [];
+}
+
+/**
+ * ระบุตัวตนคนขับ และดึงทะเบียนรถประจำตัวจาก Registered_Drivers อัตโนมัติ
+ */
+function initDriverIdentity() {
+  let savedEmail = localStorage.getItem(CONFIG.STORAGE_KEY_DRIVER) || 
+                   localStorage.getItem("TTMK_LAST_EMAIL") || 
+                   "closec16522@gmail.com"; // default dev/admin email
+
+  let matchedDriver = null;
+
+  if (savedEmail && appState.registeredDrivers.length > 0) {
+    const cleanEmail = savedEmail.trim().toLowerCase();
+    matchedDriver = appState.registeredDrivers.find(d => d.email === cleanEmail);
+  }
+
+  if (matchedDriver) {
+    applyDriverProfile(matchedDriver);
+  } else if (appState.registeredDrivers.length > 0) {
+    // Default to the first active registered driver
+    applyDriverProfile(appState.registeredDrivers[0]);
+  } else {
+    // Fallback default
+    applyDriverProfile({
+      driverId: "DRV-999",
+      driverName: "ทวีศักดิ์ คำปก",
+      email: "closec16522@gmail.com",
+      phone: "062-3285963",
+      rawPlate: "70-8899"
+    });
   }
 }
 
+/**
+ * นำข้อมูลคนขับและรถที่ตรวจพบมาล็อกไว้ในแบบฟอร์มอัตโนมัติ 100%
+ */
+function applyDriverProfile(driver) {
+  appState.currentDriver = driver;
+
+  // 1. Resolve full vehicle plate format
+  let fullPlate = driver.rawPlate || "70-8899 กทม.";
+  let resolvedVehicleType = "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)";
+
+  const matchedFleet = FLEET_PLATES.find(f => 
+    fullPlate.includes(f.short) || f.plate.includes(fullPlate) || fullPlate.includes(f.plate)
+  );
+
+  if (matchedFleet) {
+    fullPlate = matchedFleet.plate;
+    resolvedVehicleType = matchedFleet.type;
+  } else if (!fullPlate.includes(" ")) {
+    fullPlate = fullPlate + " สระบุรี";
+  }
+
+  // 2. Set hidden inputs for submit
+  const plateSelect = document.getElementById("vehiclePlate");
+  if (plateSelect) plateSelect.value = fullPlate;
+
+  const typeInput = document.getElementById("vehicleType");
+  if (typeInput) typeInput.value = resolvedVehicleType;
+
+  const nameInput = document.getElementById("driverName");
+  if (nameInput) nameInput.value = driver.driverName;
+
+  const emailInput = document.getElementById("driverEmail");
+  if (emailInput) emailInput.value = driver.email;
+
+  const phoneInput = document.getElementById("driverPhone");
+  if (phoneInput) phoneInput.value = driver.phone || "062-3285963";
+
+  // 3. Update Assigned Truck Card UI
+  const assignedPlateDisplay = document.getElementById("assignedPlateDisplay");
+  if (assignedPlateDisplay) assignedPlateDisplay.textContent = fullPlate;
+
+  const assignedDriverDisplay = document.getElementById("assignedDriverDisplay");
+  if (assignedDriverDisplay) {
+    assignedDriverDisplay.textContent = `${driver.driverName} • ${driver.phone || '-'}`;
+  }
+
+  const assignedDriverId = document.getElementById("assignedDriverId");
+  if (assignedDriverId) {
+    assignedDriverId.textContent = driver.driverId || "DRV";
+  }
+
+  // 4. Update Header UI
+  const headerName = document.getElementById("headerDriverName");
+  if (headerName) headerName.textContent = driver.driverName || driver.email;
+
+  const dot = document.getElementById("driverStatusDot");
+  if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+
+  // Remember this driver email for future app visits
+  if (driver.email) {
+    localStorage.setItem(CONFIG.STORAGE_KEY_DRIVER, driver.email);
+    localStorage.setItem("TTMK_LAST_EMAIL", driver.email);
+  }
+}
+
+window.toggleSwitchPlate = function() {
+  const container = document.getElementById("plateSelectContainer");
+  if (!container) return;
+  const isHidden = container.classList.contains("hidden");
+  if (isHidden) {
+    container.classList.remove("hidden");
+    const sel = document.getElementById("vehiclePlate");
+    if (sel) sel.focus();
+  } else {
+    container.classList.add("hidden");
+  }
+};
+
+window.handlePlateChange = function() {
+  const plateSelect = document.getElementById("vehiclePlate");
+  const customInput = document.getElementById("customPlateInput");
+  if (!plateSelect) return;
+
+  if (plateSelect.value === "OTHER") {
+    if (customInput) customInput.classList.remove("hidden");
+  } else {
+    if (customInput) customInput.classList.add("hidden");
+    const val = plateSelect.value;
+    const assignedPlateDisplay = document.getElementById("assignedPlateDisplay");
+    if (assignedPlateDisplay && val) assignedPlateDisplay.textContent = val;
+
+    const matchedFleet = FLEET_PLATES.find(f => f.plate === val);
+    if (matchedFleet) {
+      const typeInput = document.getElementById("vehicleType");
+      if (typeInput) typeInput.value = matchedFleet.type;
+    }
+  }
+};
+
 window.promptSwitchDriver = function() {
+  const drivers = appState.registeredDrivers || [];
+  
+  let optionsHtml = '';
+  if (drivers.length > 0) {
+    optionsHtml = drivers.map(d => {
+      const isSelected = appState.currentDriver && (appState.currentDriver.email === d.email);
+      return `<option value="${escapeHtml(d.email)}"${isSelected ? ' selected' : ''}>${escapeHtml(d.driverName)} (รถ: ${escapeHtml(d.rawPlate || '-')})</option>`;
+    }).join('');
+  }
+
   Swal.fire({
-    title: 'ระบุตัวตนคนขับรถ',
+    title: 'เลือกพนักงานขับรถ',
     html: `
-      <div class="text-left text-xs text-slate-300 space-y-2">
-        <p>กรุณากรอกอีเมลของท่านเพื่อจำชื่อและทะเบียนรถอัตโนมัติ:</p>
-        <input type="email" id="swalDriverEmailInput" placeholder="เช่น driver@gmail.com"
-               class="w-full p-2.5 rounded-xl border border-slate-700 bg-slate-900 text-white text-xs font-mono outline-none focus:border-amber-500">
+      <div class="text-left text-xs text-slate-300 space-y-2.5">
+        <p>เลือกรายชื่อของท่านจากฐานข้อมูล <b>Registered_Drivers</b>:</p>
+        <select id="swalDriverSelect" class="w-full p-2.5 rounded-xl border border-slate-700 bg-slate-900 text-white text-xs outline-none focus:border-amber-500 font-bold">
+          ${optionsHtml || '<option value="">-- ไม่พบรายชื่อ --</option>'}
+        </select>
+        <div class="pt-1">
+          <p class="text-[10px] text-slate-400">หรือพิมพ์อีเมลของท่าน:</p>
+          <input type="email" id="swalDriverEmailInput" placeholder="เช่น somchai@gmail.com"
+                 value="${appState.currentDriver ? appState.currentDriver.email : ''}"
+                 class="w-full mt-1 p-2 rounded-xl border border-slate-700 bg-slate-900 text-white text-xs font-mono outline-none focus:border-amber-500">
+        </div>
       </div>
     `,
     background: '#0f172a',
@@ -145,22 +399,36 @@ window.promptSwitchDriver = function() {
     confirmButtonColor: '#f59e0b',
     cancelButtonColor: '#64748b',
     preConfirm: () => {
-      const email = document.getElementById('swalDriverEmailInput').value.trim();
-      if (!email || !email.includes('@')) {
-        Swal.showValidationMessage('กรุณากรอกอีเมลให้ถูกต้อง');
+      const selectVal = document.getElementById('swalDriverSelect').value;
+      const inputVal = document.getElementById('swalDriverEmailInput').value.trim();
+      const chosenEmail = inputVal || selectVal;
+      if (!chosenEmail) {
+        Swal.showValidationMessage('กรุณาเลือกหรือระบุคนขับ');
         return false;
       }
-      return email.toLowerCase();
+      return chosenEmail;
     }
-  }).then((res) => {
-    if (res.isConfirmed && res.value) {
-      localStorage.setItem(CONFIG.STORAGE_KEY_DRIVER, res.value);
-      localStorage.setItem("TTMK_LAST_EMAIL", res.value);
-      applyDriverEmail(res.value);
+  }).then(result => {
+    if (result.isConfirmed && result.value) {
+      const email = result.value.toLowerCase();
+      const found = appState.registeredDrivers.find(d => d.email === email);
+      if (found) {
+        applyDriverProfile(found);
+      } else {
+        applyDriverProfile({
+          driverId: "DRV-CUSTOM",
+          driverName: "พนักงานขับรถ",
+          email: email,
+          phone: "062-3285963",
+          rawPlate: "70-8899"
+        });
+      }
+
       Swal.fire({
         icon: 'success',
-        title: 'บันทึกคนขับเรียบร้อย',
-        timer: 1200,
+        title: 'ยืนยันตัวตนสำเร็จ',
+        text: `เข้าสู่ระบบในชื่อ: ${appState.currentDriver.driverName} (รถประจำตัว: ${document.getElementById("vehiclePlate").value})`,
+        timer: 1700,
         showConfirmButton: false,
         background: '#0f172a',
         color: '#fff'
@@ -169,202 +437,237 @@ window.promptSwitchDriver = function() {
   });
 };
 
-window.handlePlateChange = function() {
-  const plateSelect = document.getElementById("vehiclePlate");
-  const customInput = document.getElementById("customPlateInput");
-  const vehicleType = document.getElementById("vehicleType");
+// =========================================================================
+// 4. GARAGES LIST & AUTO-COMPLETE (Sheet: Maintenance_log + Cache)
+// =========================================================================
 
-  if (!plateSelect) return;
+async function loadGaragesList() {
+  const defaultGarages = [
+    "ศูนย์บริการ TTMK สระบุรี",
+    "ศูนย์บริการ อีซูซุ สระบุรี",
+    "ศูนย์บริการ ฮีโน่ สระบุรี",
+    "ร้านยางเจริญยนต์ สระบุรี",
+    "อู่ช่างเล็ก ไดนาโม",
+    "ศูนย์บริการ BYD / NEX Point EV"
+  ];
 
-  if (plateSelect.value === "OTHER") {
-    customInput.classList.remove("hidden");
-    customInput.focus();
-  } else {
-    customInput.classList.add("hidden");
+  const garageSet = new Set(defaultGarages);
+
+  // 1. Pull from localStorage
+  try {
+    const saved = localStorage.getItem(CONFIG.STORAGE_KEY_GARAGES);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) parsed.forEach(g => garageSet.add(g));
+    }
+  } catch(e) {}
+
+  // 2. Query Google Sheet Maintenance_log Column 14 (Index 13: Garage_Name)
+  try {
+    const res = await fetch(`https://docs.google.com/spreadsheets/d/${CONFIG.SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${CONFIG.SHEET_NAME}`);
+    if (res.ok) {
+      const text = await res.text();
+      const startIdx = text.indexOf('{');
+      const endIdx = text.lastIndexOf('}');
+      if (startIdx >= 0 && endIdx >= 0) {
+        const json = JSON.parse(text.substring(startIdx, endIdx + 1));
+        (json.table.rows || []).forEach(r => {
+          if (r.c && r.c[13]) {
+            const gName = String(r.c[13].f || r.c[13].v || '').trim();
+            if (gName && gName.length > 2) garageSet.add(gName);
+          }
+        });
+      }
+    }
+  } catch(e) {}
+
+  appState.garagesList = Array.from(garageSet);
+
+  // Populate HTML5 Datalist
+  const datalist = document.getElementById("garageDatalist");
+  if (datalist) {
+    datalist.innerHTML = appState.garagesList.map(g => `<option value="${escapeHtml(g)}"></option>`).join('');
   }
 
-  if (plateSelect.value.includes("EV") || plateSelect.value.includes("73-1735") || plateSelect.value.includes("72-8297") || plateSelect.value.includes("72-5079") || plateSelect.value.includes("61-5463")) {
-    vehicleType.value = "รถบรรทุก 6 ล้อ EV (ไฟฟ้า 100%)";
-  } else if (plateSelect.value.includes("คอก")) {
-    vehicleType.value = "รถบรรทุก 6 ล้อคอกผ้าใบ (ดีเซล)";
-  } else {
-    vehicleType.value = "รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)";
+  // Populate Quick Chips
+  const chipsContainer = document.getElementById("garageChipsContainer");
+  if (chipsContainer) {
+    chipsContainer.innerHTML = appState.garagesList.slice(0, 6).map(g => `
+      <button type="button" onclick="selectGarageChip('${escapeHtml(g)}')" 
+              class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 active:scale-95 transition">
+        ${escapeHtml(g)}
+      </button>
+    `).join('');
+  }
+}
+
+window.selectGarageChip = function(name) {
+  const input = document.getElementById("garageName");
+  if (input) {
+    input.value = name;
+    input.focus();
   }
 };
 
+function saveGarageToCache(name) {
+  if (!name || name.trim().length < 2) return;
+  const clean = name.trim();
+  if (!appState.garagesList.includes(clean)) {
+    appState.garagesList.push(clean);
+    try {
+      localStorage.setItem(CONFIG.STORAGE_KEY_GARAGES, JSON.stringify(appState.garagesList));
+    } catch(e) {}
+  }
+}
+
 // =========================================================================
-// 2. QUICK CHIP SELECTION & SYMPTOM TAGS
+// 5. QUICK SYSTEM & SYMPTOM CHIPS
 // =========================================================================
 
-window.selectSystemChip = function(systemName, btn) {
-  document.getElementById("systemAffected").value = systemName;
-  document.querySelectorAll(".sys-chip").forEach(el => {
-    el.className = "sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300";
+window.selectSystemChip = function(systemName, btnEl) {
+  const hiddenInput = document.getElementById("systemAffected");
+  if (hiddenInput) hiddenInput.value = systemName;
+
+  const chips = document.querySelectorAll(".sys-chip");
+  chips.forEach(c => {
+    c.className = "sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300";
   });
-  if (btn) {
-    btn.className = "sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-amber-500 bg-amber-500/20 text-amber-300 shadow-sm";
+
+  if (btnEl) {
+    btnEl.className = "sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-amber-500 bg-amber-500/20 text-amber-300 shadow-sm";
   }
 };
 
 window.appendSymptomText = function(text) {
-  const textarea = document.getElementById("symptomDescription");
-  if (!textarea) return;
-  const current = textarea.value.trim();
-  if (!current) {
-    textarea.value = text;
-  } else if (!current.includes(text)) {
-    textarea.value = current + ", " + text;
+  const txtArea = document.getElementById("symptomDescription");
+  if (!txtArea) return;
+  const current = txtArea.value.trim();
+  if (current) {
+    txtArea.value = current + ", " + text;
+  } else {
+    txtArea.value = text;
   }
-  textarea.focus();
+  txtArea.focus();
 };
 
 // =========================================================================
-// 3. MOBILE DYNAMIC PARTS CARDS (+ เพิ่มรายการ)
+// 6. DYNAMIC MULTI-PART MOBILE CARDS
 // =========================================================================
 
 function initDefaultMobilePartCard() {
   appState.partItems = [];
-  addMobilePartCard({
-    name: "ผ้าเบรกหน้า (แท้)",
-    category: "ระบบเบรก / ลม",
-    qty: 1,
-    unit: "ชุด",
-    unitPrice: 2400
-  });
+  addMobilePartCard("ผ้าเบรกหน้า (แท้)", 1, "ชุด", 3500);
 }
 
-window.addMobilePartCard = function(initData = null) {
-  const newId = "part_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-  const item = {
-    id: newId,
-    name: initData ? initData.name : "",
-    category: initData ? initData.category : "เปลี่ยนอะไหล่ใหม่",
-    qty: initData ? initData.qty : 1,
-    unit: initData ? initData.unit : "ชิ้น",
-    unitPrice: initData ? initData.unitPrice : 0,
-    total: 0
+window.addMobilePartCard = function(defaultName = "", defaultQty = 1, defaultUnit = "ชิ้น", defaultPrice = 0) {
+  const id = Date.now() + Math.floor(Math.random() * 100);
+  const newItem = {
+    id: id,
+    name: defaultName,
+    qty: defaultQty,
+    unit: defaultUnit,
+    unitPrice: defaultPrice
   };
-  item.total = Number(item.qty || 1) * Number(item.unitPrice || 0);
-
-  appState.partItems.push(item);
-  renderMobilePartsCards();
+  appState.partItems.push(newItem);
+  renderMobilePartCards();
   calculateFinancialTotals();
 };
 
-window.removeMobilePartCard = function(id) {
+window.deleteMobilePartCard = function(id) {
   if (appState.partItems.length <= 1) {
-    Swal.fire({
-      icon: 'info',
-      title: 'ต้องมีรายการอย่างน้อย 1 รายการ',
-      text: 'หากเป็นงานบริการ สามารถระบุเป็นรายการค่าแรงหรือค่าซ่อมได้ครับ',
-      timer: 1500,
-      showConfirmButton: false,
-      background: '#0f172a',
-      color: '#fff'
-    });
+    appState.partItems[0].name = "";
+    appState.partItems[0].qty = 1;
+    appState.partItems[0].unitPrice = 0;
+    renderMobilePartCards();
+    calculateFinancialTotals();
     return;
   }
-  appState.partItems = appState.partItems.filter(it => it.id !== id);
-  renderMobilePartsCards();
-  calculateFinancialTotals();
-};
-
-window.updateMobilePartField = function(id, field, value) {
-  const item = appState.partItems.find(it => it.id === id);
-  if (!item) return;
-
-  if (field === 'qty' || field === 'unitPrice') {
-    item[field] = parseFloat(value) || 0;
-    item.total = item.qty * item.unitPrice;
-    const totalEl = document.getElementById(`card_total_${id}`);
-    if (totalEl) totalEl.textContent = Number(item.total).toLocaleString('th-TH', { minimumFractionDigits: 2 }) + " บ.";
-  } else {
-    item[field] = value;
-  }
-
+  appState.partItems = appState.partItems.filter(item => item.id !== id);
+  renderMobilePartCards();
   calculateFinancialTotals();
 };
 
 window.stepQty = function(id, delta) {
-  const item = appState.partItems.find(it => it.id === id);
+  const item = appState.partItems.find(x => x.id === id);
   if (!item) return;
-  const current = Number(item.qty || 1);
-  const next = Math.max(1, current + delta);
-  item.qty = next;
-  item.total = item.qty * item.unitPrice;
-
-  const inputEl = document.getElementById(`input_qty_${id}`);
-  if (inputEl) inputEl.value = next;
-  const totalEl = document.getElementById(`card_total_${id}`);
-  if (totalEl) totalEl.textContent = Number(item.total).toLocaleString('th-TH', { minimumFractionDigits: 2 }) + " บ.";
-
+  item.qty = Math.max(1, (parseInt(item.qty, 10) || 1) + delta);
+  renderMobilePartCards();
   calculateFinancialTotals();
 };
 
-function renderMobilePartsCards() {
+window.updatePartItem = function(id, field, value) {
+  const item = appState.partItems.find(x => x.id === id);
+  if (!item) return;
+  if (field === "name" || field === "unit") {
+    item[field] = value;
+  } else if (field === "unitPrice") {
+    item[field] = parseFloat(value) || 0;
+  } else if (field === "qty") {
+    item[field] = Math.max(1, parseInt(value, 10) || 1);
+  }
+  calculateFinancialTotals();
+};
+
+function renderMobilePartCards() {
   const container = document.getElementById("mobilePartsContainer");
   if (!container) return;
 
-  container.innerHTML = "";
+  container.innerHTML = appState.partItems.map((item, idx) => {
+    const itemTotal = (item.qty * item.unitPrice).toLocaleString();
+    return `
+      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2 shadow-sm" data-id="${item.id}">
+        
+        <!-- Header: Number & Delete -->
+        <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+          <span class="flex items-center gap-1.5 text-amber-400">
+            <i class="fa-solid fa-tag"></i> รายการที่ ${idx + 1}
+          </span>
+          <button type="button" onclick="deleteMobilePartCard(${item.id})" class="text-slate-500 hover:text-red-400 p-1 text-xs">
+            <i class="fa-solid fa-trash-can"></i> ลบ
+          </button>
+        </div>
 
-  appState.partItems.forEach((item, index) => {
-    const card = document.createElement("div");
-    card.className = "bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2 relative";
+        <!-- Part / Service Name -->
+        <div>
+          <input type="text" value="${escapeHtml(item.name)}" 
+                 oninput="updatePartItem(${item.id}, 'name', this.value)"
+                 placeholder="ชื่ออะไหล่ หรือ ค่าแรงช่าง เช่น ผ้าเบรก, ถ่ายน้ำมัน..."
+                 class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white text-xs font-semibold outline-none focus:border-amber-500">
+        </div>
 
-    card.innerHTML = `
-      <!-- Card Top: Item # & Remove Button -->
-      <div class="flex items-center justify-between text-xs pb-1.5 border-b border-slate-800">
-        <span class="font-bold text-amber-400 flex items-center gap-1">
-          <i class="fa-solid fa-tag text-[10px]"></i> รายการที่ ${index + 1}
-        </span>
-        <button type="button" onclick="removeMobilePartCard('${item.id}')"
-                class="text-slate-400 hover:text-red-400 text-xs px-1.5 py-0.5 rounded transition">
-          <i class="fa-solid fa-trash-can mr-0.5"></i> ลบ
-        </button>
-      </div>
+        <!-- Stepper Qty & Unit Price -->
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <!-- Stepper: Quantity -->
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">จำนวน</label>
+            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
+              <button type="button" onclick="stepQty(${item.id}, -1)" class="w-8 py-1.5 bg-slate-800 active:bg-slate-700 text-white font-bold text-sm">-</button>
+              <input type="number" min="1" value="${item.qty}"
+                     onchange="updatePartItem(${item.id}, 'qty', this.value)"
+                     class="w-full text-center bg-transparent text-white font-bold text-xs outline-none font-mono">
+              <button type="button" onclick="stepQty(${item.id}, 1)" class="w-8 py-1.5 bg-slate-800 active:bg-slate-700 text-white font-bold text-sm">+</button>
+            </div>
+          </div>
 
-      <!-- Item Name Input (Big & Clear) -->
-      <div>
-        <input type="text" value="${escapeHtml(item.name)}" placeholder="ชื่ออะไหล่ หรือ งานบริการ เช่น ผ้าเบรกหน้า..."
-               onchange="updateMobilePartField('${item.id}', 'name', this.value)"
-               class="w-full px-3 py-2 rounded-xl border border-slate-700 bg-slate-900 text-white font-bold text-xs outline-none focus:border-amber-500">
-      </div>
-
-      <!-- Quantity Stepper & Price Row -->
-      <div class="grid grid-cols-2 gap-2 text-xs">
-        <!-- Qty with Touch Stepper [-] [+] -->
-        <div class="flex flex-col">
-          <span class="text-[10px] text-slate-400 mb-1">จำนวน</span>
-          <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-            <button type="button" onclick="stepQty('${item.id}', -1)"
-                    class="w-9 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold active:scale-95 text-xs">-</button>
-            <input type="number" id="input_qty_${item.id}" min="1" value="${item.qty}"
-                   oninput="updateMobilePartField('${item.id}', 'qty', this.value)"
-                   class="w-full text-center bg-transparent text-white font-digital font-bold text-sm outline-none">
-            <button type="button" onclick="stepQty('${item.id}', 1)"
-                    class="w-9 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold active:scale-95 text-xs">+</button>
+          <!-- Unit Price (Baht) -->
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">ราคา/หน่วย (บาท)</label>
+            <input type="number" min="0" step="any" value="${item.unitPrice || ''}"
+                   oninput="updatePartItem(${item.id}, 'unitPrice', this.value)"
+                   placeholder="0"
+                   class="w-full px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-right text-emerald-400 font-digital font-bold text-sm outline-none focus:border-amber-500">
           </div>
         </div>
 
-        <!-- Unit Price Input -->
-        <div class="flex flex-col">
-          <span class="text-[10px] text-slate-400 mb-1">ราคา/หน่วย (บาท)</span>
-          <input type="number" min="0" step="any" value="${item.unitPrice}" placeholder="0" inputmode="decimal"
-                 oninput="updateMobilePartField('${item.id}', 'unitPrice', this.value)"
-                 class="w-full px-3 py-2 text-right bg-slate-900 border border-slate-700 rounded-xl text-white font-digital font-bold text-sm outline-none focus:border-amber-500">
+        <!-- Subtotal of this item -->
+        <div class="flex justify-between items-center pt-1 border-t border-slate-900 text-[11px] text-slate-400">
+          <span>รวมรายการนี้:</span>
+          <span class="font-digital text-xs text-white font-bold">${itemTotal} บาท</span>
         </div>
-      </div>
 
-      <!-- Line Total Display -->
-      <div class="flex items-center justify-between pt-1 border-t border-slate-800/80 text-xs">
-        <span class="text-[11px] text-slate-400">รวมรายการนี้:</span>
-        <span class="font-digital font-bold text-amber-300" id="card_total_${item.id}">
-          ${Number(item.total).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บ.
-        </span>
       </div>
     `;
-    container.appendChild(card);
-  });
+  }).join('');
 }
 
 function calculateFinancialTotals() {
@@ -372,116 +675,110 @@ function calculateFinancialTotals() {
   let laborSubtotal = 0;
 
   appState.partItems.forEach(item => {
-    const lineTotal = Number(item.qty || 0) * Number(item.unitPrice || 0);
-    if ((item.name || '').includes("ค่าแรง") || (item.name || '').includes("บริการ")) {
-      laborSubtotal += lineTotal;
+    const total = (item.qty || 1) * (item.unitPrice || 0);
+    const n = (item.name || "").toLowerCase();
+    if (n.includes("แรง") || n.includes("บริการ") || n.includes("service") || n.includes("labor")) {
+      laborSubtotal += total;
     } else {
-      partsSubtotal += lineTotal;
+      partsSubtotal += total;
     }
   });
 
-  const includeVat = document.getElementById("checkIncludeVat") ? document.getElementById("checkIncludeVat").checked : false;
-  const subtotal = partsSubtotal + laborSubtotal;
-  const vatAmount = includeVat ? subtotal * 0.07 : 0;
-  const grandTotal = subtotal + vatAmount;
+  const checkVat = document.getElementById("checkIncludeVat");
+  const hasVat = checkVat && checkVat.checked;
+  const rawSum = partsSubtotal + laborSubtotal;
+  const vatAmount = hasVat ? rawSum * 0.07 : 0;
+  const grandTotal = rawSum + vatAmount;
 
-  const sumPartsEl = document.getElementById("sumPartsCost");
-  const sumLaborEl = document.getElementById("sumLaborCost");
-  const sumVatEl = document.getElementById("sumVatCost");
-  const sumTotalEl = document.getElementById("sumTotalCost");
+  const partsEl = document.getElementById("sumPartsCost");
+  if (partsEl) partsEl.textContent = partsSubtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " บ.";
 
-  if (sumPartsEl) sumPartsEl.textContent = partsSubtotal.toLocaleString('th-TH', { minimumFractionDigits: 2 }) + " บ.";
-  if (sumLaborEl) sumLaborEl.textContent = laborSubtotal.toLocaleString('th-TH', { minimumFractionDigits: 2 }) + " บ.";
-  if (sumVatEl) sumVatEl.textContent = vatAmount.toLocaleString('th-TH', { minimumFractionDigits: 2 }) + " บ.";
-  if (sumTotalEl) sumTotalEl.textContent = grandTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 }) + " บ.";
+  const laborEl = document.getElementById("sumLaborCost");
+  if (laborEl) laborEl.textContent = laborSubtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " บ.";
+
+  const vatEl = document.getElementById("sumVatCost");
+  if (vatEl) vatEl.textContent = vatAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " บ.";
+
+  const totalEl = document.getElementById("sumTotalCost");
+  if (totalEl) totalEl.textContent = grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " บ.";
 
   return { partsSubtotal, laborSubtotal, vatAmount, grandTotal };
 }
 
 // =========================================================================
-// 4. MOBILE CAMERA & IMAGE COMPRESSION
+// 7. CAMERA & IMAGE ATTACHMENT
 // =========================================================================
 
-window.triggerMobileCamera = function(targetType) {
+window.triggerMobileCamera = async function(targetType) {
   appState.activeCameraTarget = targetType;
   const modal = document.getElementById("cameraModal");
-  const modalTitle = document.getElementById("cameraModalTitle");
-  if (modalTitle) {
-    modalTitle.textContent = targetType === 'billPhoto' ? 'ถ่ายรูปบิลค่าซ่อม / ใบเสร็จ' : 'ถ่ายรูปจุดชำรุด';
+  const title = document.getElementById("cameraModalTitle");
+  if (title) {
+    title.textContent = targetType === "billPhoto" ? "ถ่ายภาพบิลค่าซ่อม / ใบเสร็จ" : "ถ่ายภาพจุดที่ชำรุด";
   }
-  modal.classList.remove("hidden");
-  startCameraStream();
-};
-
-window.closeCameraModal = function() {
-  stopCameraStream();
-  const modal = document.getElementById("cameraModal");
-  if (modal) modal.classList.add("hidden");
-  appState.activeCameraTarget = null;
-};
-
-window.switchCameraFacing = function() {
-  appState.cameraFacingMode = appState.cameraFacingMode === 'environment' ? 'user' : 'environment';
-  startCameraStream();
-};
-
-async function startCameraStream() {
-  stopCameraStream();
-  const video = document.getElementById("liveCameraVideo");
-  if (!video) return;
+  if (modal) modal.classList.remove("hidden");
 
   try {
-    const constraints = {
+    const stream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: appState.cameraFacingMode,
         width: { ideal: 1280 },
-        height: { ideal: 960 }
+        height: { ideal: 720 }
       },
       audio: false
-    };
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    appState.activeCameraStream = stream;
-    video.srcObject = stream;
-  } catch (err) {
-    console.error("Camera error:", err);
-    Swal.fire({
-      icon: 'warning',
-      title: 'ไม่สามารถเปิดกล้องได้',
-      text: 'กรุณาแตะปุ่ม "เลือกภาพ" เพื่อถ่ายผ่านแอปกล้องมือถือ',
-      background: '#0f172a',
-      color: '#fff',
-      confirmButtonColor: '#f59e0b'
     });
+    appState.activeCameraStream = stream;
+    const video = document.getElementById("liveCameraVideo");
+    if (video) {
+      video.srcObject = stream;
+      video.play();
+    }
+  } catch (err) {
+    console.warn("Camera getUserMedia error, fallback to file input:", err);
     closeCameraModal();
+    // Simulate clicking file input
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    const idx = targetType === "billPhoto" ? 1 : 0;
+    if (fileInputs[idx]) fileInputs[idx].click();
   }
-}
-
-function stopCameraStream() {
-  if (appState.activeCameraStream) {
-    appState.activeCameraStream.getTracks().forEach(t => t.stop());
-    appState.activeCameraStream = null;
-  }
-}
+};
 
 window.snapCameraPhoto = function() {
   const video = document.getElementById("liveCameraVideo");
-  if (!video || !appState.activeCameraTarget) return;
+  if (!video || !appState.activeCameraStream) return;
 
   const canvas = document.createElement("canvas");
-  canvas.width = video.videoWidth || 640;
-  canvas.height = video.videoHeight || 480;
+  canvas.width = video.videoWidth || 1280;
+  canvas.height = video.videoHeight || 720;
   const ctx = canvas.getContext("2d");
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  const raw = canvas.toDataURL("image/jpeg", 0.85);
-  compressImageBase64(raw, (compressed) => {
+  const rawBase64 = canvas.toDataURL("image/jpeg", 0.9);
+  compressImageBase64(rawBase64, (compressed) => {
     setPhotoData(appState.activeCameraTarget, compressed);
     closeCameraModal();
   });
 };
 
+window.switchCameraFacing = function() {
+  appState.cameraFacingMode = appState.cameraFacingMode === 'user' ? 'environment' : 'user';
+  if (appState.activeCameraStream) {
+    appState.activeCameraStream.getTracks().forEach(t => t.stop());
+  }
+  triggerMobileCamera(appState.activeCameraTarget);
+};
+
+window.closeCameraModal = function() {
+  const modal = document.getElementById("cameraModal");
+  if (modal) modal.classList.add("hidden");
+  if (appState.activeCameraStream) {
+    appState.activeCameraStream.getTracks().forEach(t => t.stop());
+    appState.activeCameraStream = null;
+  }
+};
+
 window.handleFileUpload = function(event, targetType) {
-  const file = event.target.files[0];
+  const file = event.target.files && event.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
@@ -546,7 +843,7 @@ function compressImageBase64(dataUrl, callback) {
 }
 
 // =========================================================================
-// 5. SUBMIT TO GOOGLE APPS SCRIPT & CLOUD STORAGE
+// 8. FORM SUBMISSION TO GOOGLE APPS SCRIPT
 // =========================================================================
 
 window.handleMobileFormSubmit = async function(event) {
@@ -557,7 +854,8 @@ window.handleMobileFormSubmit = async function(event) {
   let plate = plateSelect.value === "OTHER" ? customInput.value.trim() : plateSelect.value.trim();
 
   if (!plate) {
-    Swal.fire({ icon: 'warning', title: 'กรุณาเลือกทะเบียนรถ', background: '#0f172a', color: '#fff', confirmButtonColor: '#f59e0b' });
+    goToStep(1);
+    Swal.fire({ icon: 'warning', title: 'กรุณาระบุทะเบียนรถ', background: '#0f172a', color: '#fff', confirmButtonColor: '#f59e0b' });
     return;
   }
 
@@ -565,7 +863,28 @@ window.handleMobileFormSubmit = async function(event) {
   const date = document.getElementById("inspectionDate").value;
   const symptom = document.getElementById("symptomDescription").value.trim();
 
-  // ตรวจสอบรายการอะไหล่
+  if (!odo || !symptom) {
+    goToStep(1);
+    Swal.fire({ icon: 'warning', title: 'กรุณากรอกข้อมูลขั้นตอนที่ 1 ให้ครบ', background: '#0f172a', color: '#fff', confirmButtonColor: '#f59e0b' });
+    return;
+  }
+
+  // Check garage name on Step 2
+  const garageName = document.getElementById("garageName").value.trim();
+  if (!garageName) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'กรุณาระบุชื่ออู่หรือศูนย์บริการ',
+      text: 'แตะเลือกจากชิป หรือพิมพ์ชื่ออู่ที่เข้าซ่อม',
+      background: '#0f172a',
+      color: '#fff',
+      confirmButtonColor: '#f59e0b'
+    });
+    document.getElementById("garageName").focus();
+    return;
+  }
+
+  // Check parts items
   if (appState.partItems.length === 0 || !appState.partItems[0].name.trim()) {
     Swal.fire({
       icon: 'warning',
@@ -577,19 +896,23 @@ window.handleMobileFormSubmit = async function(event) {
     return;
   }
 
-  // คำนวณยอดเงินรวม
+  // Save garage to memory list for future selection
+  saveGarageToCache(garageName);
+
+  // Financial totals
   const totals = calculateFinancialTotals();
   const ticketId = document.getElementById("formCurrentTicketId").textContent.trim() || generateNewTicketId();
-  const driverName = document.getElementById("driverName").value.trim() || "พนักงานขับรถ";
+  const driverName = document.getElementById("driverName").value.trim() || (appState.currentDriver ? appState.currentDriver.driverName : "พนักงานขับรถ");
 
-  // ยืนยันการส่งข้อมูล
+  // Confirmation dialog
   const confirmResult = await Swal.fire({
     title: 'ยืนยันส่งข้อมูลแจ้งซ่อม?',
     html: `
       <div class="text-left text-xs text-slate-300 space-y-1.5">
-        <p><b>ทะเบียน:</b> <span class="font-bold text-amber-400">${plate}</span></p>
+        <p><b>ทะเบียนรถ:</b> <span class="font-bold text-amber-400">${plate}</span></p>
+        <p><b>พนักงานขับรถ:</b> ${escapeHtml(driverName)}</p>
         <p><b>เลขไมล์:</b> ${Number(odo).toLocaleString()} กม.</p>
-        <p><b>อาการ:</b> ${escapeHtml(symptom)}</p>
+        <p><b>อู่ซ่อม:</b> ${escapeHtml(garageName)}</p>
         <p><b>จำนวนอะไหล่:</b> ${appState.partItems.length} รายการ</p>
         <p><b>ยอดรวมสุทธิ:</b> <span class="font-digital text-emerald-400 font-bold">${totals.grandTotal.toLocaleString()} บาท</span></p>
       </div>
@@ -636,8 +959,9 @@ window.handleMobileFormSubmit = async function(event) {
     systemAffected: document.getElementById("systemAffected").value,
     urgency: document.getElementById("urgency").value,
     symptom: symptom,
-    garageName: document.getElementById("garageName").value.trim(),
+    garageName: garageName,
     mechanicName: document.getElementById("mechanicName").value.trim(),
+    garagePhone: document.getElementById("garagePhone").value.trim(),
     items: appState.partItems,
     partsCost: totals.partsSubtotal,
     laborCost: totals.laborSubtotal,
@@ -702,97 +1026,46 @@ window.handleMobileFormSubmit = async function(event) {
 };
 
 function saveLocalTicketCache(payload, serverResult) {
-  let logs = [];
   try {
-    const raw = localStorage.getItem(CONFIG.STORAGE_KEY_LOGS);
-    if (raw) logs = JSON.parse(raw);
-  } catch (e) {}
-
-  const item = {
-    ...payload,
-    billUrl: serverResult.billUrl || payload.images?.billPhoto || "",
-    defectUrl: serverResult.defectUrl || payload.images?.defectPhoto || "",
-    timestamp: new Date().toLocaleString('th-TH')
-  };
-
-  logs = logs.filter(l => l.ticketId !== payload.ticketId);
-  logs.unshift(item);
-  localStorage.setItem(CONFIG.STORAGE_KEY_LOGS, JSON.stringify(logs));
+    const saved = localStorage.getItem(CONFIG.STORAGE_KEY_LOGS);
+    const logs = saved ? JSON.parse(saved) : [];
+    logs.unshift({
+      ...payload,
+      createdAt: new Date().toISOString(),
+      serverResult: serverResult
+    });
+    localStorage.setItem(CONFIG.STORAGE_KEY_LOGS, JSON.stringify(logs.slice(0, 30)));
+  } catch(e) {}
 }
 
 function resetMobileForm() {
-  document.getElementById("mobileMntForm").reset();
-  initDateDefaults();
-  initDriverIdentity();
+  document.getElementById("symptomDescription").value = "";
+  document.getElementById("odometer").value = "";
+  document.getElementById("garageName").value = "";
+  document.getElementById("mechanicName").value = "";
+  document.getElementById("garagePhone").value = "";
+  clearPhoto("billPhoto");
+  clearPhoto("defectPhoto");
+  generateNewTicketId();
   initDefaultMobilePartCard();
-  appState.capturedImages = { billPhoto: null, defectPhoto: null };
-  clearPhoto('billPhoto');
-  clearPhoto('defectPhoto');
+  goToStep(1);
 }
 
 // =========================================================================
-// 6. QUICK DRIVER HISTORY MODAL
+// 9. UTILITY HELPERS
 // =========================================================================
 
-window.openDriverHistoryModal = function() {
-  let logs = [];
-  try {
-    const raw = localStorage.getItem(CONFIG.STORAGE_KEY_LOGS);
-    if (raw) logs = JSON.parse(raw);
-  } catch (e) {}
-
-  if (logs.length === 0) {
-    Swal.fire({
-      icon: 'info',
-      title: 'ยังไม่มีประวัติการแจ้งซ่อม',
-      text: 'เมื่อท่านส่งแจ้งซ่อม ข้อมูลจะปรากฏในหน้านี้ครับ',
-      background: '#0f172a',
-      color: '#fff',
-      confirmButtonColor: '#f59e0b'
-    });
-    return;
-  }
-
-  const listHtml = logs.slice(0, 5).map(l => `
-    <div class="bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-left space-y-1">
-      <div class="flex justify-between items-center text-xs">
-        <span class="font-bold text-amber-400">${l.vehiclePlate}</span>
-        <span class="font-digital text-slate-400 text-[10px]">${l.inspectionDate || l.date || ''}</span>
-      </div>
-      <p class="text-xs text-white truncate">${escapeHtml(l.symptom)}</p>
-      <div class="flex justify-between items-center text-[11px] pt-1 border-t border-slate-800 text-slate-400">
-        <span>${l.items?.length || 1} รายการ &bull; ${escapeHtml(l.garageName || 'อู่ทั่วไป')}</span>
-        <span class="font-digital text-emerald-400 font-bold">${Number(l.totalCost || 0).toLocaleString()} บ.</span>
-      </div>
-    </div>
-  `).join("");
-
-  Swal.fire({
-    title: 'ประวัติการแจ้งซ่อมล่าสุด',
-    html: `
-      <div class="space-y-2 max-h-[60vh] overflow-y-auto no-scrollbar pt-1">
-        ${listHtml}
-      </div>
-    `,
-    background: '#0f172a',
-    color: '#fff',
-    confirmButtonText: 'ปิด',
-    confirmButtonColor: '#64748b'
-  });
-};
-
-// Utilities
-function capitalize(str) {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function escapeHtml(text) {
-  if (!text) return "";
-  return String(text)
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function capitalize(s) {
+  if (!s) return "";
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }

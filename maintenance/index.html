@@ -30,13 +30,16 @@
     .font-digital {
       font-family: 'Chakra Petch', monospace;
     }
-    /* Hide scrollbars for clean mobile appearance */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
     .no-scrollbar {
       -ms-overflow-style: none;
       scrollbar-width: none;
+    }
+    /* Smooth transitions between wizard steps */
+    .step-page {
+      transition: opacity 0.25s ease-in-out;
     }
   </style>
 </head>
@@ -70,12 +73,35 @@
               class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700 hover:border-amber-500/50 text-[11px] transition active:scale-95 shadow-sm">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="driverStatusDot"></span>
         <i class="fa-solid fa-user text-[10px] text-amber-400"></i>
-        <span id="headerDriverName" class="font-bold text-white truncate max-w-[85px]">ระบุคนขับ</span>
+        <span id="headerDriverName" class="font-bold text-white truncate max-w-[90px]">ระบุคนขับ</span>
         <i class="fa-solid fa-pen text-[9px] text-slate-400"></i>
       </button>
 
     </div>
   </header>
+
+  <!-- ============================================================== -->
+  <!-- 2-STEP PROGRESS WIZARD CONTROLLER                              -->
+  <!-- ============================================================== -->
+  <div class="sticky top-[53px] z-30 bg-slate-950/95 backdrop-blur-md border-b border-slate-800/80 px-3.5 py-2">
+    <div class="max-w-md mx-auto flex items-center gap-2">
+      
+      <!-- Step 1 Tab Button -->
+      <button type="button" onclick="goToStep(1)" id="stepTab1"
+              class="flex-1 py-1.5 px-2 rounded-xl text-center font-bold text-xs transition bg-amber-500 text-slate-950 shadow-md flex items-center justify-center gap-1.5">
+        <span class="w-4 h-4 rounded-full bg-slate-950 text-amber-400 text-[10px] font-black flex items-center justify-center">1</span>
+        <span>อาการเสีย & รถ</span>
+      </button>
+
+      <!-- Step 2 Tab Button -->
+      <button type="button" onclick="goToStep(2)" id="stepTab2"
+              class="flex-1 py-1.5 px-2 rounded-xl text-center font-semibold text-xs transition text-slate-400 hover:text-white bg-slate-900 border border-slate-800 flex items-center justify-center gap-1.5">
+        <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-300 text-[10px] font-black flex items-center justify-center" id="step2Badge">2</span>
+        <span>อะไหล่ & บิลค่าซ่อม</span>
+      </button>
+
+    </div>
+  </div>
 
   <!-- ============================================================== -->
   <!-- MAIN MOBILE CONTENT CONTAINER                                  -->
@@ -85,325 +111,405 @@
     <form id="mobileMntForm" onsubmit="handleMobileFormSubmit(event)" class="space-y-3.5">
       
       <!-- ============================================================ -->
-      <!-- CARD 1: ข้อมูลรถ และเลขไมล์                                  -->
+      <!-- PAGE 1: ข้อมูลรถ และอาการเสีย (STEP 1)                        -->
       <!-- ============================================================ -->
-      <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-3">
-        <div class="flex items-center justify-between text-xs font-bold text-slate-300">
-          <span class="flex items-center gap-1.5 text-amber-400">
-            <i class="fa-solid fa-truck-front"></i> 1. เลือกรถ & เลขไมล์ปัจจุบัน
-          </span>
-          <span class="text-[10px] text-slate-400 font-mono" id="formCurrentTicketId">MNT-AUTO</span>
-        </div>
-
-        <!-- Vehicle Plate Select (Big Touch Target) -->
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-400 mb-1">
-            ทะเบียนรถ 6 ล้อ <span class="text-amber-400">*</span>
-          </label>
-          <div class="relative">
-            <select id="vehiclePlate" required onchange="handlePlateChange()"
-                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white font-bold text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition appearance-none">
-              <option value="">-- แตะเลือกทะเบียนรถ --</option>
-              <optgroup label="รถบรรทุกดีเซล (Diesel)">
-                <option value="70-8899 กทม." selected>70-8899 กทม. (ทวีศักดิ์ คำปก)</option>
-                <option value="70-9312 กทม.">70-9312 กทม. (อรรถพล ยอดสิงห์)</option>
-                <option value="72-1979 สระบุรี">72-1979 สระบุรี (ดุรงค์ฤทธิ์ สำเลิศ)</option>
-                <option value="72-8139 สระบุรี">72-8139 สระบุรี (สมร มหาพันธ์)</option>
-                <option value="8กส1201 กทม.">8กส1201 กทม. (นิชานันท์)</option>
-                <option value="70-5544 กทม.">70-5544 กทม. (สมชาย วงศ์สวัสดิ์)</option>
-                <option value="72-3189 ชลบุรี">72-3189 ชลบุรี (สุรชัย หงษา)</option>
-                <option value="71-6543 อยุธยา">71-6543 อยุธยา (ธนวัฒน์ ใจดี)</option>
-                <option value="73-2415 สระบุรี">73-2415 สระบุรี (ธีระพงษ์ ศรีสุข)</option>
-                <option value="71-9820 กทม.">71-9820 กทม. (อนันต์ บุญรอด)</option>
-                <option value="72-4411 นครปฐม">72-4411 นครปฐม (ประเสริฐ สุขสวัสดิ์)</option>
-                <option value="73-9081 สระบุรี">73-9081 สระบุรี (มานะ ชนะศึก)</option>
-                <option value="70-1122 กทม.">70-1122 กทม. (กิตติศักดิ์ เจริญดี)</option>
-                <option value="72-9901 ฉะเชิงเทรา">72-9901 ฉะเชิงเทรา (วิเชียร สมบูรณ์)</option>
-              </optgroup>
-              <optgroup label="รถบรรทุกไฟฟ้า (100% EV)">
-                <option value="73-1735 สระบุรี">73-1735 สระบุรี (พิศมัย พลเยี่ยม • BYD T8)</option>
-                <option value="72-8297 สระบุรี">72-8297 สระบุรี (วิทวัส สอนพรม • BYD T8)</option>
-                <option value="72-5079 สระบุรี">72-5079 สระบุรี (ทรงวุฒิ ฉวีรัมย์ • NEX)</option>
-                <option value="61-5463 กทม.">61-5463 กทม. (วิวัฒน์ อุ่นสว่าง • NEX)</option>
-              </optgroup>
-              <option value="OTHER">-- ทะเบียนอื่น ๆ (ระบุเอง) --</option>
-            </select>
-            <div class="pointer-events-none absolute right-3.5 top-3 text-slate-400 text-xs">
-              <i class="fa-solid fa-chevron-down"></i>
-            </div>
+      <div id="stepPage1" class="step-page space-y-3.5">
+        
+        <!-- CARD 1: ข้อมูลรถ (ดึงอัตโนมัติจาก Registered_Drivers) -->
+        <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-3">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+            <span class="flex items-center gap-1.5 text-amber-400">
+              <i class="fa-solid fa-truck-front"></i> 1. รถประจำตัว & เลขไมล์ปัจจุบัน
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono" id="formCurrentTicketId">MNT-AUTO</span>
           </div>
-          <input type="text" id="customPlateInput" placeholder="พิมพ์ทะเบียนรถ เช่น 70-9999 กทม."
-                 class="w-full mt-1.5 px-3 py-2 rounded-xl border border-amber-500/50 bg-slate-800 text-amber-300 text-xs font-bold outline-none hidden">
-        </div>
 
-        <!-- 2 Column: Odometer & Date -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <!-- Odometer -->
-          <div>
-            <label class="block text-[11px] font-semibold text-slate-400 mb-1">
-              เลขไมล์ปัจจุบัน (กม.) <span class="text-amber-400">*</span>
+          <!-- ASSIGNED TRUCK CARD (Auto-populated & locked for this driver) -->
+          <div id="assignedTruckCard" class="bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-slate-900 border border-amber-500/40 rounded-2xl p-3 flex items-center justify-between gap-2 shadow-inner">
+            <div class="flex items-center space-x-3 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-slate-950 font-black text-xl shadow-md flex-shrink-0">
+                <i class="fa-solid fa-truck"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 uppercase">รถประจำตัว พขร.</span>
+                  <span class="text-[9px] text-slate-400 font-mono" id="assignedDriverId">DRV-AUTO</span>
+                </div>
+                <h3 class="text-base font-black text-white tracking-wide font-mono truncate" id="assignedPlateDisplay">กำลังโหลดข้อมูลรถ...</h3>
+                <p class="text-[11px] text-slate-300 truncate" id="assignedDriverDisplay">พนักงานขับรถ TTMK</p>
+              </div>
+            </div>
+            <button type="button" onclick="toggleSwitchPlate()" class="text-[11px] text-amber-400 hover:text-amber-300 font-bold flex-shrink-0 py-1.5 px-2 rounded-lg bg-slate-800/80 border border-slate-700/80 active:scale-95 transition">
+              <i class="fa-solid fa-arrows-rotate mr-0.5"></i> สลับคัน
+            </button>
+          </div>
+
+          <!-- Vehicle Plate Selector (Hidden by default, shown when driver clicks 'สลับคัน') -->
+          <div id="plateSelectContainer" class="hidden space-y-1.5 pt-1 border-t border-slate-800">
+            <label class="block text-[11px] font-semibold text-slate-400">
+              เลือกทะเบียนรถที่ต้องการแจ้งซ่อม <span class="text-amber-400">*</span>
             </label>
             <div class="relative">
-              <input type="number" id="odometer" required min="0" max="9999999" placeholder="เช่น 168450" inputmode="numeric"
-                     class="w-full px-3 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white font-digital text-base font-bold outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 pr-10">
-              <span class="absolute right-3 top-3 text-[10px] text-slate-400 font-bold">KM</span>
+              <select id="vehiclePlate" required onchange="handlePlateChange()"
+                      class="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white font-bold text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition appearance-none">
+                <option value="">-- แตะเลือกทะเบียนรถ --</option>
+                <optgroup label="รถบรรทุกดีเซล (Diesel)">
+                  <option value="70-8899 กทม.">70-8899 กทม. (ทวีศักดิ์ คำปก)</option>
+                  <option value="70-9312 กทม.">70-9312 กทม. (พิทยา แคนถา / อรรถพล)</option>
+                  <option value="72-1979 สระบุรี">72-1979 สระบุรี (ดุรงค์ฤทธิ์ ล้ำเลิศ)</option>
+                  <option value="72-8139 สระบุรี">72-8139 สระบุรี (ธนันกรกานต์ / สมร)</option>
+                  <option value="8กส1201 กทม.">8กส1201 กทม. (นิชานันท์ เอื้อจิรพรชัย)</option>
+                  <option value="70-5544 กทม.">70-5544 กทม. (สมชาย วงศ์สวัสดิ์)</option>
+                  <option value="72-3199 สระบุรี">72-3199 สระบุรี (สุรชัย หงษา)</option>
+                  <option value="71-6543 อยุธยา">71-6543 อยุธยา (ธนวัฒน์ ใจดี)</option>
+                  <option value="73-2415 สระบุรี">73-2415 สระบุรี (ธีระพงษ์ ศรีสุข)</option>
+                  <option value="71-9820 กทม.">71-9820 กทม. (อนันต์ บุญรอด)</option>
+                  <option value="72-4411 นครปฐม">72-4411 นครปฐม (ประเสริฐ สุขสวัสดิ์)</option>
+                  <option value="73-9081 สระบุรี">73-9081 สระบุรี (มานะ ชนะศึก)</option>
+                  <option value="70-1122 กทม.">70-1122 กทม. (กิตติศักดิ์ เจริญดี)</option>
+                  <option value="72-9901 ฉะเชิงเทรา">72-9901 ฉะเชิงเทรา (วิเชียร สมบูรณ์)</option>
+                  <option value="73-0819 สระบุรี">73-0819 สระบุรี (อุดมศักดิ์ ภูบุตตะ)</option>
+                  <option value="71-8686 สระบุรี">71-8686 สระบุรี (ฉัตรชัย เรืองหุ่น)</option>
+                  <option value="70-4713 สระบุรี">70-4713 สระบุรี (แก๊ส ศรีลาพันธ๋)</option>
+                  <option value="73-1366 สระบุรี">73-1366 สระบุรี (สุรเดช พรายแก้ว)</option>
+                  <option value="73-2705 สระบุรี">73-2705 สระบุรี (รุ่งเพชร ศิริกาล)</option>
+                </optgroup>
+                <optgroup label="รถบรรทุกไฟฟ้า (100% EV)">
+                  <option value="73-1735 สระบุรี">73-1735 สระบุรี (พิศมัย พลเยี่ยม • BYD T8)</option>
+                  <option value="72-8297 สระบุรี">72-8297 สระบุรี (วิทวัส สอนพรม • BYD T8)</option>
+                  <option value="72-5079 สระบุรี">72-5079 สระบุรี (ทรงวุฒิ / กีรติ • NEX)</option>
+                  <option value="61-5463 กทม.">61-5463 กทม. (สมชาย ส่องสว่าง • NEX)</option>
+                </optgroup>
+                <option value="OTHER">-- ทะเบียนอื่น ๆ (ระบุเอง) --</option>
+              </select>
+              <div class="pointer-events-none absolute right-3.5 top-3 text-slate-400 text-xs">
+                <i class="fa-solid fa-chevron-down"></i>
+              </div>
+            </div>
+            <input type="text" id="customPlateInput" placeholder="พิมพ์ทะเบียนรถ เช่น 70-9999 กทม."
+                   class="w-full mt-1.5 px-3 py-2 rounded-xl border border-amber-500/50 bg-slate-800 text-amber-300 text-xs font-bold outline-none hidden">
+          </div>
+
+          <!-- 2 Column: Odometer & Date -->
+          <div class="grid grid-cols-2 gap-2.5">
+            <!-- Odometer -->
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-400 mb-1">
+                เลขไมล์ปัจจุบัน (กม.) <span class="text-amber-400">*</span>
+              </label>
+              <div class="relative">
+                <input type="number" id="odometer" required min="0" max="9999999" placeholder="เช่น 168450" inputmode="numeric"
+                       class="w-full px-3 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white font-digital text-base font-bold outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 pr-10">
+                <span class="absolute right-3 top-3 text-[10px] text-slate-400 font-bold">KM</span>
+              </div>
+            </div>
+
+            <!-- Date -->
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-400 mb-1">
+                วันที่แจ้งซ่อม
+              </label>
+              <input type="date" id="inspectionDate" required
+                     class="w-full px-3 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white text-xs outline-none focus:border-amber-500">
             </div>
           </div>
 
-          <!-- Date -->
+          <!-- Hidden details auto-bound for submit -->
+          <input type="hidden" id="vehicleType" value="รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)">
+          <input type="hidden" id="driverName" value="ทวีศักดิ์ คำปก">
+          <input type="hidden" id="driverEmail" value="closec16522@gmail.com">
+          <input type="hidden" id="driverPhone" value="062-3285963">
+          <input type="hidden" id="ticketStatus" value="ซ่อมเสร็จแล้ว">
+        </div>
+
+        <!-- CARD 2: อาการเสีย และแตะหมวดลัด -->
+        <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-3">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+            <span class="flex items-center gap-1.5 text-amber-400">
+              <i class="fa-solid fa-triangle-exclamation"></i> 2. อาการเสีย / ระบบที่ชำรุด
+            </span>
+            <span class="text-[10px] text-slate-400">แตะเลือกหมวดลัด</span>
+          </div>
+
+          <!-- Quick System Filter Pills (Touch Chips) -->
+          <div class="grid grid-cols-3 gap-1.5" id="systemChipsContainer">
+            <button type="button" onclick="selectSystemChip('ระบบเบรกและลมเบรก', this)"
+                    class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-amber-500 bg-amber-500/20 text-amber-300 shadow-sm">
+              <span>🛑 เบรก/ลม</span>
+            </button>
+            <button type="button" onclick="selectSystemChip('เครื่องยนต์และของเหลว', this)"
+                    class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300">
+              <span>⚙️ เครื่อง/น้ำมัน</span>
+            </button>
+            <button type="button" onclick="selectSystemChip('ยางและกระทะล้อ', this)"
+                    class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300">
+              <span>🛞 ยาง/ล้อ</span>
+            </button>
+            <button type="button" onclick="selectSystemChip('ระบบปรับอากาศ (แอร์รถ)', this)"
+                    class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300">
+              <span>❄️ แอร์รถ</span>
+            </button>
+            <button type="button" onclick="selectSystemChip('ระบบไฟส่องสว่างและสัญญาณ', this)"
+                    class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300">
+              <span>💡 ระบบไฟ</span>
+            </button>
+            <button type="button" onclick="selectSystemChip('ช่วงล่างและแหนบ', this)"
+                    class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300">
+              <span>🛠️ ช่วงล่าง/อื่นๆ</span>
+            </button>
+          </div>
+          <input type="hidden" id="systemAffected" value="ระบบเบรกและลมเบรก">
+
+          <!-- Quick Symptom Tags (Tap to Append) -->
+          <div class="space-y-1">
+            <span class="text-[10px] text-slate-400 block">แตะข้อความตัวอย่างด่วน:</span>
+            <div class="flex flex-wrap gap-1">
+              <button type="button" onclick="appendSymptomText('ผ้าเบรกหมด มีเสียงเสียดสี')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] text-slate-300 border border-slate-700">+ ผ้าเบรกหมด</button>
+              <button type="button" onclick="appendSymptomText('เปลี่ยนถ่ายน้ำมันเครื่องตามระยะ')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] text-slate-300 border border-slate-700">+ ถ่ายน้ำมันเครื่อง</button>
+              <button type="button" onclick="appendSymptomText('ยางแบน/รั่ว โดนตะปู')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] text-slate-300 border border-slate-700">+ ยางรั่ว</button>
+              <button type="button" onclick="appendSymptomText('แอร์ไม่เย็น ลมไม่ออก')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] text-slate-300 border border-slate-700">+ แอร์ไม่เย็น</button>
+            </div>
+          </div>
+
+          <!-- Symptom Textarea -->
           <div>
             <label class="block text-[11px] font-semibold text-slate-400 mb-1">
-              วันที่แจ้งซ่อม
+              รายละเอียดอาการเสีย <span class="text-amber-400">*</span>
             </label>
-            <input type="date" id="inspectionDate" required
-                   class="w-full px-3 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white text-xs outline-none focus:border-amber-500">
+            <textarea id="symptomDescription" rows="2" required placeholder="พิมพ์อธิบายสั้นๆ เช่น ผ้าเบรกหน้าซ้ายบาง มีเสียงดังเวลาเบรก..."
+                      class="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-xs outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 leading-relaxed"></textarea>
           </div>
-        </div>
 
-        <!-- Hidden details auto-bound for submit -->
-        <input type="hidden" id="vehicleType" value="รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)">
-        <input type="hidden" id="driverName" value="ทวีศักดิ์ คำปก">
-        <input type="hidden" id="driverEmail" value="taweesak.kom@gmail.com">
-        <input type="hidden" id="driverPhone" value="062-3285963">
-        <input type="hidden" id="ticketStatus" value="ซ่อมเสร็จแล้ว">
-      </div>
-
-      <!-- ============================================================ -->
-      <!-- CARD 2: อาการเสีย และแตะหมวดลัด                               -->
-      <!-- ============================================================ -->
-      <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-3">
-        <div class="flex items-center justify-between text-xs font-bold text-slate-300">
-          <span class="flex items-center gap-1.5 text-amber-400">
-            <i class="fa-solid fa-triangle-exclamation"></i> 2. อาการเสีย / ระบบที่ชำรุด
-          </span>
-          <span class="text-[10px] text-slate-400">แตะเลือกหมวดลัด</span>
-        </div>
-
-        <!-- Quick System Filter Pills (Touch Chips) -->
-        <div class="grid grid-cols-3 gap-1.5" id="systemChipsContainer">
-          <button type="button" onclick="selectSystemChip('ระบบเบรกและลมเบรก', this)"
-                  class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-amber-500 bg-amber-500/20 text-amber-300 shadow-sm">
-            <span>🛑 เบรก/ลม</span>
-          </button>
-          <button type="button" onclick="selectSystemChip('เครื่องยนต์และของเหลว', this)"
-                  class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300">
-            <span>⚙️ เครื่อง/น้ำมัน</span>
-          </button>
-          <button type="button" onclick="selectSystemChip('ยางและกระทะล้อ', this)"
-                  class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300">
-            <span>🛞 ยาง/ล้อ</span>
-          </button>
-          <button type="button" onclick="selectSystemChip('ระบบปรับอากาศ (แอร์รถ)', this)"
-                  class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300">
-            <span>❄️ แอร์รถ</span>
-          </button>
-          <button type="button" onclick="selectSystemChip('ระบบไฟส่องสว่างและสัญญาณ', this)"
-                  class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300">
-            <span>💡 ระบบไฟ</span>
-          </button>
-          <button type="button" onclick="selectSystemChip('ช่วงล่างและแหนบ', this)"
-                  class="sys-chip py-2 px-1.5 rounded-xl border text-[11px] font-bold flex flex-col items-center justify-center gap-0.5 transition active:scale-95 border-slate-700 bg-slate-800 text-slate-300">
-            <span>🛠️ ช่วงล่าง/อื่นๆ</span>
-          </button>
-        </div>
-        <input type="hidden" id="systemAffected" value="ระบบเบรกและลมเบรก">
-
-        <!-- Quick Symptom Tags (Tap to Append) -->
-        <div class="space-y-1">
-          <span class="text-[10px] text-slate-400 block">แตะข้อความตัวอย่างด่วน:</span>
-          <div class="flex flex-wrap gap-1">
-            <button type="button" onclick="appendSymptomText('ผ้าเบรกหมด มีเสียงเสียดสี')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] text-slate-300 border border-slate-700">+ ผ้าเบรกหมด</button>
-            <button type="button" onclick="appendSymptomText('เปลี่ยนถ่ายน้ำมันเครื่องตามระยะ')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] text-slate-300 border border-slate-700">+ ถ่ายน้ำมันเครื่อง</button>
-            <button type="button" onclick="appendSymptomText('ยางแบน/รั่ว โดนตะปู')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] text-slate-300 border border-slate-700">+ ยางรั่ว</button>
-            <button type="button" onclick="appendSymptomText('แอร์ไม่เย็น ลมไม่ออก')" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] text-slate-300 border border-slate-700">+ แอร์ไม่เย็น</button>
+          <!-- 2 Column: Maintenance Type & Urgency -->
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-1">ประเภทการซ่อม</label>
+              <select id="maintenanceType" class="w-full p-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-[11px]">
+                <option value="ซ่อมบำรุงตามระยะทาง (PM)" selected>PM ตามระยะ</option>
+                <option value="ซ่อมฉุกเฉิน / เสียระหว่างทาง (Breakdown)">ซ่อมฉุกเฉิน</option>
+                <option value="เปลี่ยนอะไหล่สึกหรอ (Wear & Tear)">เปลี่ยนตามสภาพ</option>
+                <option value="แก้ไขจากผลตรวจประจำวัน (Daily Defect)">ผลตรวจประจำวัน</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-1">ความเร่งด่วน</label>
+              <select id="urgency" class="w-full p-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-[11px] font-bold">
+                <option value="ปกติ" selected>🟡 ปกติ</option>
+                <option value="ด่วน">🟠 ด่วน</option>
+                <option value="ด่วนที่สุด">🔴 ด่วนที่สุด</option>
+              </select>
+            </div>
           </div>
+
         </div>
 
-        <!-- Symptom Textarea -->
-        <div>
-          <label class="block text-[11px] font-semibold text-slate-400 mb-1">
-            รายละเอียดอาการเสีย <span class="text-amber-400">*</span>
-          </label>
-          <textarea id="symptomDescription" rows="2" required placeholder="พิมพ์อธิบายสั้นๆ เช่น ผ้าเบรกหน้าซ้ายบาง มีเสียงดังเวลาเบรก..."
-                    class="w-full p-3 rounded-xl border border-slate-700 bg-slate-800 text-white text-xs outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 leading-relaxed"></textarea>
-        </div>
-
-        <!-- 2 Column: Maintenance Type & Urgency -->
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-1">ประเภทการซ่อม</label>
-            <select id="maintenanceType" class="w-full p-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-[11px]">
-              <option value="ซ่อมบำรุงตามระยะทาง (PM)" selected>PM ตามระยะ</option>
-              <option value="ซ่อมฉุกเฉิน / เสียระหว่างทาง (Breakdown)">ซ่อมฉุกเฉิน</option>
-              <option value="เปลี่ยนอะไหล่สึกหรอ (Wear & Tear)">เปลี่ยนตามสภาพ</option>
-              <option value="แก้ไขจากผลตรวจประจำวัน (Daily Defect)">ผลตรวจประจำวัน</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-1">ความเร่งด่วน</label>
-            <select id="urgency" class="w-full p-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-[11px] font-bold">
-              <option value="ปกติ" selected>🟡 ปกติ</option>
-              <option value="ด่วน">🟠 ด่วน</option>
-              <option value="ด่วนที่สุด">🔴 ด่วนที่สุด</option>
-            </select>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ============================================================ -->
-      <!-- CARD 3: รายการอะไหล่ & ค่าซ่อม (MOBILE CARDS LIST + เพิ่ม)   -->
-      <!-- ============================================================ -->
-      <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-3">
-        <div class="flex items-center justify-between text-xs font-bold text-slate-300">
-          <span class="flex items-center gap-1.5 text-amber-400">
-            <i class="fa-solid fa-gears"></i> 3. รายการอะไหล่ & ค่าใช้จ่าย
-          </span>
-          <span class="text-[10px] text-slate-400">กดบวกเพิ่มได้หลายชิ้น</span>
-        </div>
-
-        <!-- Mobile Dynamic Parts Cards Container -->
-        <div id="mobilePartsContainer" class="space-y-2.5">
-          <!-- Dynamically Injected Cards -->
-        </div>
-
-        <!-- Big Add Item Button -->
-        <button type="button" onclick="addMobilePartCard()"
-                class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 border-2 border-dashed border-amber-500/50 hover:border-amber-500 text-amber-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 shadow-sm cursor-pointer">
-          <i class="fa-solid fa-circle-plus text-base text-amber-400"></i>
-          <span>+ เพิ่มรายการอะไหล่ / ค่าแรงช่าง</span>
-        </button>
-
-        <!-- Summary Cost Box -->
-        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1.5 text-xs">
-          <div class="flex justify-between items-center text-slate-400 text-[11px]">
-            <span>รวมค่าอะไหล่:</span>
-            <span id="sumPartsCost" class="font-digital text-slate-200">0.00 บ.</span>
-          </div>
-          <div class="flex justify-between items-center text-slate-400 text-[11px]">
-            <span>รวมค่าแรงช่าง:</span>
-            <span id="sumLaborCost" class="font-digital text-slate-200">0.00 บ.</span>
-          </div>
-          <div class="flex justify-between items-center pt-1 border-t border-slate-800">
-            <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer">
-              <input type="checkbox" id="checkIncludeVat" onchange="calculateFinancialTotals()" class="rounded text-amber-500">
-              <span>บิลมี VAT 7%</span>
-            </label>
-            <span id="sumVatCost" class="font-digital text-slate-400 text-[11px]">0.00 บ.</span>
-          </div>
-          <div class="flex justify-between items-center pt-1.5 border-t border-slate-700 text-sm font-bold">
-            <span class="text-white">ยอดรวมทั้งสิ้น (สุทธิ):</span>
-            <span id="sumTotalCost" class="font-digital text-lg text-emerald-400 font-extrabold">0.00 บ.</span>
-          </div>
-        </div>
-
-        <!-- Garage Info (Short) -->
-        <div class="grid grid-cols-2 gap-2 text-xs pt-1">
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-1">ชื่ออู่ / ศูนย์บริการ <span class="text-amber-400">*</span></label>
-            <input type="text" id="garageName" required placeholder="เช่น อู่มงคลการช่าง"
-                   class="w-full p-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs outline-none focus:border-amber-500">
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-400 mb-1">ชื่อช่าง / เบอร์โทรอู่</label>
-            <input type="text" id="mechanicName" placeholder="เช่น ช่างสมชาย 036-123456"
-                   class="w-full p-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs outline-none focus:border-amber-500">
-          </div>
-        </div>
-      </div>
-
-      <!-- ============================================================ -->
-      <!-- CARD 4: ถ่ายรูปบิลค่าซ่อม และรูปชำรุด (BIG CAMERA TARGETS)     -->
-      <!-- ============================================================ -->
-      <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-3">
-        <div class="flex items-center justify-between text-xs font-bold text-slate-300">
-          <span class="flex items-center gap-1.5 text-amber-400">
-            <i class="fa-solid fa-camera"></i> 4. ถ่ายรูปบิลค่าซ่อม & รูปอาการเสีย
-          </span>
-          <span class="text-[10px] text-emerald-400 font-mono">Google Drive Ready</span>
-        </div>
-
-        <!-- 2 Big Photo Action Cards -->
-        <div class="grid grid-cols-2 gap-2.5">
-          
-          <!-- PHOTO 1: บิลค่าซ่อม / ใบเสร็จ (Highlight) -->
-          <div class="bg-slate-950 p-2.5 rounded-xl border-2 border-dashed border-amber-500/70 flex flex-col items-center justify-between text-center space-y-2">
-            <span class="text-[11px] font-bold text-amber-300 flex items-center gap-1">
-              <i class="fa-solid fa-receipt"></i> บิลค่าซ่อม / ใบเสร็จ <span class="text-red-400">*</span>
+        <!-- CARD 3: รูปถ่ายอาการชำรุด (STEP 1) -->
+        <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-2.5">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+            <span class="flex items-center gap-1.5 text-blue-400">
+              <i class="fa-solid fa-camera"></i> 3. รูปถ่ายจุดชำรุด / อาการเสีย (ถ้ามี)
             </span>
-
-            <div class="w-full aspect-[4/3] bg-slate-900 rounded-lg overflow-hidden border border-slate-800 relative flex items-center justify-center">
-              <img id="previewBillPhoto" src="" alt="บิลค่าซ่อม" class="w-full h-full object-cover hidden">
-              <div id="placeholderBillPhoto" class="text-slate-500 text-center p-2">
-                <i class="fa-solid fa-file-invoice-dollar text-2xl mb-1 text-amber-500/50"></i>
-                <p class="text-[9px]">แตะปุ่มด้านล่างเพื่อถ่าย</p>
-              </div>
-            </div>
-
-            <div class="w-full flex items-center gap-1">
-              <button type="button" onclick="triggerMobileCamera('billPhoto')"
-                      class="flex-1 py-2 bg-gradient-to-r from-amber-500 to-orange-500 active:scale-95 text-slate-950 font-bold rounded-lg text-xs shadow-md transition flex items-center justify-center gap-1">
-                <i class="fa-solid fa-camera text-sm"></i> ถ่ายบิล
-              </button>
-              <label class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs transition cursor-pointer" title="เลือกจากอัลบั้ม">
-                <i class="fa-solid fa-image"></i>
-                <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event, 'billPhoto')">
-              </label>
-              <button type="button" onclick="clearPhoto('billPhoto')" class="p-2 bg-slate-800 text-slate-400 hover:text-red-400 rounded-lg text-xs" title="ลบภาพ">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </div>
+            <span class="text-[10px] text-slate-400">รูปภาพก่อนซ่อม</span>
           </div>
 
-          <!-- PHOTO 2: รูปจุดที่ชำรุด หรือหลังซ่อม -->
           <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex flex-col items-center justify-between text-center space-y-2">
-            <span class="text-[11px] font-semibold text-slate-300 flex items-center gap-1">
-              <i class="fa-solid fa-wrench text-blue-400"></i> รูปจุดชำรุด / อะไหล่
-            </span>
-
-            <div class="w-full aspect-[4/3] bg-slate-900 rounded-lg overflow-hidden border border-slate-800 relative flex items-center justify-center">
+            <div class="w-full aspect-[16/9] bg-slate-900 rounded-lg overflow-hidden border border-slate-800 relative flex items-center justify-center">
               <img id="previewDefectPhoto" src="" alt="จุดชำรุด" class="w-full h-full object-cover hidden">
               <div id="placeholderDefectPhoto" class="text-slate-500 text-center p-2">
-                <i class="fa-solid fa-camera text-2xl mb-1 text-slate-600"></i>
-                <p class="text-[9px]">ภาพชำรุด/ขณะซ่อม</p>
+                <i class="fa-solid fa-wrench text-2xl mb-1 text-slate-600"></i>
+                <p class="text-[10px]">แตะปุ่มด้านล่างเพื่อถ่ายภาพจุดชำรุด</p>
               </div>
             </div>
 
-            <div class="w-full flex items-center gap-1">
+            <div class="w-full flex items-center gap-1.5">
               <button type="button" onclick="triggerMobileCamera('defectPhoto')"
-                      class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-semibold rounded-lg text-xs transition flex items-center justify-center gap-1">
-                <i class="fa-solid fa-camera text-xs"></i> ถ่ายรูป
+                      class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-semibold rounded-xl text-xs transition flex items-center justify-center gap-1.5 border border-slate-700">
+                <i class="fa-solid fa-camera text-sm text-blue-400"></i> ถ่ายรูปจุดชำรุด
               </button>
-              <label class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs transition cursor-pointer" title="เลือกจากอัลบั้ม">
+              <label class="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs transition cursor-pointer border border-slate-700" title="เลือกจากอัลบั้ม">
                 <i class="fa-solid fa-image"></i>
                 <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event, 'defectPhoto')">
               </label>
-              <button type="button" onclick="clearPhoto('defectPhoto')" class="p-2 bg-slate-800 text-slate-400 hover:text-red-400 rounded-lg text-xs" title="ลบภาพ">
+              <button type="button" onclick="clearPhoto('defectPhoto')" class="p-2.5 bg-slate-800 text-slate-400 hover:text-red-400 rounded-xl text-xs border border-slate-700" title="ลบภาพ">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
           </div>
-
         </div>
+
+        <!-- STICKY ACTION BAR FOR STEP 1 -->
+        <div class="pt-2">
+          <button type="button" onclick="goToStep(2)"
+                  class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 active:scale-98 text-slate-950 font-black text-sm shadow-lg shadow-orange-500/25 transition flex items-center justify-center gap-2 cursor-pointer">
+            <span>ถัดไป: กรอกอะไหล่ & แนบบิลค่าซ่อม (2/2)</span>
+            <i class="fa-solid fa-arrow-right text-sm"></i>
+          </button>
+        </div>
+
       </div>
 
       <!-- ============================================================ -->
-      <!-- STICKY ACTION BUTTON BAR                                    -->
+      <!-- PAGE 2: อู่ซ่อม, อะไหล่ & บิลค่าซ่อม (STEP 2)                 -->
       <!-- ============================================================ -->
-      <div class="fixed bottom-0 left-0 right-0 z-30 p-3 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 shadow-2xl">
-        <div class="max-w-md mx-auto flex items-center gap-2">
-          <button type="button" onclick="openDriverHistoryModal()"
-                  class="px-3.5 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold text-xs transition active:scale-95 flex items-center justify-center gap-1.5" title="ดูประวัติ">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            <span class="hidden sm:inline">ประวัติ</span>
+      <div id="stepPage2" class="step-page space-y-3.5 hidden">
+        
+        <!-- CARD 4: อู่ซ่อม & ดึงจากประวัติเก่าที่เคยกรอก -->
+        <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-3">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+            <span class="flex items-center gap-1.5 text-amber-400">
+              <i class="fa-solid fa-warehouse"></i> 4. อู่ซ่อม / ศูนย์บริการ
+            </span>
+            <span class="text-[10px] text-slate-400">ดึงจากประวัติ</span>
+          </div>
+
+          <!-- Quick Garage Selection Chips -->
+          <div>
+            <span class="text-[10px] text-slate-400 block mb-1.5">แตะเลือกอู่ที่เคยซ่อม / ศูนย์บริการมาตรฐาน:</span>
+            <div id="garageChipsContainer" class="flex flex-wrap gap-1.5">
+              <!-- Dynamically populated or default chips -->
+              <button type="button" onclick="selectGarageChip('ศูนย์บริการ TTMK สระบุรี')" class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 transition">
+                🏢 ศูนย์บริการ TTMK
+              </button>
+              <button type="button" onclick="selectGarageChip('ศูนย์บริการ อีซูซุ สระบุรี')" class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 transition">
+                🚚 อีซูซุ สระบุรี
+              </button>
+              <button type="button" onclick="selectGarageChip('ศูนย์บริการ ฮีโน่ สระบุรี')" class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 transition">
+                🚛 ฮีโน่ สระบุรี
+              </button>
+              <button type="button" onclick="selectGarageChip('ร้านยางเจริญยนต์ สระบุรี')" class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 transition">
+                🛞 ร้านยางเจริญยนต์
+              </button>
+              <button type="button" onclick="selectGarageChip('อู่ช่างเล็ก ไดนาโม')" class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 transition">
+                💡 อู่ช่างเล็ก ไดนาโม
+              </button>
+            </div>
+          </div>
+
+          <!-- Input Garage with HTML5 Datalist for Auto-complete -->
+          <div class="grid grid-cols-1 gap-2 pt-1">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-400 mb-1">
+                ชื่ออู่ / สถานที่ซ่อม <span class="text-amber-400">*</span>
+              </label>
+              <input type="text" id="garageName" list="garageDatalist" required placeholder="แตะเลือกจากรายการ หรือพิมพ์ชื่ออู่..."
+                     class="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs outline-none focus:border-amber-500 font-bold">
+              <datalist id="garageDatalist">
+                <!-- Dynamically populated from Maintenance_log -->
+              </datalist>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-1">ชื่อช่างผู้ตรวจซ่อม</label>
+                <input type="text" id="mechanicName" placeholder="เช่น ช่างสมชาย"
+                       class="w-full p-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-400 mb-1">เบอร์โทรศัพท์อู่ / ช่าง</label>
+                <input type="tel" id="garagePhone" placeholder="เช่น 036-221500" inputmode="tel"
+                       class="w-full p-2 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs outline-none focus:border-amber-500 font-mono">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CARD 5: รายการอะไหล่ & ค่าใช้จ่าย (STEP 2) -->
+        <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-3">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+            <span class="flex items-center gap-1.5 text-amber-400">
+              <i class="fa-solid fa-gears"></i> 5. รายการอะไหล่ & ค่าใช้จ่าย
+            </span>
+            <span class="text-[10px] text-slate-400">กดบวกเพิ่มได้หลายชิ้น</span>
+          </div>
+
+          <!-- Mobile Dynamic Parts Cards Container -->
+          <div id="mobilePartsContainer" class="space-y-2.5">
+            <!-- Dynamically Injected Cards -->
+          </div>
+
+          <!-- Big Add Item Button -->
+          <button type="button" onclick="addMobilePartCard()"
+                  class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 border-2 border-dashed border-amber-500/50 hover:border-amber-500 text-amber-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 shadow-sm cursor-pointer">
+            <i class="fa-solid fa-circle-plus text-base text-amber-400"></i>
+            <span>+ เพิ่มรายการอะไหล่ / ค่าแรงช่าง</span>
+          </button>
+
+          <!-- Summary Cost Box -->
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1.5 text-xs">
+            <div class="flex justify-between items-center text-slate-400 text-[11px]">
+              <span>รวมค่าอะไหล่:</span>
+              <span id="sumPartsCost" class="font-digital text-slate-200">0.00 บ.</span>
+            </div>
+            <div class="flex justify-between items-center text-slate-400 text-[11px]">
+              <span>รวมค่าแรงช่าง:</span>
+              <span id="sumLaborCost" class="font-digital text-slate-200">0.00 บ.</span>
+            </div>
+            <div class="flex justify-between items-center pt-1 border-t border-slate-800">
+              <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer">
+                <input type="checkbox" id="checkIncludeVat" onchange="calculateFinancialTotals()" class="rounded text-amber-500">
+                <span>บิลมี VAT 7%</span>
+              </label>
+              <span id="sumVatCost" class="font-digital text-slate-400 text-[11px]">0.00 บ.</span>
+            </div>
+            <div class="flex justify-between items-center pt-1.5 border-t border-slate-700 text-sm font-bold">
+              <span class="text-white">ยอดรวมทั้งสิ้น (สุทธิ):</span>
+              <span id="sumTotalCost" class="font-digital text-lg text-emerald-400 font-extrabold">0.00 บ.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 6: แนบรูปถ่ายบิลค่าซ่อม / ใบเสร็จ (STEP 2 HIGHLIGHT) -->
+        <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-3">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+            <span class="flex items-center gap-1.5 text-amber-400">
+              <i class="fa-solid fa-receipt"></i> 6. ถ่ายรูปบิลค่าซ่อม / ใบเสร็จ
+            </span>
+            <span class="text-[10px] text-emerald-400 font-mono">Google Drive Upload</span>
+          </div>
+
+          <!-- Highlight Bill Photo Box -->
+          <div class="bg-slate-950 p-3 rounded-xl border-2 border-dashed border-amber-500/80 flex flex-col items-center justify-between text-center space-y-2.5">
+            <div class="w-full aspect-[4/3] bg-slate-900 rounded-lg overflow-hidden border border-slate-800 relative flex items-center justify-center">
+              <img id="previewBillPhoto" src="" alt="บิลค่าซ่อม" class="w-full h-full object-contain hidden">
+              <div id="placeholderBillPhoto" class="text-slate-500 text-center p-3">
+                <i class="fa-solid fa-file-invoice-dollar text-3xl mb-1 text-amber-500/70"></i>
+                <p class="text-xs font-semibold text-slate-300">ถ่ายรูปบิล หรือ ใบเสร็จรับเงิน</p>
+                <p class="text-[10px] text-slate-500 mt-0.5">จัดเก็บเข้าสู่ Google Drive อัตโนมัติ</p>
+              </div>
+            </div>
+
+            <div class="w-full flex items-center gap-1.5">
+              <button type="button" onclick="triggerMobileCamera('billPhoto')"
+                      class="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-500 active:scale-95 text-slate-950 font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-camera text-base"></i> แตะถ่ายรูปบิลค่าซ่อม
+              </button>
+              <label class="p-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs transition cursor-pointer border border-slate-700" title="เลือกจากอัลบั้ม">
+                <i class="fa-solid fa-image text-sm"></i>
+                <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event, 'billPhoto')">
+              </label>
+              <button type="button" onclick="clearPhoto('billPhoto')" class="p-3 bg-slate-800 text-slate-400 hover:text-red-400 rounded-xl text-xs border border-slate-700" title="ลบภาพ">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STICKY ACTION BUTTONS FOR STEP 2 (Back & Submit) -->
+        <div class="pt-2 flex items-center gap-2">
+          <button type="button" onclick="goToStep(1)"
+                  class="py-3.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold text-xs transition active:scale-95 flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>ย้อนกลับ</span>
           </button>
 
           <button type="submit" id="btnSubmitMobileForm"
-                  class="flex-1 py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 active:scale-98 text-slate-950 font-extrabold text-sm shadow-lg shadow-orange-500/25 transition flex items-center justify-center gap-2 cursor-pointer">
+                  class="flex-1 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 active:scale-98 text-slate-950 font-black text-sm shadow-lg shadow-orange-500/25 transition flex items-center justify-center gap-2 cursor-pointer">
             <i class="fa-solid fa-cloud-arrow-up text-base"></i>
             <span>ส่งแจ้งซ่อม (บันทึกเข้าระบบ)</span>
           </button>
         </div>
+
       </div>
 
     </form>
@@ -447,6 +553,6 @@
   <canvas id="hiddenCompressCanvas" class="hidden"></canvas>
 
   <!-- App Script Logic -->
-  <script src="app.js?v=20261013_02"></script>
+  <script src="app.js?v=20261013_03"></script>
 </body>
 </html>
