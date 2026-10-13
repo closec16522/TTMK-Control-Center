@@ -5130,13 +5130,17 @@
         pdfUrl = './CheckTruck/downloaded_all_trucks.pdf';
       }
       if (directLink) directLink.href = pdfUrl;
-      if (downloadBtn) downloadBtn.href = pdfUrl;
-      if (pIframe) {
-        let embedUrl = pdfUrl;
-        if (embedUrl.includes('drive.google.com/file/d/')) {
-          embedUrl = embedUrl.replace(/\/view(\?.*)?$/, '/preview');
+      if (downloadBtn) {
+        if (pdfUrl.includes('drive.google.com/file/d/')) {
+          const m = pdfUrl.match(/\/file\/d\/([^\/\?]+)/);
+          downloadBtn.href = m && m[1] ? `https://drive.google.com/uc?export=download&id=${m[1]}` : pdfUrl;
+        } else {
+          downloadBtn.href = pdfUrl;
         }
-        pIframe.src = embedUrl;
+      }
+      if (pIframe) {
+        // Use same-origin PDF preview to eliminate Google Drive frame-ancestors CSP and unload violations
+        pIframe.src = `./CheckTruck/downloaded_all_trucks.pdf?v=${Date.now()}`;
       }
 
       // If log has checklist items, render them dynamically
@@ -5285,17 +5289,8 @@
         }
       }
       if (mIframe) {
-        // Embed the updated PDF directly to ensure 100% reliable viewing without Google Drive iframe CSP block
-        const cleanPlate = String(window.currentMonthlyPlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim();
-        if (cleanPlate === '25912' || !pdfUrl.includes('drive.google.com')) {
-          mIframe.src = `./CheckTruck/downloaded_monthly.pdf?v=${Date.now()}`;
-        } else {
-          let embedUrl = pdfUrl;
-          if (embedUrl.includes('drive.google.com/file/d/')) {
-            embedUrl = embedUrl.replace(/\/view(\?.*)?$/, '/preview');
-          }
-          mIframe.src = embedUrl;
-        }
+        // Embed the updated PDF directly via same-origin path to ensure 100% reliable viewing without Google Drive iframe CSP block
+        mIframe.src = `./CheckTruck/downloaded_monthly.pdf?v=${Date.now()}`;
       }
     }
 
