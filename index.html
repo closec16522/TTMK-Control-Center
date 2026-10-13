@@ -2464,6 +2464,25 @@
 
         <!-- Tab 2: PDF Preview in Direct Modal -->
         <div id="truckTabContentPdf" class="hidden space-y-3">
+          <div class="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl flex flex-wrap items-center justify-between gap-2.5 text-xs">
+            <div class="flex items-center gap-2 text-amber-900 dark:text-amber-200">
+              <div class="w-8 h-8 rounded-lg bg-amber-600 text-white flex items-center justify-center flex-shrink-0">
+                <i class="fa-brands fa-google-drive"></i>
+              </div>
+              <div>
+                <span class="font-bold block text-sm">เอกสารใบตรวจสภาพรถประจำวันจัดเก็บบน Google Drive</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400">มีผลตรวจ ลายเซ็นดิจิทัล พขร. และเจ้าหน้าที่ TSM รับรองความปลอดภัย</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <a id="truckModalPdfDirectLink2" href="./CheckTruck/downloaded_all_trucks.pdf" target="_blank"
+                 class="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                <span>เปิดดูไฟล์เต็มจอใน Google Drive</span>
+              </a>
+            </div>
+          </div>
+
           <div class="rounded-2xl overflow-hidden border border-slate-300 dark:border-slate-700 bg-slate-900 shadow-xl">
             <div class="p-3 bg-slate-800 flex items-center justify-between text-xs text-white">
               <span class="flex items-center gap-2 font-bold text-slate-200">
@@ -2474,7 +2493,7 @@
                 <a id="truckModalPdfDirectLink" href="./CheckTruck/downloaded_all_trucks.pdf" target="_blank"
                    class="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] font-bold transition flex items-center gap-1">
                   <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                  <span>เปิดเต็มจอ</span>
+                  <span>เปิดเต็มจอ Drive</span>
                 </a>
                 <a id="truckModalPdfDownloadBtn" href="./CheckTruck/downloaded_all_trucks.pdf" download
                    class="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold shadow transition flex items-center gap-1">
@@ -2485,6 +2504,9 @@
             </div>
             <iframe id="truckModalPdfIframe" src="about:blank" data-src="./CheckTruck/downloaded_all_trucks.pdf" allow="unload" class="w-full h-[580px] bg-slate-100 border-0"></iframe>
           </div>
+          <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center pt-0.5">
+            <i class="fa-solid fa-circle-info mr-1 text-amber-500"></i> หากเบราว์เซอร์ไม่แสดงตัวอย่างในกรอบเนื่องจากระบบความปลอดภัย กรุณากดปุ่ม <strong>"เปิดดูไฟล์เต็มจอใน Google Drive"</strong> ด้านบน
+          </p>
         </div>
 
       </div>
@@ -5122,8 +5144,8 @@
       const cleanPlate = (log.vehiclePlate || 'Truck').replace(/\s+/g, '_');
       document.getElementById('truckModalPdfTitle').textContent = `F-CAM-032_r3_${cleanPlate}_Daily.pdf`;
 
-      // Set PDF direct link, download link and preview iframe
       const directLink = document.getElementById('truckModalPdfDirectLink');
+      const directLink2 = document.getElementById('truckModalPdfDirectLink2');
       const downloadBtn = document.getElementById('truckModalPdfDownloadBtn');
       const pIframe = document.getElementById('truckModalPdfIframe');
       let pdfUrl = log.pdfUrl;
@@ -5131,6 +5153,7 @@
         pdfUrl = './CheckTruck/downloaded_all_trucks.pdf';
       }
       if (directLink) directLink.href = pdfUrl;
+      if (directLink2) directLink2.href = pdfUrl;
       if (downloadBtn) {
         if (pdfUrl.includes('drive.google.com/file/d/')) {
           const m = pdfUrl.match(/\/file\/d\/([^\/\?]+)/);
