@@ -3,6 +3,7 @@
 # Portable Tools & Binary Archives
 MinGit/
 File/
+node_modules/
 **/.git_subrepo/
 
 # OS & Editor Files

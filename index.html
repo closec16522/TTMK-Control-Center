@@ -345,6 +345,13 @@
         <span class="bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[9px] font-bold px-1.5 py-0.2 rounded-full">F-CAM</span>
       </button>
 
+      <!-- 2.3 ประวัติแจ้งซ่อมบำรุง & บิลค่าซ่อม (Maintenance_log) -->
+      <button onclick="switchTab('maintenance-logs')" id="nav-maintenance-logs" class="sidebar-item pl-7 text-xs flex items-center group">
+        <i class="fa-solid fa-screwdriver-wrench w-4 text-center mr-2 text-indigo-500 group-hover:scale-110 transition"></i>
+        <span class="flex-1 text-left">2.3 ประวัติแจ้งซ่อมบำรุง</span>
+        <span class="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-indigo-500/20">บิลค่าซ่อม</span>
+      </button>
+
       <!-- 3. ตั้งเบิก & ค่าน้ำมัน -->
       <button onclick="switchTab('billing')" id="nav-billing" class="sidebar-item">
         <i class="fa-solid fa-file-invoice-dollar w-5 text-center mr-2 text-emerald-500"></i>
@@ -812,8 +819,8 @@
           </div>
         </div>
 
-        <!-- 2 Executive Gateway Navigation Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- 3 Executive Gateway Navigation Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
           <!-- Gateway Card 1: Alcohol & BP Module -->
           <div class="glass-panel p-5 flex flex-col justify-between space-y-4 hover:shadow-lg transition border border-slate-200/80 dark:border-slate-800">
             <div class="space-y-3">
@@ -828,11 +835,11 @@
                   </div>
                 </div>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Real-time Live
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live
                 </span>
               </div>
               <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                ระบบคัดกรองพนักงานขับรถก่อนเริ่มงาน ยืนยันตัวตนด้วยใบหน้า 1:1 Face Matching, อ่านค่าเครื่องเป่าแอลกอฮอล์ด้วย AI OCR, และบันทึกค่าความดันโลหิต SYS/DIA/Pulse พร้อมเก็บไฟล์หลักฐานภาพถ่าย 4 รูปบน Google Drive แบบเรียลไทม์
+                ระบบคัดกรองพนักงานขับรถก่อนเริ่มงาน ยืนยันตัวตนด้วยใบหน้า 1:1 Face Matching, อ่านค่าเครื่องเป่าแอลกอฮอล์ด้วย AI OCR, บันทึกความดันโลหิต พร้อมเก็บไฟล์ 4 รูปใน Drive
               </p>
               <div class="grid grid-cols-3 gap-2 pt-1 text-center text-xs">
                 <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
@@ -844,7 +851,7 @@
                   <strong class="text-emerald-700 dark:text-emerald-300">0.00 mg%</strong>
                 </div>
                 <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900">
-                  <span class="text-[10px] text-blue-600 block">ภาพถ่าย 4 รูป</span>
+                  <span class="text-[10px] text-blue-600 block">รูป Drive</span>
                   <strong class="text-blue-700 dark:text-blue-300">ครบ 100%</strong>
                 </div>
               </div>
@@ -852,7 +859,7 @@
 
             <button type="button" onclick="switchTab('alcohol-logs')"
                     class="w-full py-2.5 px-4 bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition transform active:scale-98">
-              <span>เข้าสู่ตารางตรวจแอลกอฮอล์ & ดูหลักฐาน 4 รูป</span>
+              <span>เข้าสู่ตารางตรวจแอลกอฮอล์</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
           </div>
@@ -867,7 +874,7 @@
                   </div>
                   <div>
                     <h3 class="font-extrabold text-sm md:text-base text-slate-900 dark:text-white">2.2 ตรวจสอบสภาพรถ 6 ล้อ</h3>
-                    <span class="text-[10px] text-slate-500 dark:text-slate-400">Truck_Inspection_Logs • SCG F-CAM-032_r3</span>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400">Truck_Inspection • F-CAM-032_r3</span>
                   </div>
                 </div>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/30">
@@ -875,19 +882,19 @@
                 </span>
               </div>
               <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                ระบบตรวจเช็กสภาพความปลอดภัยรถบรรทุก 6 ล้อ ทั้งชนิดตู้ทึบ คอก และรถบรรทุกไฟฟ้า EV ครอบคลุม 15 รายการสำคัญ (ยาง, ลมยาง, เบรก, ระบบไฟ, ใบปัดน้ำฝน, ความสะอาดตู้) พร้อมออกเอกสารรับรอง PDF และปฏิทินตรวจประจำเดือน
+                ตรวจเช็กความปลอดภัยรถบรรทุก 6 ล้อ ตู้ทึบ/คอก/EV ครอบคลุม 15 รายการสำคัญ พร้อมออกเอกสารรับรอง PDF และปฏิทินตรวจประจำเดือน
               </p>
               <div class="grid grid-cols-3 gap-2 pt-1 text-center text-xs">
                 <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
                   <span class="text-[10px] text-slate-400 block">รายการตรวจ</span>
-                  <strong class="text-slate-800 dark:text-slate-100">15 จุดมาตรฐาน</strong>
+                  <strong class="text-slate-800 dark:text-slate-100">15 รายการ</strong>
                 </div>
                 <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900">
                   <span class="text-[10px] text-blue-600 block">ผ่านเกณฑ์</span>
                   <strong class="text-blue-700 dark:text-blue-300">100% สมบูรณ์</strong>
                 </div>
                 <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900">
-                  <span class="text-[10px] text-amber-600 block">เอกสาร PDF</span>
+                  <span class="text-[10px] text-amber-600 block">PDF รายเดือน</span>
                   <strong class="text-amber-700 dark:text-amber-300">แนบทุกเที่ยว</strong>
                 </div>
               </div>
@@ -895,7 +902,50 @@
 
             <button type="button" onclick="switchTab('truck-logs')"
                     class="w-full py-2.5 px-4 bg-gradient-to-r from-amber-600 to-blue-600 hover:from-amber-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition transform active:scale-98">
-              <span>เข้าสู่ตารางตรวจสภาพรถ & ปฏิทินรายเดือน</span>
+              <span>เข้าสู่ตารางตรวจสภาพรถ</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+          <!-- Gateway Card 3: Maintenance & Repair Log Module -->
+          <div class="glass-panel p-5 flex flex-col justify-between space-y-4 hover:shadow-lg transition border border-slate-200/80 dark:border-slate-800">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2.5">
+                  <div class="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-extrabold text-sm md:text-base text-slate-900 dark:text-white">2.3 แจ้งซ่อมบำรุง & บิลค่าซ่อม</h3>
+                    <span class="text-[10px] text-slate-500 dark:text-slate-400">Maintenance_log • Drive Receipts</span>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
+                  Job Orders
+                </span>
+              </div>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                ระบบติดตามงานซ่อมบำรุงและค่าใช้จ่ายอะไหล่รถ 6 ล้อ รองรับหลายรายการต่อครั้ง แนบรูปบิลค่าซ่อมใน Drive พร้อมพิมพ์ใบสั่งซ่อมมาตรฐาน A4
+              </p>
+              <div class="grid grid-cols-3 gap-2 pt-1 text-center text-xs">
+                <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                  <span class="text-[10px] text-slate-400 block">งานซ่อมทั้งหมด</span>
+                  <strong id="tsmMaintenanceTotalCount" class="text-slate-800 dark:text-slate-100">0 งาน</strong>
+                </div>
+                <div class="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900">
+                  <span class="text-[10px] text-indigo-600 block">ยอดค่าซ่อมสะสม</span>
+                  <strong id="tsmMaintenanceTotalCost" class="text-indigo-700 dark:text-indigo-300 font-mono">฿0</strong>
+                </div>
+                <div class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900">
+                  <span class="text-[10px] text-emerald-600 block">ซ่อมเสร็จแล้ว</span>
+                  <strong id="tsmMaintenanceDoneCount" class="text-emerald-700 dark:text-emerald-300">0 งาน</strong>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" onclick="switchTab('maintenance-logs')"
+                    class="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition transform active:scale-98">
+              <span>เข้าสู่ประวัติแจ้งซ่อม & รายงานบิล</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
           </div>
@@ -1238,6 +1288,218 @@
               </div>
             </div>
 
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 2.3: ข้อมูลประวัติการซ่อมบำรุง & บิลค่าซ่อม (Maintenance_log) -->
+      <!-- ============================================================== -->
+      <section id="tab-maintenance-logs" class="tab-content space-y-5">
+        
+        <!-- Header Banner & Quick Actions -->
+        <div class="glass-panel p-4 md:p-5 flex flex-wrap items-center justify-between gap-4 border border-slate-200/80 dark:border-slate-800">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center text-xl shadow-md flex-shrink-0">
+              <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm md:text-base font-extrabold text-slate-800 dark:text-white">ระบบประวัติการซ่อมบำรุง & รายงานบิลค่าซ่อม (Maintenance Oversight)</h2>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800">
+                  Google Sheet: Maintenance_log
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                ศูนย์กลางบันทึกงานซ่อมบำรุงรถบรรทุก 6 ล้อ, ติดตามอะไหล่, ตรวจสอบบิลค่าซ่อมบน Google Drive และพิมพ์ใบสั่งซ่อมมาตรฐาน A4
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <!-- Open Mobile Driver Portal -->
+            <a href="./maintenance/index.html" target="_blank"
+               class="py-2 px-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold shadow-md transition flex items-center gap-2 active:scale-95">
+              <i class="fa-solid fa-mobile-screen-button text-amber-300"></i>
+              <span>หน้าแจ้งซ่อมคนขับ (Mobile App)</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-75"></i>
+            </a>
+
+            <!-- Drive Folder Link -->
+            <a href="https://drive.google.com/drive/folders/1YRkTR9dMz0PxKgF60edVF56Ckq909fMF" target="_blank"
+               class="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 shadow-sm">
+              <i class="fa-brands fa-google-drive text-amber-500 text-sm"></i>
+              <span class="hidden sm:inline">โฟลเดอร์บิลใน Drive</span>
+            </a>
+
+            <!-- Refresh Button -->
+            <button type="button" onclick="syncLiveMaintenanceData(true)"
+                    class="py-2 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-indigo-200 dark:border-indigo-800 transition flex items-center gap-1.5 shadow-sm">
+              <i id="maintenanceSyncIcon" class="fa-solid fa-rotate text-xs"></i>
+              <span>ซิงค์ข้อมูล</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Maintenance KPI Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+          <!-- Card 1: Total Cost -->
+          <div class="glass-panel p-4 flex items-center space-x-3 border-l-4 border-l-indigo-600">
+            <div class="w-11 h-11 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg flex-shrink-0">
+              <i class="fa-solid fa-coins"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">ยอดรวมค่าซ่อมสะสม</span>
+              <div class="flex items-baseline space-x-1 mt-0.5">
+                <span id="kpiMntTotalCost" class="text-lg md:text-xl font-black text-slate-900 dark:text-white font-mono">฿0</span>
+              </div>
+              <p class="text-[10px] text-slate-400 truncate">รวมค่าอะไหล่ & ค่าแรง</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Total Jobs -->
+          <div class="glass-panel p-4 flex items-center space-x-3 border-l-4 border-l-blue-500">
+            <div class="w-11 h-11 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg flex-shrink-0">
+              <i class="fa-solid fa-clipboard-list"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">จำนวนงานซ่อมทั้งหมด</span>
+              <div class="flex items-baseline space-x-1 mt-0.5">
+                <span id="kpiMntTotalTickets" class="text-lg md:text-xl font-black text-slate-900 dark:text-white">0</span>
+                <span class="text-xs text-slate-400">งาน</span>
+              </div>
+              <p class="text-[10px] text-slate-400 truncate">บันทึกใน Sheet</p>
+            </div>
+          </div>
+
+          <!-- Card 3: Pending / In Progress -->
+          <div class="glass-panel p-4 flex items-center space-x-3 border-l-4 border-l-amber-500">
+            <div class="w-11 h-11 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg flex-shrink-0">
+              <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">อยู่ระหว่างซ่อม / รออะไหล่</span>
+              <div class="flex items-baseline space-x-1 mt-0.5">
+                <span id="kpiMntPendingCount" class="text-lg md:text-xl font-black text-amber-600 dark:text-amber-400">0</span>
+                <span class="text-xs text-slate-400">งาน</span>
+              </div>
+              <p class="text-[10px] text-slate-400 truncate">ต้องเร่งรัดติดตาม</p>
+            </div>
+          </div>
+
+          <!-- Card 4: Completed -->
+          <div class="glass-panel p-4 flex items-center space-x-3 border-l-4 border-l-emerald-500">
+            <div class="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg flex-shrink-0">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">ซ่อมเสร็จแล้ว / ปิดงาน</span>
+              <div class="flex items-baseline space-x-1 mt-0.5">
+                <span id="kpiMntDoneCount" class="text-lg md:text-xl font-black text-emerald-600 dark:text-emerald-400">0</span>
+                <span class="text-xs text-slate-400">งาน</span>
+              </div>
+              <p class="text-[10px] text-slate-400 truncate">พร้อมวิ่งงาน 100%</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Panel: Table with Search and Filters -->
+        <div class="glass-panel p-5 space-y-4">
+          
+          <!-- Filter Controls Toolbar -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
+              
+              <!-- Search Input -->
+              <div class="relative flex-1 min-w-[200px] max-w-md">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                <input type="text" id="mntSearchInput" oninput="filterMaintenanceTable()"
+                       placeholder="ค้นหา ทะเบียนรถ, Ticket ID, คนขับ, อาการเสีย..."
+                       class="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder-slate-400 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm" />
+              </div>
+
+              <!-- Vehicle Plate Selector -->
+              <select id="mntPlateFilter" onchange="filterMaintenanceTable()"
+                      class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm">
+                <option value="">ทะเบียนรถ: ทั้งหมด</option>
+              </select>
+
+              <!-- Status Selector -->
+              <select id="mntStatusFilter" onchange="filterMaintenanceTable()"
+                      class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm">
+                <option value="">สถานะ: ทั้งหมด</option>
+                <option value="รอดำเนินการ">รอดำเนินการ</option>
+                <option value="กำลังดำเนินการซ่อม">กำลังซ่อม</option>
+                <option value="ซ่อมเสร็จแล้ว">ซ่อมเสร็จแล้ว</option>
+                <option value="ปิดงาน">ปิดงาน</option>
+              </select>
+
+              <!-- System Selector -->
+              <select id="mntSystemFilter" onchange="filterMaintenanceTable()"
+                      class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm">
+                <option value="">ระบบ: ทั้งหมด</option>
+                <option value="เบรก">ระบบเบรก</option>
+                <option value="เครื่องยนต์">เครื่องยนต์</option>
+                <option value="ยาง">ยางและล้อ</option>
+                <option value="ไฟ">ระบบไฟส่องสว่าง</option>
+                <option value="ช่วงล่าง">ช่วงล่างและเพลา</option>
+                <option value="ความเย็น">ระบบระบายความร้อน</option>
+              </select>
+
+              <!-- Date Period Filter -->
+              <select id="mntDateFilter" onchange="filterMaintenanceTable()"
+                      class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm">
+                <option value="">วันที่: ทั้งหมด</option>
+                <option value="today">วันนี้</option>
+                <option value="7days">ย้อนหลัง 7 วัน</option>
+                <option value="month">เดือนนี้</option>
+              </select>
+
+              <!-- Reset Filters Button -->
+              <button type="button" onclick="resetMaintenanceFilters()"
+                      class="py-1.5 px-2.5 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold transition flex items-center gap-1 shadow-sm"
+                      title="ล้างตัวกรองทั้งหมด">
+                <i class="fa-solid fa-arrow-rotate-left"></i>
+                <span class="hidden sm:inline">ล้างตัวกรอง</span>
+              </button>
+            </div>
+
+            <!-- Counter Badge & Last Sync -->
+            <div class="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400">
+              <span>แสดง <strong id="mntFilteredCount" class="text-indigo-600 dark:text-indigo-400 font-bold">0</strong> จาก <span id="mntTotalCount" class="font-bold">0</span> รายการ</span>
+              <span id="mntLastSyncTimeText" class="hidden md:inline text-slate-400">• อัปเดตล่าสุด: -</span>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+              <thead class="bg-slate-100/80 dark:bg-slate-800 text-slate-700 dark:text-slate-200 uppercase font-bold text-[11px] border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th class="py-2.5 px-3 whitespace-nowrap">วัน/เวลาแจ้ง</th>
+                  <th class="py-2.5 px-3 whitespace-nowrap">รหัสใบแจ้งซ่อม</th>
+                  <th class="py-2.5 px-3 whitespace-nowrap">ทะเบียนรถ</th>
+                  <th class="py-2.5 px-3 whitespace-nowrap">พนักงานขับรถ</th>
+                  <th class="py-2.5 px-3 whitespace-nowrap">เลขไมล์</th>
+                  <th class="py-2.5 px-3">อาการเสีย / ระบบ</th>
+                  <th class="py-2.5 px-3">รายการอะไหล่ & ซ่อม</th>
+                  <th class="py-2.5 px-3 text-right whitespace-nowrap">ยอดรวมสุทธิ (฿)</th>
+                  <th class="py-2.5 px-3 text-center whitespace-nowrap">สถานะ</th>
+                  <th class="py-2.5 px-3 text-center whitespace-nowrap">บิล / Drive</th>
+                  <th class="py-2.5 px-3 text-center whitespace-nowrap">เอกสาร A4</th>
+                </tr>
+              </thead>
+              <tbody id="maintenanceTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <tr>
+                  <td colspan="11" class="py-8 text-center text-slate-400 dark:text-slate-500">
+                    <i class="fa-solid fa-spinner fa-spin text-2xl text-indigo-500 mb-2"></i>
+                    <p class="font-medium text-xs">กำลังโหลดข้อมูลประวัติการซ่อมบำรุง (Maintenance_log)...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
         </div>
@@ -3129,20 +3391,261 @@
     </div>
   </div>
 
+  <!-- ============================================================== -->
+  <!-- MODAL 5: Maintenance Ticket Detail Modal                         -->
+  <!-- ============================================================== -->
+  <div id="maintenanceDetailModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="glass-panel max-w-3xl w-full p-5 sm:p-6 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl max-h-[92vh] flex flex-col my-auto">
+      
+      <!-- Header -->
+      <div class="flex items-start justify-between pb-3.5 border-b border-slate-200 dark:border-slate-800 gap-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-base text-slate-900 dark:text-white">รายละเอียดงานแจ้งซ่อมบำรุง</h3>
+              <span id="mntModalStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
+                รอดำเนินการ
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              เลขที่เอกสาร: <strong id="mntModalTicketId" class="text-indigo-600 dark:text-indigo-400 font-mono">-</strong> • วันที่: <span id="mntModalDate">-</span>
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="closeMaintenanceDetailModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Quick Info Bar -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-3.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-xs">
+        <div>
+          <span class="text-slate-500 dark:text-slate-400 block text-[11px]">ทะเบียนรถ:</span>
+          <strong id="mntModalPlate" class="text-slate-900 dark:text-white font-bold block">-</strong>
+        </div>
+        <div>
+          <span class="text-slate-500 dark:text-slate-400 block text-[11px]">เลขไมล์:</span>
+          <span id="mntModalOdo" class="text-slate-700 dark:text-slate-300 font-semibold block">-</span>
+        </div>
+        <div>
+          <span class="text-slate-500 dark:text-slate-400 block text-[11px]">ผู้แจ้งซ่อม:</span>
+          <span id="mntModalDriver" class="text-slate-700 dark:text-slate-300 font-semibold block truncate">-</span>
+        </div>
+        <div>
+          <span class="text-slate-500 dark:text-slate-400 block text-[11px]">อู่ / สถานที่ซ่อม:</span>
+          <span id="mntModalGarage" class="text-indigo-600 dark:text-indigo-400 font-semibold block truncate">-</span>
+        </div>
+      </div>
+
+      <!-- Scrollable Body Content -->
+      <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
+        
+        <!-- Symptom Details -->
+        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+              <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+              อาการเสีย / ปัญหาที่พบ
+            </span>
+            <span id="mntModalUrgencyBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+              ความเร่งด่วน: ปกติ
+            </span>
+          </div>
+          <p id="mntModalSymptom" class="text-slate-700 dark:text-slate-300 leading-relaxed bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-slate-200/80 dark:border-slate-700 font-sans">
+            -
+          </p>
+        </div>
+
+        <!-- Parts & Labor Itemized Table -->
+        <div class="space-y-2">
+          <h4 class="font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-list-check text-indigo-500"></i>
+              รายการอะไหล่ & ค่าแรงซ่อมแซม
+            </span>
+            <span id="mntModalItemsCount" class="text-[10px] text-slate-500 font-semibold">0 รายการ</span>
+          </h4>
+          <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-100 dark:bg-slate-800 font-bold text-slate-700 dark:text-slate-300 text-[11px]">
+                <tr>
+                  <th class="py-2 px-3 text-center w-10">#</th>
+                  <th class="py-2 px-3">รายการอะไหล่ / งานซ่อม</th>
+                  <th class="py-2 px-3 text-center w-16">จำนวน</th>
+                  <th class="py-2 px-3 text-center w-16">หน่วย</th>
+                  <th class="py-2 px-3 text-right w-24">ราคา/หน่วย</th>
+                  <th class="py-2 px-3 text-right w-24">รวม (บาท)</th>
+                </tr>
+              </thead>
+              <tbody id="mntModalItemsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Cost Breakdown Card -->
+        <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
+          <div class="grid grid-cols-3 gap-4 text-center flex-1 min-w-[240px]">
+            <div>
+              <span class="text-[10px] text-slate-500 block">ค่าอะไหล่</span>
+              <strong id="mntModalPartsCost" class="text-slate-800 dark:text-slate-200 font-mono text-sm">฿0.00</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 block">ค่าแรงช่าง</span>
+              <strong id="mntModalLaborCost" class="text-slate-800 dark:text-slate-200 font-mono text-sm">฿0.00</strong>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 block">ภาษี VAT (7%)</span>
+              <strong id="mntModalVatCost" class="text-slate-800 dark:text-slate-200 font-mono text-sm">฿0.00</strong>
+            </div>
+          </div>
+          <div class="p-2.5 rounded-lg bg-indigo-600 text-white text-right px-4">
+            <span class="text-[10px] opacity-80 block uppercase font-bold">ยอดสุทธิทั้งสิ้น</span>
+            <strong id="mntModalTotalCost" class="text-base font-black font-mono">฿0.00</strong>
+          </div>
+        </div>
+
+        <!-- Photos & Receipts Gallery -->
+        <div class="space-y-2">
+          <h4 class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+            <i class="fa-solid fa-images text-indigo-500"></i>
+            หลักฐานภาพถ่าย & บิลค่าซ่อม (Google Drive)
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            
+            <!-- Bill / Receipt Photo -->
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-2">
+              <div>
+                <span class="font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between text-[11px]">
+                  <span><i class="fa-solid fa-receipt text-amber-500 mr-1"></i> บิลค่าซ่อม / ใบเสร็จ</span>
+                  <span class="text-[10px] text-slate-400">Drive</span>
+                </span>
+                <div id="mntModalBillImgWrap" class="h-36 rounded-lg bg-slate-200 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 mt-2 flex items-center justify-center overflow-hidden">
+                  <span class="text-slate-400 text-xs">ไม่มีรูปภาพบิล</span>
+                </div>
+              </div>
+              <a id="mntModalBillDriveBtn" href="#" target="_blank"
+                 class="w-full py-1.5 px-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
+                <i class="fa-brands fa-google-drive"></i>
+                <span>เปิดดูรูปบิลใน Google Drive</span>
+              </a>
+            </div>
+
+            <!-- Defect / Symptom Photo -->
+            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-2">
+              <div>
+                <span class="font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between text-[11px]">
+                  <span><i class="fa-solid fa-camera text-blue-500 mr-1"></i> รูปถ่ายอาการชำรุด</span>
+                  <span class="text-[10px] text-slate-400">Drive</span>
+                </span>
+                <div id="mntModalDefectImgWrap" class="h-36 rounded-lg bg-slate-200 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 mt-2 flex items-center justify-center overflow-hidden">
+                  <span class="text-slate-400 text-xs">ไม่มีรูปถ่ายอาการ</span>
+                </div>
+              </div>
+              <a id="mntModalDefectDriveBtn" href="#" target="_blank"
+                 class="w-full py-1.5 px-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
+                <i class="fa-brands fa-google-drive"></i>
+                <span>เปิดดูรูปใน Google Drive</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="pt-3.5 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5">
+        <button type="button" id="btnMntPrintOrder" onclick="triggerMntPrintFromModal()"
+                class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md transition flex items-center gap-1.5 active:scale-95">
+          <i class="fa-solid fa-print"></i>
+          <span>พิมพ์ใบสั่งซ่อมมาตรฐาน A4 (Job Order)</span>
+        </button>
+
+        <button type="button" onclick="closeMaintenanceDetailModal()"
+                class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold transition">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL 6: Maintenance Job Order A4 Printable Modal                -->
+  <!-- ============================================================== -->
+  <div id="maintenanceJobOrderPrintModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto print-modal-container">
+    <div class="glass-panel max-w-4xl w-full p-4 sm:p-6 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl max-h-[96vh] flex flex-col my-auto print-modal-box">
+      
+      <!-- Modal Header (Hidden on print) -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 no-print gap-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fa-solid fa-print"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+              พิมพ์ใบแจ้งซ่อมบำรุงและตรวจรับงาน (A4 Work Order)
+            </h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+              จัดรูปแบบกระดาษมาตรฐาน A4 พร้อมช่องลงนาม พขร., ช่างซ่อม และเจ้าหน้าที่ TSM
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="window.print()"
+                  class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-print"></i>
+            <span>สั่งพิมพ์ตอนนี้ (Ctrl+P)</span>
+          </button>
+          <button type="button" onclick="closeMaintenanceJobOrderModal()"
+                  class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Document Canvas -->
+      <div id="maintenancePrintableArea" class="flex-1 overflow-y-auto p-4 sm:p-6 my-2 bg-white text-black font-sans text-xs">
+        <!-- Rendered dynamically by printMaintenanceJobOrder() -->
+      </div>
+
+      <!-- Modal Footer (Hidden on print) -->
+      <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between no-print text-xs">
+        <span class="text-slate-500 dark:text-slate-400 text-[11px]">
+          💡 แนะนำให้ตั้งค่าหน้าพิมพ์: Scale: Fit to page width หรือ 100%, Margins: Default
+        </span>
+        <button type="button" onclick="closeMaintenanceJobOrderModal()"
+                class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold transition">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- App Script Logic -->
   <script>
     const CONFIG = {
       SPREADSHEET_ID: "1JM-i8_nrGR7-VDEY82QZ5l5JMJTIBOIsuqOSQSrcD3Y",
       GAS_URL: "https://script.google.com/macros/s/AKfycbxbyJ1yWNodowMh-OLxqBuFvH-Pk-TLwg7dRv_lwT7bbTJBu5MH_lhqxE3KwJ7lDH407g/exec",
       GAS_TRUCK_URL: "https://script.google.com/macros/s/AKfycbwvZxSw_p62y6ZwegF8iUiEdxyEJrF01yB37AumDHwgLcSFBoRSZUmwgvdtLJ-6hCFE/exec",
+      GAS_MAINTENANCE_URL: "https://script.google.com/macros/s/AKfycbwvZxSw_p62y6ZwegF8iUiEdxyEJrF01yB37AumDHwgLcSFBoRSZUmwgvdtLJ-6hCFE/exec",
       DRIVE_FOLDER_ALCOHOL: "1tfKH6EOBFdG0c4Wm2MPO-R61NP5mAc0c",
-      DRIVE_FOLDER_TRUCK: "1ryLhwkO1lnv-2qgLbDDl0XyVaq8S2Szs"
+      DRIVE_FOLDER_TRUCK: "1ryLhwkO1lnv-2qgLbDDl0XyVaq8S2Szs",
+      DRIVE_FOLDER_MAINTENANCE: "1YRkTR9dMz0PxKgF60edVF56Ckq909fMF"
     };
 
     let appState = {
       drivers: [],
       alcoholLogs: [],
       truckLogs: [],
+      maintenanceLogs: [],
       vehicles: [],
       billingImports: [],
       currentTab: 'overview',
@@ -3156,6 +3659,7 @@
       tsm: 'ศูนย์ตรวจสอบความปลอดภัย TSM Safety Oversight (Executive Overview)',
       'alcohol-logs': 'ข้อมูลการตรวจวัดแอลกอฮอล์และความดัน (Alcohol_Logs 1:1 Face Match)',
       'truck-logs': 'ข้อมูลการตรวจสอบรถบรรทุก 6 ล้อ (Truck_Inspection_Logs F-CAM-032_r3)',
+      'maintenance-logs': 'ข้อมูลประวัติการซ่อมบำรุง & รายงานบิลค่าซ่อม (Maintenance Oversight & Job Orders)',
       billing: 'ตรวจสอบค่าน้ำมัน, อัตราสิ้นเปลือง & เกราะป้องกันทุจริต (Fuel Shield)',
       'import-billing': 'ศูนย์นำเข้าไฟล์ตั้งเบิก แยก Feed & พิมพ์สรุปยอดวิ่ง/วางบิล (Billing Import Portal)',
       fleet: 'ข้อมูลกองรถ 6 ล้อ (ดีเซล/EV) & ทะเบียนคนขับรถจริง (Enterprise ERP)',
@@ -3451,6 +3955,218 @@
       return result.reverse();
     }
 
+    // Parser for Google Sheet: Maintenance_log (GViz JSON format)
+    function parseGvizMaintenanceRows(rows) {
+      if (!rows || !Array.isArray(rows)) return [];
+      const result = [];
+      const now = new Date();
+
+      rows.forEach((r, idx) => {
+        const c = r.c || [];
+        const getVal = (i) => {
+          if (!c[i]) return '';
+          if (c[i].f !== null && c[i].f !== undefined) return String(c[i].f).trim();
+          if (c[i].v !== null && c[i].v !== undefined) {
+            const s = String(c[i].v).trim();
+            const m = s.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)$/);
+            if (m) {
+              const yr = m[1];
+              const mo = String(parseInt(m[2], 10) + 1).padStart(2, '0');
+              const da = String(parseInt(m[3], 10)).padStart(2, '0');
+              const hr = m[4] !== undefined ? String(parseInt(m[4], 10)).padStart(2, '0') : '00';
+              const mi = m[5] !== undefined ? String(parseInt(m[5], 10)).padStart(2, '0') : '00';
+              const sc = m[6] !== undefined ? String(parseInt(m[6], 10)).padStart(2, '0') : '00';
+              return `${da}/${mo}/${yr} ${hr}:${mi}:${sc}`;
+            }
+            return s;
+          }
+          return '';
+        };
+
+        const timestamp = getVal(0);
+        const ticketId = getVal(1) || `MNT-${idx + 1}`;
+        const inspectionDate = getVal(2) || (timestamp ? timestamp.split(' ')[0] : '');
+        const vehiclePlate = getVal(3);
+        const vehicleType = getVal(4) || 'รถบรรทุก 6 ล้อ';
+        const odometer = getVal(5);
+        const driverName = getVal(6);
+        const driverEmail = getVal(7);
+        const driverPhone = getVal(8);
+        const maintenanceType = getVal(9) || 'ซ่อมแซมทั่วไป';
+        const urgency = getVal(10) || 'ปกติ';
+        const systemAffected = getVal(11) || 'ทั่วไป';
+        const symptomDesc = getVal(12) || 'เช็กสภาพตามระยะ';
+        const garageName = getVal(13) || 'ศูนย์บริการ TTMK';
+        const mechanicName = getVal(14) || 'ช่างประจำศูนย์';
+        const garagePhone = getVal(15);
+        const itemsCount = parseInt(getVal(16), 10) || 0;
+        const itemsJson = getVal(17);
+        let itemsList = [];
+        try {
+          if (itemsJson && (itemsJson.startsWith('[') || itemsJson.startsWith('{'))) {
+            const parsed = JSON.parse(itemsJson);
+            itemsList = Array.isArray(parsed) ? parsed : [parsed];
+          }
+        } catch(e) {}
+        const itemsSummary = getVal(18);
+        const partsCost = parseFloat(getVal(19)) || 0;
+        const laborCost = parseFloat(getVal(20)) || 0;
+        const vatAmount = parseFloat(getVal(21)) || 0;
+        const totalCost = parseFloat(getVal(22)) || (partsCost + laborCost + vatAmount);
+        const status = getVal(23) || 'รอดำเนินการ';
+        const billPhotoUrl = getVal(24);
+        const defectPhotoUrl = getVal(25);
+        const partsPhotoUrl = getVal(26);
+        const finishedPhotoUrl = getVal(27);
+        const remarks = getVal(28);
+
+        if (ticketId || vehiclePlate || driverName) {
+          result.push({
+            timestamp: timestamp || `${now.toLocaleDateString('th-TH')} ${now.toLocaleTimeString('th-TH')}`,
+            ticketId,
+            inspectionDate,
+            vehiclePlate,
+            vehicleType,
+            odometer,
+            driverName,
+            driverEmail,
+            driverPhone,
+            maintenanceType,
+            urgency,
+            systemAffected,
+            symptomDesc,
+            garageName,
+            mechanicName,
+            garagePhone,
+            itemsCount: itemsList.length > 0 ? itemsList.length : (itemsCount || (itemsSummary ? 1 : 0)),
+            itemsList,
+            itemsSummary,
+            partsCost,
+            laborCost,
+            vatAmount,
+            totalCost,
+            status,
+            billPhotoUrl,
+            defectPhotoUrl,
+            partsPhotoUrl,
+            finishedPhotoUrl,
+            remarks
+          });
+        }
+      });
+
+      return result.reverse();
+    }
+
+    // Default Seed Maintenance Logs (เมื่อยังไม่มีรายการบันทึกจริงใน Google Sheet)
+    function getDefaultMaintenanceLogs() {
+      return [
+        {
+          timestamp: "12/10/2026 14:35:10",
+          ticketId: "MNT-20261012-001",
+          inspectionDate: "12/10/2026",
+          vehiclePlate: "70-8899 กทม.",
+          vehicleType: "รถบรรทุก 6 ล้อตู้ทึบ",
+          odometer: "168,450 กม.",
+          driverName: "ทวีศักดิ์ คำปก",
+          driverEmail: "taweesak.kom@ttmk.co.th",
+          driverPhone: "062-3285963",
+          maintenanceType: "บำรุงรักษาตามระยะ (PM)",
+          urgency: "ด่วน",
+          systemAffected: "ระบบเบรก",
+          symptomDesc: "มีเสียงดังเอี๊ยดขณะเหยียบเบรกหน้าขวา และระยะเบรกยาวขึ้นเล็กน้อย",
+          garageName: "ศูนย์บริการ อีซูซุ สระบุรี",
+          mechanicName: "ช่างสมศักดิ์ ชำนาญการ",
+          garagePhone: "036-221500",
+          itemsCount: 3,
+          itemsList: [
+            { name: "ผ้าเบรกหน้า Heavy Duty (ชุด)", qty: 1, unit: "ชุด", unitPrice: 3850, total: 3850 },
+            { name: "เจียรจานเบรกคู่หน้า", qty: 2, unit: "ข้าง", unitPrice: 450, total: 900 },
+            { name: "น้ำมันเบรก DOT 4 (ลิตร)", qty: 2, unit: "ลิตร", unitPrice: 320, total: 640 }
+          ],
+          itemsSummary: "ผ้าเบรกหน้า Heavy Duty (1 ชุด), เจียรจานเบรก (2 ข้าง), น้ำมันเบรก DOT 4 (2 ลิตร)",
+          partsCost: 5390,
+          laborCost: 1200,
+          vatAmount: 461.30,
+          totalCost: 7051.30,
+          status: "ซ่อมเสร็จแล้ว",
+          billPhotoUrl: "https://drive.google.com/drive/folders/1YRkTR9dMz0PxKgF60edVF56Ckq909fMF",
+          defectPhotoUrl: "",
+          partsPhotoUrl: "",
+          finishedPhotoUrl: "",
+          remarks: "ตรวจรับงานเบรกทดสอบระยะเบรกและแรงดันลมผ่านเกณฑ์ 100%"
+        },
+        {
+          timestamp: "11/10/2026 09:15:22",
+          ticketId: "MNT-20261011-002",
+          inspectionDate: "11/10/2026",
+          vehiclePlate: "72-8297 สระบุรี",
+          vehicleType: "รถบรรทุก 6 ล้อคอกผ้าใบ EV",
+          odometer: "52,100 กม.",
+          driverName: "วิทวัส สอนพรม",
+          driverEmail: "withawat.s@ttmk.co.th",
+          driverPhone: "089-1122334",
+          maintenanceType: "ซ่อมแซมจากการสึกหรอ",
+          urgency: "ปกติ",
+          systemAffected: "ระบบไฟส่องสว่าง",
+          symptomDesc: "ไฟเลี้ยวหลังขวาไม่ติด หลอดไฟขาดเนื่องจากขั้วหลวม",
+          garageName: "อู่ช่างเล็ก ไดนาโม",
+          mechanicName: "ช่างเล็ก",
+          garagePhone: "081-9988776",
+          itemsCount: 2,
+          itemsList: [
+            { name: "หลอดไฟ LED 24V สีส้ม", qty: 2, unit: "หลอด", unitPrice: 180, total: 360 },
+            { name: "ขั้วไฟกันน้ำมาตรฐาน IP67", qty: 1, unit: "ชุด", unitPrice: 250, total: 250 }
+          ],
+          itemsSummary: "หลอดไฟ LED 24V (2 หลอด), ขั้วไฟกันน้ำ (1 ชุด)",
+          partsCost: 610,
+          laborCost: 300,
+          vatAmount: 0,
+          totalCost: 910,
+          status: "ปิดงาน",
+          billPhotoUrl: "https://drive.google.com/drive/folders/1YRkTR9dMz0PxKgF60edVF56Ckq909fMF",
+          defectPhotoUrl: "",
+          partsPhotoUrl: "",
+          finishedPhotoUrl: "",
+          remarks: "เปลี่ยนหลอดและเดินสายไฟใหม่ ทดสอบไฟเลี้ยวและไฟฉุกเฉินทำงานปกติ"
+        },
+        {
+          timestamp: "10/10/2026 16:40:05",
+          ticketId: "MNT-20261010-003",
+          inspectionDate: "10/10/2026",
+          vehiclePlate: "73-2415 สระบุรี",
+          vehicleType: "รถบรรทุก 6 ล้อตู้ทึบ",
+          odometer: "161,200 กม.",
+          driverName: "ธีระพงษ์ ศรีสุข",
+          driverEmail: "theerapong.s@ttmk.co.th",
+          driverPhone: "084-5566778",
+          maintenanceType: "ซ่อมแซมจากการสึกหรอ",
+          urgency: "ด่วนที่สุด",
+          systemAffected: "ยางและล้อ",
+          symptomDesc: "ยางล้อหลังขวาด้านนอกโดนเศษเหล็กตำ ลมซึม ดอกยางเหลือ 2 มม.",
+          garageName: "ร้านยางเจริญยนต์ สระบุรี",
+          mechanicName: "ช่างเอกชัย",
+          garagePhone: "036-334455",
+          itemsCount: 2,
+          itemsList: [
+            { name: "ยางเรเดียล Bridgestone 9.5R17.5", qty: 2, unit: "เส้น", unitPrice: 8200, total: 16400 },
+            { name: "ค่าถอดใส่ ถ่วงล้อ และตั้งศูนย์", qty: 2, unit: "ล้อ", unitPrice: 350, total: 700 }
+          ],
+          itemsSummary: "ยาง Bridgestone 9.5R17.5 (2 เส้น), ถอดใส่ถ่วงล้อ (2 ล้อ)",
+          partsCost: 16400,
+          laborCost: 700,
+          vatAmount: 1197,
+          totalCost: 18297,
+          status: "กำลังดำเนินการซ่อม",
+          billPhotoUrl: "https://drive.google.com/drive/folders/1YRkTR9dMz0PxKgF60edVF56Ckq909fMF",
+          defectPhotoUrl: "",
+          partsPhotoUrl: "",
+          finishedPhotoUrl: "",
+          remarks: "อยู่ระหว่างรอร้านยางจัดส่งยางเรเดียลเส้นใหม่และติดตั้ง"
+        }
+      ];
+    }
+
     // Data Sync & Real-time Live Engine
     async function syncAllSheetData(showToast = false) {
       const syncIcon = document.getElementById('topSyncIcon');
@@ -3459,6 +4175,8 @@
       if (tableSyncIcon) tableSyncIcon.classList.add('fa-spin');
       const truckSyncIcon = document.getElementById('truckTableSyncIcon');
       if (truckSyncIcon) truckSyncIcon.classList.add('fa-spin');
+      const mntSyncIcon = document.getElementById('maintenanceSyncIcon');
+      if (mntSyncIcon) mntSyncIcon.classList.add('fa-spin');
 
       try {
         let loaded = false;
@@ -3476,6 +4194,9 @@
                 appState.alcoholLogs = data.alcoholLogs || [];
                 if (data.truckLogs && data.truckLogs.length > 0) {
                   appState.truckLogs = data.truckLogs;
+                }
+                if (data.maintenanceLogs && data.maintenanceLogs.length > 0) {
+                  appState.maintenanceLogs = data.maintenanceLogs;
                 }
                 loaded = true;
               }
@@ -3550,7 +4271,27 @@
           }
         } catch(e){}
 
-        // 3. Query GAS Web App for live alcohol logs (Google Sheet: Alcohol_Logs)
+        // 3. Query Google Sheet directly via GViz for Maintenance_log
+        try {
+          const gvizMntResp = await fetch(`https://docs.google.com/spreadsheets/d/${CONFIG.SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Maintenance_log`);
+          if (gvizMntResp.ok) {
+            const gvizMntText = await gvizMntResp.text();
+            const startIdx = gvizMntText.indexOf('{');
+            const endIdx = gvizMntText.lastIndexOf('}');
+            if (startIdx >= 0 && endIdx >= 0) {
+              const gvizData = JSON.parse(gvizMntText.substring(startIdx, endIdx + 1));
+              if (gvizData.table && gvizData.table.rows && gvizData.table.rows.length > 0) {
+                const liveMntLogs = parseGvizMaintenanceRows(gvizData.table.rows);
+                if (liveMntLogs && liveMntLogs.length > 0) {
+                  appState.maintenanceLogs = liveMntLogs;
+                  loaded = true;
+                }
+              }
+            }
+          }
+        } catch(e){}
+
+        // 4. Query GAS Web App for live alcohol logs (Google Sheet: Alcohol_Logs)
         try {
           const gasAlcResp = await fetch(`${CONFIG.GAS_URL}?action=listAlcoholLogs`);
           if (gasAlcResp.ok) {
@@ -3562,7 +4303,7 @@
           }
         } catch(e){}
 
-        // 4. Query GAS Web App for live Truck_Inspection_Logs (Google Sheet: Truck_Inspection_Logs)
+        // 5. Query GAS Web App for live Truck_Inspection_Logs (Google Sheet: Truck_Inspection_Logs)
         try {
           const gasTruckUrl = CONFIG.GAS_TRUCK_URL;
           if (gasTruckUrl) {
@@ -3577,7 +4318,22 @@
           }
         } catch(e){}
 
-        // 5. Query GAS Web App for live driver updates
+        // 6. Query GAS Web App for live Maintenance_log
+        try {
+          const gasMntUrl = CONFIG.GAS_MAINTENANCE_URL;
+          if (gasMntUrl && (!appState.maintenanceLogs || appState.maintenanceLogs.length === 0)) {
+            const gasMntResp = await fetch(`${gasMntUrl}?action=list_logs`);
+            if (gasMntResp.ok) {
+              const mntData = await gasMntResp.json();
+              if (mntData.logs && mntData.logs.length > 0) {
+                appState.maintenanceLogs = mntData.logs;
+                loaded = true;
+              }
+            }
+          }
+        } catch(e){}
+
+        // 7. Query GAS Web App for live driver updates
         try {
           const gasResp = await fetch(`${CONFIG.GAS_URL}?action=listDrivers`);
           if (gasResp.ok) {
@@ -3588,6 +4344,11 @@
             }
           }
         } catch(e){}
+
+        // Fallback default maintenance logs if sheet is empty yet
+        if (!appState.maintenanceLogs || appState.maintenanceLogs.length === 0) {
+          appState.maintenanceLogs = getDefaultMaintenanceLogs();
+        }
 
         if (appState.alcoholLogs && appState.alcoholLogs.length > 0) {
           preloadAllEvidencePhotos(appState.alcoholLogs);
@@ -3607,11 +4368,17 @@
           truckSyncTimeEl.textContent = `• อัปเดตล่าสุด: ${now.toLocaleTimeString('th-TH')} น.`;
         }
 
+        const mntSyncTimeEl = document.getElementById('mntLastSyncTimeText');
+        if (mntSyncTimeEl) {
+          const now = new Date();
+          mntSyncTimeEl.textContent = `• อัปเดตล่าสุด: ${now.toLocaleTimeString('th-TH')} น.`;
+        }
+
         if (showToast) {
           Swal.fire({
             icon: 'success',
             title: 'ซิงค์ข้อมูลสำเร็จ',
-            text: `ดึงข้อมูลพนักงานจริงเรียบร้อยแล้ว (${appState.drivers.length} คน, ${appState.alcoholLogs.length} ผลตรวจแอลกอฮอล์, ${appState.truckLogs.length} รายการตรวจรถ)`,
+            text: `ดึงข้อมูลเรียบร้อยแล้ว (${appState.drivers.length} คน, ${appState.alcoholLogs.length} ผลตรวจแอลกอฮอล์, ${appState.truckLogs.length} รายการตรวจรถ, ${appState.maintenanceLogs.length} งานซ่อมบำรุง)`,
             timer: 1700,
             showConfirmButton: false
           });
@@ -3620,6 +4387,7 @@
         if (syncIcon) syncIcon.classList.remove('fa-spin');
         if (tableSyncIcon) tableSyncIcon.classList.remove('fa-spin');
         if (truckSyncIcon) truckSyncIcon.classList.remove('fa-spin');
+        if (mntSyncIcon) mntSyncIcon.classList.remove('fa-spin');
       }
     }
 
@@ -4111,11 +4879,14 @@
       renderDriversTable();
       renderAlcoholTable();
       renderTruckTable();
+      renderMaintenanceTable();
       populatePlateSelect();
       populateCalendarPlateFilter();
+      populateMaintenanceFilters();
       renderInspectionCalendar();
       updateBadges();
       updateErpKpis();
+      updateMaintenanceKpis();
       if (appState.leafletMap && typeof renderLiveFleetMap === 'function') {
         renderLiveFleetMap();
       }
@@ -4127,6 +4898,502 @@
       if (b1) b1.textContent = count;
       const b2 = document.getElementById('erpDriversBadge');
       if (b2) b2.textContent = count;
+    }
+
+    // =========================================================================
+    // MAINTENANCE LOGS & REPAIR JOB OVERSIGHT ENGINE (Maintenance_log)
+    // =========================================================================
+    let currentMntModalIndex = 0;
+
+    function populateMaintenanceFilters() {
+      const select = document.getElementById('mntPlateFilter');
+      if (!select) return;
+
+      const currentVal = select.value;
+      const plates = new Set();
+
+      (appState.maintenanceLogs || []).forEach(log => {
+        if (log && log.vehiclePlate) plates.add(log.vehiclePlate.trim());
+      });
+      (appState.vehicles || []).forEach(v => {
+        if (v && v.plate) plates.add(v.plate.trim());
+      });
+
+      let html = '<option value="">ทะเบียนรถ: ทั้งหมด</option>';
+      Array.from(plates).sort().forEach(plate => {
+        html += `<option value="${escapeHtml(plate)}"${plate === currentVal ? ' selected' : ''}>${escapeHtml(plate)}</option>`;
+      });
+      select.innerHTML = html;
+    }
+
+    function updateMaintenanceKpis() {
+      const logs = appState.maintenanceLogs || [];
+      const totalTickets = logs.length;
+
+      let totalCost = 0;
+      let pendingCount = 0;
+      let doneCount = 0;
+
+      logs.forEach(log => {
+        totalCost += (Number(log.totalCost) || 0);
+        const st = (log.status || '').toLowerCase();
+        if (st.includes('เสร็จ') || st.includes('ปิด') || st === 'completed' || st === 'closed') {
+          doneCount++;
+        } else {
+          pendingCount++;
+        }
+      });
+
+      // Tab KPIs
+      const costEl = document.getElementById('kpiMntTotalCost');
+      if (costEl) costEl.textContent = '฿' + totalCost.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const ticketsEl = document.getElementById('kpiMntTotalTickets');
+      if (ticketsEl) ticketsEl.textContent = totalTickets.toLocaleString('th-TH');
+      const pendingEl = document.getElementById('kpiMntPendingCount');
+      if (pendingEl) pendingEl.textContent = pendingCount.toLocaleString('th-TH');
+      const doneEl = document.getElementById('kpiMntDoneCount');
+      if (doneEl) doneEl.textContent = doneCount.toLocaleString('th-TH');
+
+      // TSM Executive Overview Gateway Card KPIs
+      const tsmTotalEl = document.getElementById('tsmMaintenanceTotalCount');
+      if (tsmTotalEl) tsmTotalEl.textContent = `${totalTickets} งาน`;
+      const tsmCostEl = document.getElementById('tsmMaintenanceTotalCost');
+      if (tsmCostEl) tsmCostEl.textContent = '฿' + totalCost.toLocaleString('th-TH', { maximumFractionDigits: 0 });
+      const tsmDoneEl = document.getElementById('tsmMaintenanceDoneCount');
+      if (tsmDoneEl) tsmDoneEl.textContent = `${doneCount} งาน`;
+    }
+
+    function filterMaintenanceTable() {
+      const searchVal = (document.getElementById('mntSearchInput')?.value || '').toLowerCase().trim();
+      const plateVal = (document.getElementById('mntPlateFilter')?.value || '').toLowerCase().trim();
+      const statusVal = (document.getElementById('mntStatusFilter')?.value || '').toLowerCase().trim();
+      const sysVal = (document.getElementById('mntSystemFilter')?.value || '').toLowerCase().trim();
+      const dateVal = (document.getElementById('mntDateFilter')?.value || '').trim();
+
+      const allLogs = appState.maintenanceLogs || [];
+      const now = new Date();
+
+      const filtered = allLogs.filter(log => {
+        // Search text
+        if (searchVal) {
+          const hay = `${log.ticketId || ''} ${log.vehiclePlate || ''} ${log.driverName || ''} ${log.symptomDesc || ''} ${log.itemsSummary || ''} ${log.garageName || ''}`.toLowerCase();
+          if (!hay.includes(searchVal)) return false;
+        }
+
+        // Plate
+        if (plateVal) {
+          const rowPlate = (log.vehiclePlate || '').toLowerCase();
+          if (!rowPlate.includes(plateVal)) return false;
+        }
+
+        // Status
+        if (statusVal) {
+          const rowStatus = (log.status || '').toLowerCase();
+          if (!rowStatus.includes(statusVal)) return false;
+        }
+
+        // System
+        if (sysVal) {
+          const rowSys = (log.systemAffected || '').toLowerCase();
+          if (!rowSys.includes(sysVal)) return false;
+        }
+
+        // Date period
+        if (dateVal) {
+          const dmy = parseInspectionDateInfo(log.inspectionDate || log.timestamp);
+          if (dmy) {
+            const rowDate = new Date(dmy.year, dmy.month - 1, dmy.day);
+            if (dateVal === 'today') {
+              if (rowDate.toDateString() !== now.toDateString()) return false;
+            } else if (dateVal === '7days') {
+              const diffMs = now - rowDate;
+              if (diffMs < 0 || diffMs > 7 * 86400000) return false;
+            } else if (dateVal === 'month') {
+              if (rowDate.getMonth() !== now.getMonth() || rowDate.getFullYear() !== now.getFullYear()) return false;
+            }
+          }
+        }
+
+        return true;
+      });
+
+      renderMaintenanceTable(filtered);
+    }
+
+    function resetMaintenanceFilters() {
+      const s = document.getElementById('mntSearchInput'); if (s) s.value = '';
+      const p = document.getElementById('mntPlateFilter'); if (p) p.value = '';
+      const st = document.getElementById('mntStatusFilter'); if (st) st.value = '';
+      const sy = document.getElementById('mntSystemFilter'); if (sy) sy.value = '';
+      const d = document.getElementById('mntDateFilter'); if (d) d.value = '';
+      filterMaintenanceTable();
+    }
+
+    function renderMaintenanceTable(listToRender = null) {
+      const tbody = document.getElementById('maintenanceTableBody');
+      if (!tbody) return;
+
+      const allLogs = appState.maintenanceLogs || [];
+      const logs = listToRender !== null ? listToRender : allLogs;
+
+      // Update counters
+      const filtEl = document.getElementById('mntFilteredCount');
+      if (filtEl) filtEl.textContent = logs.length;
+      const totEl = document.getElementById('mntTotalCount');
+      if (totEl) totEl.textContent = allLogs.length;
+
+      if (!logs || logs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="11" class="py-8 text-center text-slate-400 dark:text-slate-500">
+              <i class="fa-solid fa-file-circle-question text-3xl mb-2 text-slate-300 dark:text-slate-600 block"></i>
+              <p class="font-medium text-xs">ไม่พบข้อมูลการแจ้งซ่อมตามเงื่อนไขที่เลือก</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = logs.map((log, index) => {
+        // Original index in appState.maintenanceLogs
+        const originalIndex = appState.maintenanceLogs.indexOf(log);
+        const useIndex = originalIndex >= 0 ? originalIndex : index;
+
+        const st = (log.status || '').toLowerCase();
+        let statusBadge = '';
+        if (st.includes('เสร็จ') || st === 'completed') {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800"><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> ซ่อมเสร็จแล้ว</span>`;
+        } else if (st.includes('ปิด') || st === 'closed') {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-200 dark:bg-slate-800 dark:text-slate-300"><i class="fa-solid fa-lock text-slate-500 mr-1"></i> ปิดงานแล้ว</span>`;
+        } else if (st.includes('กำลัง') || st.includes('progress')) {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800"><i class="fa-solid fa-screwdriver text-blue-600 mr-1"></i> กำลังซ่อม</span>`;
+        } else {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800"><i class="fa-solid fa-clock text-amber-600 mr-1"></i> รอดำเนินการ</span>`;
+        }
+
+        const formattedCost = (Number(log.totalCost) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const driveBillLink = log.billPhotoUrl && log.billPhotoUrl.startsWith('http') 
+          ? log.billPhotoUrl 
+          : `https://drive.google.com/drive/folders/${CONFIG.DRIVE_FOLDER_MAINTENANCE}`;
+
+        return `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-100 dark:border-slate-800 text-xs">
+            <td class="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">${escapeHtml(log.timestamp || log.inspectionDate || '-')}</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">${escapeHtml(log.ticketId || '-')}</td>
+            <td class="py-2.5 px-3 whitespace-nowrap">
+              <strong class="font-bold text-slate-900 dark:text-white block">${escapeHtml(log.vehiclePlate || '-')}</strong>
+              <span class="text-[10px] text-slate-400 block">${escapeHtml(log.vehicleType || 'รถบรรทุก 6 ล้อ')}</span>
+            </td>
+            <td class="py-2.5 px-3 whitespace-nowrap">
+              <span class="font-semibold text-slate-800 dark:text-slate-200 block">${escapeHtml(log.driverName || '-')}</span>
+              <span class="text-[10px] text-slate-400 block">${escapeHtml(log.driverPhone || '')}</span>
+            </td>
+            <td class="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">${escapeHtml(log.odometer || '-')}</td>
+            <td class="py-2.5 px-3 max-w-xs">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 mr-1">${escapeHtml(log.systemAffected || 'ทั่วไป')}</span>
+              <span class="text-slate-800 dark:text-slate-200 text-xs">${escapeHtml(log.symptomDesc || '-')}</span>
+            </td>
+            <td class="py-2.5 px-3 max-w-xs text-slate-600 dark:text-slate-300">
+              <div class="line-clamp-2" title="${escapeHtml(log.itemsSummary || '-')}">
+                ${escapeHtml(log.itemsSummary || (log.itemsList && log.itemsList.length ? log.itemsList.map(i=>`${i.name} (${i.qty})`).join(', ') : '-'))}
+              </div>
+            </td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white whitespace-nowrap">
+              ฿${formattedCost}
+            </td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">${statusBadge}</td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <a href="${driveBillLink}" target="_blank" title="เปิดดูรูปบิล/เอกสารใน Google Drive"
+                 class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-600 hover:text-white text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 text-xs font-bold transition shadow-sm">
+                <i class="fa-solid fa-receipt text-amber-500"></i>
+                <span>ดูบิล Drive</span>
+              </a>
+            </td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <div class="inline-flex items-center gap-1.5">
+                <button type="button" onclick="openMaintenanceDetailModal(${useIndex})"
+                        class="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition active:scale-95"
+                        title="ดูรายละเอียดงานซ่อม & รายการอะไหล่ทั้งหมด">
+                  <i class="fa-solid fa-eye mr-1"></i> รายละเอียด
+                </button>
+                <button type="button" onclick="printMaintenanceJobOrder(${useIndex})"
+                        class="p-1 px-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 border border-slate-200 dark:border-slate-700 text-xs font-bold transition shadow-sm"
+                        title="พิมพ์ใบสั่งซ่อมบำรุง A4">
+                  <i class="fa-solid fa-print"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openMaintenanceDetailModal(index) {
+      const logs = appState.maintenanceLogs || [];
+      const log = (typeof index === 'number' && logs[index]) ? logs[index] : logs[0];
+      if (!log) return;
+
+      currentMntModalIndex = typeof index === 'number' ? index : 0;
+
+      // Meta & Header
+      document.getElementById('mntModalTicketId').textContent = log.ticketId || '-';
+      document.getElementById('mntModalDate').textContent = log.inspectionDate || log.timestamp || '-';
+      document.getElementById('mntModalPlate').textContent = log.vehiclePlate || '-';
+      document.getElementById('mntModalOdo').textContent = log.odometer || '-';
+      document.getElementById('mntModalDriver').textContent = `${log.driverName || '-'} ${log.driverPhone ? '(' + log.driverPhone + ')' : ''}`;
+      document.getElementById('mntModalGarage').textContent = log.garageName || 'ศูนย์บริการ TTMK';
+
+      // Status Badge
+      const statusBadge = document.getElementById('mntModalStatusBadge');
+      if (statusBadge) {
+        statusBadge.textContent = log.status || 'รอดำเนินการ';
+      }
+
+      // Urgency & Symptom
+      const urgencyBadge = document.getElementById('mntModalUrgencyBadge');
+      if (urgencyBadge) {
+        urgencyBadge.textContent = `ความเร่งด่วน: ${log.urgency || 'ปกติ'}`;
+      }
+      document.getElementById('mntModalSymptom').textContent = log.symptomDesc || '-';
+
+      // Items Table
+      const itemsTbody = document.getElementById('mntModalItemsTableBody');
+      const itemsCountEl = document.getElementById('mntModalItemsCount');
+      let items = log.itemsList || [];
+      if (!items.length && log.itemsSummary) {
+        items = [{ name: log.itemsSummary, qty: 1, unit: 'งาน', unitPrice: log.partsCost || log.totalCost || 0, total: log.partsCost || log.totalCost || 0 }];
+      }
+
+      if (itemsCountEl) itemsCountEl.textContent = `${items.length} รายการ`;
+
+      if (itemsTbody) {
+        if (!items.length) {
+          itemsTbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-slate-400">ไม่มีรายการอะไหล่ระบุย่อย</td></tr>`;
+        } else {
+          itemsTbody.innerHTML = items.map((it, idx) => `
+            <tr class="border-b border-slate-100 dark:border-slate-800">
+              <td class="py-2 px-3 text-center text-slate-400">${idx + 1}</td>
+              <td class="py-2 px-3 font-semibold text-slate-800 dark:text-slate-200">${escapeHtml(it.name || it.item || '-')}</td>
+              <td class="py-2 px-3 text-center font-mono font-bold">${it.qty || 1}</td>
+              <td class="py-2 px-3 text-center text-slate-500">${escapeHtml(it.unit || 'ชิ้น')}</td>
+              <td class="py-2 px-3 text-right font-mono">฿${(Number(it.unitPrice) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+              <td class="py-2 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">฿${(Number(it.total || (it.qty * it.unitPrice)) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })}</td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      // Costs
+      document.getElementById('mntModalPartsCost').textContent = '฿' + (Number(log.partsCost) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 });
+      document.getElementById('mntModalLaborCost').textContent = '฿' + (Number(log.laborCost) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 });
+      document.getElementById('mntModalVatCost').textContent = '฿' + (Number(log.vatAmount) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 });
+      document.getElementById('mntModalTotalCost').textContent = '฿' + (Number(log.totalCost) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 });
+
+      // Photos
+      const billDriveUrl = log.billPhotoUrl && log.billPhotoUrl.startsWith('http') ? log.billPhotoUrl : `https://drive.google.com/drive/folders/${CONFIG.DRIVE_FOLDER_MAINTENANCE}`;
+      const defectDriveUrl = log.defectPhotoUrl && log.defectPhotoUrl.startsWith('http') ? log.defectPhotoUrl : `https://drive.google.com/drive/folders/${CONFIG.DRIVE_FOLDER_MAINTENANCE}`;
+
+      document.getElementById('mntModalBillDriveBtn').href = billDriveUrl;
+      document.getElementById('mntModalDefectDriveBtn').href = defectDriveUrl;
+
+      const billImgWrap = document.getElementById('mntModalBillImgWrap');
+      if (billImgWrap) {
+        if (log.billPhotoUrl && (log.billPhotoUrl.startsWith('data:image') || log.billPhotoUrl.match(/\.(jpeg|jpg|png|webp)/i))) {
+          billImgWrap.innerHTML = `<img src="${log.billPhotoUrl}" alt="บิลค่าซ่อม" class="w-full h-full object-contain p-1" />`;
+        } else {
+          billImgWrap.innerHTML = `
+            <div class="text-center p-3 text-slate-500">
+              <i class="fa-solid fa-file-invoice-dollar text-2xl mb-1 text-amber-500"></i>
+              <p class="text-[11px] font-semibold">ไฟล์บิลใน Google Drive</p>
+              <span class="text-[10px] text-slate-400">คลิกปุ่มด้านล่างเพื่อเปิดดูเอกสารตัวจริง</span>
+            </div>
+          `;
+        }
+      }
+
+      const defectImgWrap = document.getElementById('mntModalDefectImgWrap');
+      if (defectImgWrap) {
+        if (log.defectPhotoUrl && (log.defectPhotoUrl.startsWith('data:image') || log.defectPhotoUrl.match(/\.(jpeg|jpg|png|webp)/i))) {
+          defectImgWrap.innerHTML = `<img src="${log.defectPhotoUrl}" alt="รูปอาการเสีย" class="w-full h-full object-contain p-1" />`;
+        } else {
+          defectImgWrap.innerHTML = `
+            <div class="text-center p-3 text-slate-500">
+              <i class="fa-solid fa-camera text-2xl mb-1 text-blue-500"></i>
+              <p class="text-[11px] font-semibold">รูปภาพอาการเสีย</p>
+              <span class="text-[10px] text-slate-400">บันทึกผ่านกล้องมือถือคนขับ</span>
+            </div>
+          `;
+        }
+      }
+
+      document.getElementById('maintenanceDetailModal').classList.remove('hidden');
+    }
+
+    function closeMaintenanceDetailModal() {
+      document.getElementById('maintenanceDetailModal').classList.add('hidden');
+    }
+
+    function triggerMntPrintFromModal() {
+      closeMaintenanceDetailModal();
+      printMaintenanceJobOrder(currentMntModalIndex);
+    }
+
+    function printMaintenanceJobOrder(index) {
+      const logs = appState.maintenanceLogs || [];
+      const log = (typeof index === 'number' && logs[index]) ? logs[index] : logs[0];
+      if (!log) return;
+
+      const printableArea = document.getElementById('maintenancePrintableArea');
+      if (!printableArea) return;
+
+      let items = log.itemsList || [];
+      if (!items.length && log.itemsSummary) {
+        items = [{ name: log.itemsSummary, qty: 1, unit: 'งาน', unitPrice: log.partsCost || log.totalCost || 0, total: log.partsCost || log.totalCost || 0 }];
+      }
+
+      const itemsRows = items.map((it, idx) => `
+        <tr style="border-bottom: 1px solid #e2e8f0;">
+          <td style="padding: 6px 8px; text-align: center; border-right: 1px solid #e2e8f0;">${idx + 1}</td>
+          <td style="padding: 6px 8px; border-right: 1px solid #e2e8f0; font-weight: 600;">${escapeHtml(it.name || it.item || '-')}</td>
+          <td style="padding: 6px 8px; text-align: center; border-right: 1px solid #e2e8f0;">${it.qty || 1}</td>
+          <td style="padding: 6px 8px; text-align: center; border-right: 1px solid #e2e8f0;">${escapeHtml(it.unit || 'ชิ้น')}</td>
+          <td style="padding: 6px 8px; text-align: right; border-right: 1px solid #e2e8f0; font-family: monospace;">${(Number(it.unitPrice) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          <td style="padding: 6px 8px; text-align: right; font-family: monospace; font-weight: bold;">${(Number(it.total || (it.qty * it.unitPrice)) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        </tr>
+      `).join('');
+
+      const partsCostFmt = (Number(log.partsCost) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const laborCostFmt = (Number(log.laborCost) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const vatFmt = (Number(log.vatAmount) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const totalFmt = (Number(log.totalCost) || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      printableArea.innerHTML = `
+        <div style="font-family: 'Sarabun', Arial, sans-serif; color: #0f172a; line-height: 1.4; padding: 10px; max-width: 800px; margin: 0 auto;">
+          
+          <!-- Company Official Header -->
+          <div style="border-bottom: 2px solid #1e293b; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <h2 style="font-size: 18px; font-weight: 800; color: #1e3a8a; margin: 0 0 4px 0;">ห้างหุ้นส่วนจำกัด ทั่วไทยขนส่งมงคล (TTMK)</h2>
+              <p style="font-size: 11px; color: #475569; margin: 0;">222/2 หมู่ 3 ต.พุแค อ.เฉลิมพระเกียรติ จ.สระบุรี 18000 • โทร 062-3285963 (Mr.Taweesak.kom)</p>
+              <h3 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 6px 0 0 0;">ใบแจ้งซ่อมบำรุงและตรวจรับงานรถบรรทุก (Truck Maintenance Work Order)</h3>
+            </div>
+            <div style="text-align: right;">
+              <span style="display: inline-block; padding: 4px 10px; background: #e0e7ff; color: #3730a3; font-weight: bold; border-radius: 6px; font-size: 11px; margin-bottom: 4px;">
+                F-MNT-TTMK_r1
+              </span>
+              <p style="font-size: 11px; font-family: monospace; font-weight: bold; color: #1e3a8a; margin: 0;">เลขที่: ${escapeHtml(log.ticketId || '-')}</p>
+              <p style="font-size: 10px; color: #64748b; margin: 2px 0 0 0;">วันที่แจ้ง: ${escapeHtml(log.inspectionDate || log.timestamp || '-')}</p>
+            </div>
+          </div>
+
+          <!-- Vehicle & Driver Details Grid -->
+          <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 14px; border: 1px solid #cbd5e1;">
+            <tbody>
+              <tr style="background: #f8fafc; border-bottom: 1px solid #cbd5e1;">
+                <td style="padding: 6px 10px; width: 18%; font-weight: bold; color: #475569; border-right: 1px solid #cbd5e1;">ทะเบียนรถ:</td>
+                <td style="padding: 6px 10px; width: 32%; font-weight: bold; color: #0f172a; border-right: 1px solid #cbd5e1;">${escapeHtml(log.vehiclePlate || '-')} (${escapeHtml(log.vehicleType || 'รถบรรทุก 6 ล้อ')})</td>
+                <td style="padding: 6px 10px; width: 18%; font-weight: bold; color: #475569; border-right: 1px solid #cbd5e1;">เลขไมล์ปัจจุบัน:</td>
+                <td style="padding: 6px 10px; width: 32%; font-weight: bold; color: #0f172a;">${escapeHtml(log.odometer || '-')}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #cbd5e1;">
+                <td style="padding: 6px 10px; font-weight: bold; color: #475569; border-right: 1px solid #cbd5e1;">พนักงานขับรถ:</td>
+                <td style="padding: 6px 10px; border-right: 1px solid #cbd5e1;">${escapeHtml(log.driverName || '-')} ${log.driverPhone ? '• โทร ' + escapeHtml(log.driverPhone) : ''}</td>
+                <td style="padding: 6px 10px; font-weight: bold; color: #475569; border-right: 1px solid #cbd5e1;">ความเร่งด่วน:</td>
+                <td style="padding: 6px 10px;">${escapeHtml(log.urgency || 'ปกติ')} (${escapeHtml(log.maintenanceType || 'ซ่อมทั่วไป')})</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 10px; font-weight: bold; color: #475569; border-right: 1px solid #cbd5e1;">อู่ / ศูนย์บริการ:</td>
+                <td style="padding: 6px 10px; border-right: 1px solid #cbd5e1;">${escapeHtml(log.garageName || 'ศูนย์บริการ TTMK')} ${log.garagePhone ? '(' + escapeHtml(log.garagePhone) + ')' : ''}</td>
+                <td style="padding: 6px 10px; font-weight: bold; color: #475569; border-right: 1px solid #cbd5e1;">ช่างผู้ซ่อม:</td>
+                <td style="padding: 6px 10px;">${escapeHtml(log.mechanicName || 'ช่างประจำศูนย์')}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Symptom Description Box -->
+          <div style="margin-bottom: 14px; padding: 8px 12px; background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px; font-size: 11px;">
+            <strong style="color: #b45309; display: block; margin-bottom: 3px;">อาการเสีย / สาเหตุที่ตรวจพบ (ระบบ: ${escapeHtml(log.systemAffected || 'ทั่วไป')}):</strong>
+            <span style="color: #1e293b;">${escapeHtml(log.symptomDesc || '-')}</span>
+          </div>
+
+          <!-- Parts & Labor Table -->
+          <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 14px; border: 1px solid #cbd5e1;">
+            <thead>
+              <tr style="background: #1e293b; color: #ffffff;">
+                <th style="padding: 6px 8px; width: 35px; text-align: center; border-right: 1px solid #475569;">#</th>
+                <th style="padding: 6px 8px; text-align: left; border-right: 1px solid #475569;">รายการอะไหล่ / งานบริการซ่อมแซม</th>
+                <th style="padding: 6px 8px; width: 50px; text-align: center; border-right: 1px solid #475569;">จำนวน</th>
+                <th style="padding: 6px 8px; width: 50px; text-align: center; border-right: 1px solid #475569;">หน่วย</th>
+                <th style="padding: 6px 8px; width: 90px; text-align: right; border-right: 1px solid #475569;">ราคา/หน่วย</th>
+                <th style="padding: 6px 8px; width: 100px; text-align: right;">จำนวนเงิน (บาท)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsRows}
+            </tbody>
+            <tfoot>
+              <tr style="background: #f8fafc; border-top: 2px solid #cbd5e1;">
+                <td colspan="4" rowspan="4" style="padding: 8px 10px; vertical-align: top; border-right: 1px solid #cbd5e1; font-size: 10px; color: #64748b;">
+                  <strong>หมายเหตุ / การรับประกันงานซ่อม:</strong><br/>
+                  ${escapeHtml(log.remarks || 'ตรวจรับงานเรียบร้อย อะไหล่ทุกรายการได้รับการทดสอบการทำงานตามเกณฑ์มาตรฐานความปลอดภัย TSM ก่อนปล่อยวิ่งงาน')}
+                  <br/><br/>
+                  <em>เอกสารบิลจัดเก็บใน Google Drive Folder ID: ${CONFIG.DRIVE_FOLDER_MAINTENANCE}</em>
+                </td>
+                <td style="padding: 4px 8px; text-align: right; font-weight: bold; border-right: 1px solid #cbd5e1;">รวมค่าอะไหล่:</td>
+                <td style="padding: 4px 8px; text-align: right; font-family: monospace;">฿${partsCostFmt}</td>
+              </tr>
+              <tr style="background: #f8fafc;">
+                <td style="padding: 4px 8px; text-align: right; font-weight: bold; border-right: 1px solid #cbd5e1;">รวมค่าแรงช่าง:</td>
+                <td style="padding: 4px 8px; text-align: right; font-family: monospace;">฿${laborCostFmt}</td>
+              </tr>
+              <tr style="background: #f8fafc;">
+                <td style="padding: 4px 8px; text-align: right; font-weight: bold; border-right: 1px solid #cbd5e1;">ภาษีมูลค่าเพิ่ม (VAT 7%):</td>
+                <td style="padding: 4px 8px; text-align: right; font-family: monospace;">฿${vatFmt}</td>
+              </tr>
+              <tr style="background: #e0e7ff; color: #1e1b4b; font-size: 12px;">
+                <td style="padding: 6px 8px; text-align: right; font-weight: 800; border-right: 1px solid #cbd5e1;">ยอดสุทธิทั้งสิ้น:</td>
+                <td style="padding: 6px 8px; text-align: right; font-family: monospace; font-weight: 800;">฿${totalFmt}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <!-- 3 Signatures Footer Grid -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 25px; text-align: center; font-size: 10px;">
+            <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px 6px; background: #fafafa;">
+              <p style="margin: 0 0 35px 0; color: #475569;">ลงชื่อ ..............................................................</p>
+              <strong style="display: block; color: #0f172a;">(${escapeHtml(log.driverName || 'พนักงานขับรถ')})</strong>
+              <span style="color: #64748b;">พนักงานขับรถผู้แจ้ง / ตรวจรับรถ</span>
+            </div>
+
+            <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px 6px; background: #fafafa;">
+              <p style="margin: 0 0 35px 0; color: #475569;">ลงชื่อ ..............................................................</p>
+              <strong style="display: block; color: #0f172a;">(${escapeHtml(log.mechanicName || 'ช่างผู้ตรวจซ่อม')})</strong>
+              <span style="color: #64748b;">ช่างผู้ดำเนินการซ่อม / อู่ซ่อม</span>
+            </div>
+
+            <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px 6px; background: #fafafa;">
+              <p style="margin: 0 0 35px 0; color: #475569;">ลงชื่อ ..............................................................</p>
+              <strong style="display: block; color: #0f172a;">(นายทวีศักดิ์ คำปก)</strong>
+              <span style="color: #64748b;">เจ้าหน้าที่ความปลอดภัย TSM / ผู้อนุมัติ</span>
+            </div>
+          </div>
+
+          <div style="text-align: right; margin-top: 10px; font-size: 9px; color: #94a3b8;">
+            พิมพ์จากระบบ TTMK Control Center • เอกสารอ้างอิง Google Sheet: Maintenance_log
+          </div>
+
+        </div>
+      `;
+
+      document.getElementById('maintenanceJobOrderPrintModal').classList.remove('hidden');
+    }
+
+    function closeMaintenanceJobOrderModal() {
+      document.getElementById('maintenanceJobOrderPrintModal').classList.add('hidden');
+    }
+
+    function syncLiveMaintenanceData(showToast = true) {
+      syncAllSheetData(showToast);
     }
 
     // =========================================================================
