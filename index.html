@@ -260,6 +260,28 @@
         margin: 0 !important;
         padding: 0 !important;
         width: 100% !important;
+        overflow: visible !important;
+        height: auto !important;
+      }
+      .print-modal-container {
+        position: static !important;
+        background: transparent !important;
+        padding: 0 !important;
+        display: block !important;
+        inset: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .print-modal-box {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+      .page-break {
+        page-break-after: always;
+        break-after: page;
       }
     }
   </style>
@@ -326,7 +348,14 @@
       <!-- 3. ตั้งเบิก & ค่าน้ำมัน -->
       <button onclick="switchTab('billing')" id="nav-billing" class="sidebar-item">
         <i class="fa-solid fa-file-invoice-dollar w-5 text-center mr-2 text-emerald-500"></i>
-        <span class="flex-1 text-left">3. ตั้งเบิก & ค่าน้ำมัน</span>
+        <span class="flex-1 text-left">3. ตรวจสอบค่าน้ำมัน & สรุป</span>
+      </button>
+
+      <!-- 3.1 นำเข้าไฟล์ตั้งเบิก แยก Feed & ประเภทไฟล์ -->
+      <button onclick="switchTab('import-billing')" id="nav-import-billing" class="sidebar-item pl-7 text-xs flex items-center group">
+        <i class="fa-solid fa-file-excel w-4 text-center mr-2 text-emerald-600 group-hover:scale-110 transition"></i>
+        <span class="flex-1 text-left">3.1 นำเข้าไฟล์ตั้งเบิก (แยก Feed)</span>
+        <span class="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-emerald-500/20">วางบิล/ยอดวิ่ง</span>
       </button>
 
       <!-- 4. ข้อมูลกองรถ (ดีเซล/EV) & ทะเบียนคนขับรถจริง (ERP) -->
@@ -1267,6 +1296,295 @@
           </div>
 
         </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 3.1: นำเข้าไฟล์ตั้งเบิก แยก Feed & ประเภทไฟล์ (Billing Import Portal) -->
+      <!-- ============================================================== -->
+      <section id="tab-import-billing" class="tab-content space-y-5">
+        
+        <!-- Header Banner -->
+        <div class="glass-panel p-5 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center space-x-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-700 text-white flex items-center justify-center shadow-lg text-xl flex-shrink-0">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-base md:text-lg font-extrabold text-slate-800 dark:text-white">
+                  ศูนย์นำเข้าไฟล์ตั้งเบิก แยกตาม Feed และประเภทไฟล์ (Multi-Feed Billing Hub)
+                </h2>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                  รองรับ 15+ Feeds & อัตราต่อตัน/เที่ยว
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                นำเข้าไฟล์ Excel ต่างรูปแบบจากลูกค้าและไซต์งานต่าง ๆ มารวมในระบบเดียว เพื่อสรุปยอดวิ่งรถ พิมพ์ใบสรุปเที่ยววิ่ง และพิมพ์ใบวางบิล
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5 flex-wrap no-print">
+            <button type="button" onclick="printBillingReport('trips')"
+                    class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-2 shadow-md">
+              <i class="fa-solid fa-print"></i>
+              <span>สั่งพิมพ์ สรุปยอดวิ่งรถ (A4)</span>
+            </button>
+            <button type="button" onclick="printBillingReport('invoice')"
+                    class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-2 shadow-md">
+              <i class="fa-solid fa-file-invoice"></i>
+              <span>สั่งพิมพ์ ใบวางบิล / ตั้งเบิก (A4)</span>
+            </button>
+            <button type="button" onclick="clearImportedBillingData()"
+                    class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 hover:text-rose-600 text-slate-600 dark:text-slate-300 text-xs font-bold border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-trash-can"></i>
+              <span>ล้างข้อมูลที่นำเข้า</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Summary Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+          <div class="glass-panel p-4 flex items-center justify-between border-l-4 border-l-blue-600">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">จำนวนเที่ยววิ่งรวม:</span>
+              <strong id="billingMetricTrips" class="text-xl md:text-2xl font-extrabold text-blue-700 dark:text-blue-400 font-mono">0 เที่ยว</strong>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-truck-moving"></i>
+            </div>
+          </div>
+
+          <div class="glass-panel p-4 flex items-center justify-between border-l-4 border-l-emerald-600">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">ยอดเงินค่าขนส่งรวม:</span>
+              <strong id="billingMetricAmount" class="text-xl md:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">฿0.00</strong>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-coins"></i>
+            </div>
+          </div>
+
+          <div class="glass-panel p-4 flex items-center justify-between border-l-4 border-l-amber-600">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">น้ำหนักสุทธิรวม:</span>
+              <strong id="billingMetricWeight" class="text-xl md:text-2xl font-extrabold text-amber-600 dark:text-amber-400 font-mono">0.00 ตัน</strong>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/40 text-amber-600 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-weight-hanging"></i>
+            </div>
+          </div>
+
+          <div class="glass-panel p-4 flex items-center justify-between border-l-4 border-l-purple-600">
+            <div>
+              <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">จำนวน Feed ที่โหลด:</span>
+              <strong id="billingMetricFeeds" class="text-xl md:text-2xl font-extrabold text-purple-600 dark:text-purple-400 font-mono">0 Feeds</strong>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/40 text-purple-600 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Import Form & Feed Selector Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          
+          <!-- Column 1 & 2: Upload Controller & Config -->
+          <div class="lg:col-span-2 glass-panel p-5 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 class="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-file-arrow-up text-emerald-600"></i>
+                <span>ตั้งค่าและนำเข้าไฟล์ Excel ตั้งเบิก (แยก Feed และประเภทไฟล์)</span>
+              </h3>
+              <span class="text-[11px] text-slate-500 font-mono">SheetJS Parser v0.18.5</span>
+            </div>
+
+            <!-- Feed Selection Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <i class="fa-solid fa-diagram-project text-blue-600 mr-1"></i> ประเภท Feed / ไซต์งานลูกค้า:
+                </label>
+                <select id="billingFeedSelect" onchange="onBillingFeedChange()"
+                        class="w-full px-3 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 shadow-sm">
+                  <option value="AUTO">✨ ตรวจจับอัตโนมัติจากโครงสร้างไฟล์ (Auto-Detect Feed)</option>
+                  <option value="TCCB">1. TCCB ค่าขนส่งต่อตัน (CB ชลบุรี / กล่อง / E-book)</option>
+                  <option value="TCSB">2. TCSB สระบุรี / ค่าทางด่วน / เปลือย / EV (E-bookTCSB)</option>
+                  <option value="TCRY">3. TCRY ระยอง ค่าขนส่งต่อตัน</option>
+                  <option value="PPACK">4. P-Pack AM / SS (โอนคลัง & ส่งมอบ)</option>
+                  <option value="CHEM">5. สารเคมี / กาว (OCSS, TCCB, TCKK, TCPB, TCPT, TWN)</option>
+                  <option value="BILL_BOX">6. ผรม.ทั่วไทย วางบิล (กล่อง / สินค้าเต็มเที่ยว)</option>
+                  <option value="PALLET">7. ส่งพาเลทและไม้อัดประสาน</option>
+                  <option value="EV_FLEET">8. กองรถ 100% EV (รถตู้ / รถจัมโบ้)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  <i class="fa-solid fa-tags text-indigo-600 mr-1"></i> ประเภทเอกสารที่ต้องการประมวลผล:
+                </label>
+                <select id="billingDocTypeSelect"
+                        class="w-full px-3 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-emerald-500 shadow-sm">
+                  <option value="ALL">รวมทั้งสองประเภท (ยอดวิ่ง + วางบิล)</option>
+                  <option value="TRIPS_ONLY">รายงานสรุปยอดวิ่งรถ (Trip Summary)</option>
+                  <option value="INVOICE_ONLY">ใบวางบิล / รายการตั้งเบิก (Billing Statement)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Upload Dropzone -->
+            <div class="border-2 border-dashed border-emerald-300 dark:border-emerald-800/80 hover:border-emerald-500 rounded-2xl p-6 text-center cursor-pointer bg-emerald-50/30 dark:bg-emerald-950/20 transition group"
+                 onclick="document.getElementById('billingFeedFileInput').click()">
+              <input type="file" id="billingFeedFileInput" accept=".xlsx, .xls, .csv" multiple class="hidden" onchange="handleBillingFeedUpload(event)">
+              <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl group-hover:scale-110 transition shadow-inner">
+                <i class="fa-solid fa-file-excel"></i>
+              </div>
+              <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">
+                คลิกเลือกไฟล์ หรือลากไฟล์ Excel ตั้งเบิกมาวางที่นี่
+              </h4>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                รองรับการเลือกทีละหลายไฟล์พร้อมกัน (.xlsx, .xls, .csv) จากโฟลเดอร์ <code class="text-emerald-600 font-mono font-bold">C:\TTMK\File</code>
+              </p>
+              <div class="mt-3 flex items-center justify-center gap-2 flex-wrap text-[11px] text-slate-500">
+                <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">TCCB</span>
+                <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">TCSB</span>
+                <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">P-Pack</span>
+                <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">สารเคมี</span>
+                <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">ผรม.วางบิล</span>
+              </div>
+            </div>
+
+            <!-- Feed Explanation Banner -->
+            <div id="feedDescriptionBox" class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 leading-relaxed flex items-start gap-2.5">
+              <i class="fa-solid fa-circle-info text-blue-500 mt-0.5"></i>
+              <div>
+                <strong class="font-bold text-slate-800 dark:text-white block mb-0.5">ระบบจับคู่คอลัมน์อัตโนมัติ (Intelligent Schema Harmonization)</strong>
+                ระบบจะวิเคราะห์หัวตารางในแต่ละ Sheet (เช่น เลขที่ชั่ง, ทะเบียนรถ, พขร., นน.สุทธิ, ระยะทาง, ค่าขนส่ง) และแปลงเข้าสู่ฐานข้อมูลมาตรฐานเดียวกัน ทำให้สามารถออกรายงานยอดวิ่งและใบวางบิลรวมได้ทันที
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Column 3: Quick Demo Loader & Feed Filter -->
+          <div class="glass-panel p-5 space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <h3 class="font-bold text-sm text-slate-800 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-bolt text-amber-500"></i>
+                <span>โหลดตัวอย่างไฟล์จากระบบ (Quick Demo)</span>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">
+                สามารถทดสอบโหลดข้อมูลจากไฟล์จริงที่มีอยู่ในระบบเพื่อดูตัวอย่างการคำนวณยอดและแบบฟอร์มพิมพ์:
+              </p>
+              
+              <div class="space-y-2 text-xs">
+                <button type="button" onclick="loadSampleFeedData('TCCB')"
+                        class="w-full py-2 px-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-bold text-left flex items-center justify-between transition">
+                  <span><i class="fa-solid fa-file-lines mr-1.5 text-blue-600"></i> Feed TCCB (ค่าขนส่งต่อตัน)</span>
+                  <span class="text-[10px] bg-blue-200/60 dark:bg-blue-900 px-1.5 py-0.5 rounded">18 เที่ยว</span>
+                </button>
+                <button type="button" onclick="loadSampleFeedData('BILL_BOX')"
+                        class="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold text-left flex items-center justify-between transition">
+                  <span><i class="fa-solid fa-boxes-stacked mr-1.5 text-emerald-600"></i> Feed ผรม.ทั่วไทย (วางบิลกล่อง)</span>
+                  <span class="text-[10px] bg-emerald-200/60 dark:bg-emerald-900 px-1.5 py-0.5 rounded">890+ เที่ยว</span>
+                </button>
+                <button type="button" onclick="loadSampleFeedData('TCSB')"
+                        class="w-full py-2 px-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800 font-bold text-left flex items-center justify-between transition">
+                  <span><i class="fa-solid fa-route mr-1.5 text-purple-600"></i> Feed สระบุรี & ค่าทางด่วน</span>
+                  <span class="text-[10px] bg-purple-200/60 dark:bg-purple-900 px-1.5 py-0.5 rounded">300+ เที่ยว</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Print Actions Guide Card -->
+            <div class="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl text-xs space-y-1.5 text-amber-900 dark:text-amber-200">
+              <strong class="font-bold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
+                <i class="fa-solid fa-print"></i> รูปแบบรายงานที่สามารถพิมพ์ได้:
+              </strong>
+              <ul class="list-disc list-inside space-y-1 text-[11px] text-amber-800/90 dark:text-amber-200/90">
+                <li><strong>ใบสรุปยอดวิ่งรถ (Trip Summary):</strong> รวมเที่ยววิ่งแยกตามทะเบียนรถ และพนักงานขับรถ</li>
+                <li><strong>ใบวางบิล / ตั้งเบิก (Billing Statement):</strong> ตารางวางบิลส่งลูกค้าพร้อมยอดรวมเงินสุทธิ หัก ภาษี 1% และลายเซ็น</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Master Unified Table Section -->
+        <div class="glass-panel p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-3">
+            <div>
+              <h3 class="font-bold text-base text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-table-list text-blue-600"></i>
+                <span>ตารางข้อมูลตั้งเบิกรวมจากทุก Feed (Unified Billing Master Sheet)</span>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                รวมข้อมูลที่นำเข้าแล้ว สามารถกรองตามทะเบียนรถ หรือไซต์งาน เพื่อสั่งพิมพ์เฉพาะส่วนได้
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2.5 flex-wrap no-print">
+              <!-- Filter by Plate -->
+              <div class="flex items-center gap-1.5 text-xs">
+                <span class="font-bold text-slate-500">ทะเบียน:</span>
+                <select id="billingFilterPlate" onchange="renderBillingMasterTable()"
+                        class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                  <option value="ALL">ทั้งหมด (All Plates)</option>
+                </select>
+              </div>
+
+              <!-- Filter by Feed -->
+              <div class="flex items-center gap-1.5 text-xs">
+                <span class="font-bold text-slate-500">Feed:</span>
+                <select id="billingFilterFeed" onchange="renderBillingMasterTable()"
+                        class="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                  <option value="ALL">ทั้งหมด (All Feeds)</option>
+                </select>
+              </div>
+
+              <!-- Search Box -->
+              <div class="relative">
+                <input type="text" id="billingSearchInput" oninput="renderBillingMasterTable()" placeholder="ค้นหาเลขชั่ง, พขร, ลูกค้า..."
+                       class="pl-7 pr-3 py-1 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 w-44 focus:ring-1 focus:ring-blue-500">
+                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2 text-[10px] text-slate-400"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-xl">
+            <table class="w-full text-left text-xs text-slate-700 dark:text-slate-200">
+              <thead class="bg-slate-100/90 dark:bg-slate-800 text-slate-700 dark:text-slate-200 uppercase font-bold text-[11px] border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th class="py-2.5 px-3">ลำดับ</th>
+                  <th class="py-2.5 px-3">Feed / ไซต์งาน</th>
+                  <th class="py-2.5 px-3">วันที่ / เวลา</th>
+                  <th class="py-2.5 px-3">เลขที่ชั่ง / เอกสาร</th>
+                  <th class="py-2.5 px-3">ทะเบียนรถ</th>
+                  <th class="py-2.5 px-3">พนักงานขับรถ</th>
+                  <th class="py-2.5 px-3">ประเภทรถ</th>
+                  <th class="py-2.5 px-3">ลูกค้า / ปลายทาง</th>
+                  <th class="py-2.5 px-3 text-right">ระยะทาง (กม.)</th>
+                  <th class="py-2.5 px-3 text-right">น้ำหนัก (ตัน)</th>
+                  <th class="py-2.5 px-3 text-right">จำนวนเงิน (บาท)</th>
+                </tr>
+              </thead>
+              <tbody id="billingMasterTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 font-mono text-[11px]">
+                <tr>
+                  <td colspan="11" class="py-8 text-center text-slate-400 font-sans text-xs">
+                    <i class="fa-solid fa-cloud-arrow-up text-2xl block mb-2 text-slate-300"></i>
+                    ยังไม่มีข้อมูลที่นำเข้า กรุณาลากไฟล์ Excel หรือคลิกปุ่มตัวอย่าง Feed ด้านบนเพื่อเริ่มต้น
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1">
+            <span id="billingTableCountText">แสดง 0 รายการ</span>
+            <span class="font-bold text-emerald-600 dark:text-emerald-400 font-mono" id="billingTableSubtotalText">ยอดรวมหน้านี้: ฿0.00</span>
+          </div>
+        </div>
+
       </section>
 
       <!-- ============================================================== -->
@@ -2742,6 +3060,60 @@
     </div>
   </div>
 
+  <!-- ============================================================== -->
+  <!-- MODAL 4: Billing & Trips Print Report Modal (A4 Print Engine)   -->
+  <!-- ============================================================== -->
+  <div id="billingPrintModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto print-modal-container">
+    <div class="glass-panel max-w-4xl w-full p-4 sm:p-6 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl max-h-[96vh] flex flex-col my-auto print-modal-box">
+      
+      <!-- Modal Header (Hidden on print) -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 no-print gap-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fa-solid fa-print"></i>
+          </div>
+          <div>
+            <h3 id="billingPrintModalTitle" class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+              ตัวอย่างก่อนพิมพ์รายงาน (Print Preview)
+            </h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+              จัดรูปแบบกระดาษมาตรฐาน A4 เรียบร้อย พร้อมสั่งพิมพ์ออกเครื่องพิมพ์หรือบันทึกเป็น PDF
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="window.print()"
+                  class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-print"></i>
+            <span>สั่งพิมพ์ตอนนี้ (Ctrl+P)</span>
+          </button>
+          <button type="button" onclick="closeBillingPrintModal()"
+                  class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Document Canvas -->
+      <div id="billingPrintableArea" class="flex-1 overflow-y-auto p-4 sm:p-6 my-2 bg-white text-black font-sans text-xs">
+        <!-- Rendered dynamically by printBillingReport() -->
+      </div>
+
+      <!-- Modal Footer (Hidden on print) -->
+      <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between no-print text-xs">
+        <span class="text-slate-500 dark:text-slate-400 text-[11px]">
+          💡 แนะนำให้ตั้งค่าหน้าพิมพ์: Scale: Fit to page width หรือ 100%, Margins: Default
+        </span>
+        <button type="button" onclick="closeBillingPrintModal()"
+                class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold transition">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- App Script Logic -->
   <script>
     const CONFIG = {
@@ -2757,6 +3129,7 @@
       alcoholLogs: [],
       truckLogs: [],
       vehicles: [],
+      billingImports: [],
       currentTab: 'overview',
       leafletMap: null,
       mapTileLayer: null,
@@ -2768,7 +3141,8 @@
       tsm: 'ศูนย์ตรวจสอบความปลอดภัย TSM Safety Oversight (Executive Overview)',
       'alcohol-logs': 'ข้อมูลการตรวจวัดแอลกอฮอล์และความดัน (Alcohol_Logs 1:1 Face Match)',
       'truck-logs': 'ข้อมูลการตรวจสอบรถบรรทุก 6 ล้อ (Truck_Inspection_Logs F-CAM-032_r3)',
-      billing: 'ตั้งเบิก, รายได้ & ตรวจสอบค่าน้ำมัน (Fuel Fraud Shield)',
+      billing: 'ตรวจสอบค่าน้ำมัน, อัตราสิ้นเปลือง & เกราะป้องกันทุจริต (Fuel Shield)',
+      'import-billing': 'ศูนย์นำเข้าไฟล์ตั้งเบิก แยก Feed & พิมพ์สรุปยอดวิ่ง/วางบิล (Billing Import Portal)',
       fleet: 'ข้อมูลกองรถ 6 ล้อ (ดีเซล/EV) & ทะเบียนคนขับรถจริง (Enterprise ERP)',
       esg: 'การจัดการพลังงานและลดคาร์บอน (ESG & Green Logistics)',
       dispatch: 'ปฏิทินจัดคิวและกระจายเที่ยววิ่ง (Visual Dispatch Calendar)',
@@ -5959,6 +6333,869 @@
         }
       };
       reader.readAsArrayBuffer(file);
+    }
+
+    // =========================================================================
+    // MULTI-FEED BILLING & TRIPS IMPORT ENGINE (Unified Schema Normalizer)
+    // =========================================================================
+    const FEED_CONFIGS = {
+      TCCB: { name: 'TCCB ชลบุรี', color: 'blue', desc: 'ค่าขนส่งต่อตัน / ส่งกล่อง / CB ชลบุรี' },
+      TCSB: { name: 'TCSB สระบุรี', color: 'purple', desc: 'ค่าขนส่งปกติ / ทางด่วน / รถเปลือย / EV' },
+      TCRY: { name: 'TCRY ระยอง', color: 'cyan', desc: 'ค่าขนส่งต่อตัน / ระยอง' },
+      PPACK: { name: 'P-Pack AM/SS', color: 'emerald', desc: 'P-Pack รับส่งกล่อง โอนคลัง AM-SS' },
+      CHEM: { name: 'สารเคมี / กาว', color: 'amber', desc: 'ส่งกาว / สารเคมี ขาจ่าย ทำบิล (OCSS, TCCB, TCPB...)' },
+      BILL_BOX: { name: 'ผรม.ทั่วไทย วางบิลกล่อง', color: 'teal', desc: 'บันทึกส่งมอบสินค้าเต็มเที่ยว / กล่อง 890+ รายการ' },
+      PALLET: { name: 'พาเลท & ไม้อัด', color: 'orange', desc: 'ส่งพาเลทและไม้อัดประสาน' },
+      EV_FLEET: { name: 'รถ EV ขนส่ง', color: 'green', desc: 'กองรถบรรทุก 100% EV' },
+      GENERAL: { name: 'ทั่วไป', color: 'slate', desc: 'ไฟล์ตั้งเบิกทั่วไป' }
+    };
+
+    function onBillingFeedChange() {
+      const feedKey = document.getElementById('billingFeedSelect').value;
+      const descEl = document.getElementById('feedDescriptionBox');
+      if (!descEl) return;
+      if (feedKey === 'AUTO') {
+        descEl.innerHTML = `
+          <i class="fa-solid fa-wand-magic-sparkles text-blue-500 mt-0.5"></i>
+          <div>
+            <strong class="font-bold text-slate-800 dark:text-white block mb-0.5">ตรวจจับอัตโนมัติ (Intelligent Auto-Detect)</strong>
+            ระบบจะตรวจสอบชื่อไฟล์และหัวตารางในแต่ละ Sheet (TCCB, TCSB, P-Pack, วางบิลกล่อง, สารเคมี) เพื่อเลือก Schema ที่ถูกต้องให้อัตโนมัติ
+          </div>
+        `;
+      } else {
+        const conf = FEED_CONFIGS[feedKey] || FEED_CONFIGS.GENERAL;
+        descEl.innerHTML = `
+          <i class="fa-solid fa-check-circle text-emerald-500 mt-0.5"></i>
+          <div>
+            <strong class="font-bold text-slate-800 dark:text-white block mb-0.5">${escapeHtml(conf.name)}</strong>
+            ${escapeHtml(conf.desc)}: ระบบจะกรองและจัดกลุ่มคอลัมน์ ทะเบียน, วันที่, ปลายทาง, น้ำหนัก, และจำนวนเงินเพื่อออกรายงาน
+          </div>
+        `;
+      }
+    }
+
+    function parseExcelDate(serial) {
+      if (!serial) return '';
+      if (typeof serial === 'string') return serial.trim();
+      if (typeof serial === 'number') {
+        // Handle Excel date serial numbers
+        const utc_days = Math.floor(serial - 25569);
+        const utc_value = utc_days * 86400;
+        const date_info = new Date(utc_value * 1000);
+        if (!isNaN(date_info.getTime())) {
+          const d = String(date_info.getDate()).padStart(2, '0');
+          const m = String(date_info.getMonth() + 1).padStart(2, '0');
+          const y = date_info.getFullYear();
+          return `${d}/${m}/${y}`;
+        }
+      }
+      return String(serial);
+    }
+
+    function parseNumericVal(val) {
+      if (val === undefined || val === null || val === '') return 0;
+      if (typeof val === 'number') return isNaN(val) ? 0 : val;
+      const cleaned = String(val).replace(/[^0-9.-]/g, '');
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+
+    function normalizeRowToBillingItem(row, fileName, sheetName, manualFeed) {
+      // row is an object with column names as keys or raw array
+      let item = {
+        id: 'B-' + Math.random().toString(36).substr(2, 9),
+        feed: manualFeed || 'GENERAL',
+        feedName: '',
+        fileName: fileName || '',
+        sheetName: sheetName || '',
+        date: '',
+        ticketNo: '',
+        plate: '',
+        driver: '',
+        vehicleType: '',
+        customer: '',
+        distance: 0,
+        weight: 0,
+        amount: 0,
+        note: ''
+      };
+
+      const keys = Object.keys(row);
+      const strRow = JSON.stringify(row);
+
+      // Auto detect feed if not specified
+      if (!manualFeed || manualFeed === 'AUTO') {
+        if (fileName.includes('TCCB') || sheetName.includes('TCCB') || strRow.includes('CB69')) item.feed = 'TCCB';
+        else if (fileName.includes('TCSB') || sheetName.includes('TCSB') || strRow.includes('SB69')) item.feed = 'TCSB';
+        else if (fileName.includes('P-Pack') || sheetName.includes('AM') || sheetName.includes('SS')) item.feed = 'PPACK';
+        else if (fileName.includes('สารเคมี') || fileName.includes('OCON') || fileName.includes('OCSS') || sheetName.includes('กาว')) item.feed = 'CHEM';
+        else if (fileName.includes('วางบิล') || sheetName.includes('กล่อง')) item.feed = 'BILL_BOX';
+        else if (fileName.includes('พาเลท') || fileName.includes('ไม้อัด')) item.feed = 'PALLET';
+        else if (fileName.includes('EV') || sheetName.includes('EV')) item.feed = 'EV_FLEET';
+        else item.feed = 'GENERAL';
+      }
+
+      item.feedName = (FEED_CONFIGS[item.feed] || FEED_CONFIGS.GENERAL).name;
+
+      // Map Plate (ทะเบียน)
+      for (const k of keys) {
+        const lk = k.toLowerCase().trim();
+        if (lk.includes('ทะเบียน')) {
+          item.plate = String(row[k] || '').trim();
+          break;
+        }
+      }
+
+      // Map Driver (พขร / ชื่อ)
+      for (const k of keys) {
+        const lk = k.toLowerCase().trim();
+        if (lk.includes('พขร') || lk.includes('ชื่อ-สกุล') || lk === 'ชื่อ' || lk.includes('คนขับ')) {
+          item.driver = String(row[k] || '').trim();
+          break;
+        }
+      }
+
+      // Map Ticket No (เลขที่ชั่ง / บัตรชั่ง / ใบเวลา / Cu Invoice)
+      for (const k of keys) {
+        const lk = k.toLowerCase().trim();
+        if (lk.includes('เลขที่ชั่ง') || lk.includes('บัตรชั่ง') || lk.includes('ใบเวลา') || lk.includes('เลขที่เอกสาร') || lk.includes('no.')) {
+          if (row[k] && !item.ticketNo) item.ticketNo = String(row[k]).trim();
+        }
+      }
+
+      // Map Date (วันที่ / เวลาเข้า / วดป)
+      for (const k of keys) {
+        const lk = k.toLowerCase().trim();
+        if (lk.includes('วันที่') || lk.includes('วดป') || lk.includes('เวลาเข้า') || lk.includes('เวลาออก')) {
+          if (row[k] && !item.date) item.date = parseExcelDate(row[k]);
+        }
+      }
+
+      // Map Customer / Destination (ลูกค้า / ปลายทาง / จุดรับ)
+      for (const k of keys) {
+        const lk = k.toLowerCase().trim();
+        if (lk.includes('ลูกค้า') || lk.includes('ปลายทาง') || lk.includes('รายละเอียด') || lk.includes('สถานที่ส่ง') || lk.includes('จุดรับ')) {
+          if (row[k] && !item.customer) item.customer = String(row[k]).trim();
+        }
+      }
+
+      // Map Vehicle Type (ประเภทรถ)
+      for (const k of keys) {
+        const lk = k.toLowerCase().trim();
+        if (lk.includes('ประเภทรถ') || lk.includes('ขนาดรถ')) {
+          item.vehicleType = String(row[k] || '').trim();
+          break;
+        }
+      }
+
+      // Map Distance (ระยะทาง / KM)
+      for (const k of keys) {
+        const lk = k.toLowerCase().trim();
+        if (lk.includes('ระยะทาง') || lk === 'km.' || lk === 'km') {
+          item.distance = parseNumericVal(row[k]);
+          break;
+        }
+      }
+
+      // Map Weight (นน.สุทธิ / นน.ที่คิด / น้ำหนัก / ตัน)
+      for (const k of keys) {
+        const lk = k.toLowerCase().trim();
+        if (lk.includes('นน.สุทธิ') || lk.includes('นน.ที่คิด') || lk.includes('(ตัน)') || lk === 'นน.') {
+          item.weight = parseNumericVal(row[k]);
+          break;
+        }
+      }
+
+      // Map Amount (ค่าขนส่งรวม / ค่าขนส่ง / จ่าย / ราคา)
+      for (const k of keys) {
+        const lk = k.toLowerCase().trim();
+        if (lk.includes('ค่าขนส่งรวม') || lk === 'จ่าย' || lk.includes('ราคา') || lk.includes('ค่าขนส่งหลัง') || lk === 'ค่าขนส่ง') {
+          const val = parseNumericVal(row[k]);
+          if (val > 0 && !item.amount) item.amount = val;
+        }
+      }
+
+      // Map Note (หมายเหตุ)
+      for (const k of keys) {
+        const lk = k.toLowerCase().trim();
+        if (lk.includes('หมายเหตุ') || lk.includes('remark')) {
+          item.note = String(row[k] || '').trim();
+          break;
+        }
+      }
+
+      // Sanitize fields
+      if (!item.plate || item.plate === '-') {
+        // Try fallback find plate-like string (e.g. 70-xxxx or 72-xxxx or 61-xxxx)
+        const match = strRow.match(/\b\d{2}-\d{4}\b/);
+        if (match) item.plate = match[0];
+      }
+
+      if (!item.date) item.date = '01/09/2026';
+      if (!item.vehicleType) item.vehicleType = '6 ล้อ 7.2 ม. ตู้ทึบ';
+      if (!item.customer) item.customer = 'ไซต์งาน SCG Packaging / ขาจ่าย';
+
+      return item;
+    }
+
+    function processWorkbookToBillingItems(wb, fileName, manualFeed) {
+      const items = [];
+      wb.SheetNames.forEach(sheetName => {
+        const ws = wb.Sheets[sheetName];
+        if (!ws) return;
+        // Parse array of rows
+        const rawRows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        if (!rawRows || rawRows.length < 2) return;
+
+        // Find header row that contains keywords
+        let headerRowIdx = -1;
+        for (let i = 0; i < Math.min(rawRows.length, 12); i++) {
+          const rStr = JSON.stringify(rawRows[i] || []);
+          if (rStr.includes('ทะเบียน') || rStr.includes('พขร') || rStr.includes('เลขที่ชั่ง') || rStr.includes('รายการ') || rStr.includes('วดป') || rStr.includes('ลำดับ')) {
+            headerRowIdx = i;
+            break;
+          }
+        }
+
+        if (headerRowIdx !== -1) {
+          const headers = rawRows[headerRowIdx].map(h => (h !== undefined && h !== null ? String(h).trim() : ''));
+          for (let r = headerRowIdx + 1; r < rawRows.length; r++) {
+            const rowData = rawRows[r];
+            if (!rowData || rowData.length === 0) continue;
+            
+            // Build key-value object
+            const rowObj = {};
+            let hasContent = false;
+            headers.forEach((h, cIdx) => {
+              if (h && rowData[cIdx] !== undefined) {
+                rowObj[h] = rowData[cIdx];
+                hasContent = true;
+              }
+            });
+
+            if (hasContent) {
+              const parsed = normalizeRowToBillingItem(rowObj, fileName, sheetName, manualFeed);
+              if (parsed.plate || parsed.ticketNo || parsed.amount > 0 || parsed.weight > 0) {
+                items.push(parsed);
+              }
+            }
+          }
+        }
+      });
+      return items;
+    }
+
+    function handleBillingFeedUpload(evt) {
+      const files = evt.target.files;
+      if (!files || files.length === 0) return;
+
+      const manualFeed = document.getElementById('billingFeedSelect').value;
+      let totalParsed = 0;
+      let filesProcessed = 0;
+
+      Swal.fire({
+        title: 'กำลังนำเข้าและประมวลผลไฟล์...',
+        text: `กำลังวิเคราะห์ ${files.length} ไฟล์ Excel`,
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const wb = XLSX.read(data, { type: 'array' });
+            const items = processWorkbookToBillingItems(wb, file.name, manualFeed);
+            if (items.length > 0) {
+              appState.billingImports = (appState.billingImports || []).concat(items);
+              totalParsed += items.length;
+            }
+          } catch(err) {
+            console.error('Error reading excel file:', file.name, err);
+          } finally {
+            filesProcessed++;
+            if (filesProcessed === files.length) {
+              updateBillingUI();
+              Swal.fire({
+                icon: 'success',
+                title: 'นำเข้าข้อมูลตั้งเบิกสำเร็จ!',
+                html: `
+                  <div class="text-xs space-y-1 text-left">
+                    <p>✔ นำเข้าสำเร็จ: <strong>${files.length} ไฟล์</strong></p>
+                    <p>✔ ดึงรายการยอดวิ่ง/วางบิลได้: <strong>${totalParsed.toLocaleString()} แถว</strong></p>
+                    <p>✔ ข้อมูลถูกรวมเข้ากับ Master Billing Sheet เรียบร้อยแล้ว</p>
+                  </div>
+                `,
+                confirmButtonColor: '#059669'
+              });
+            }
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function loadSampleFeedData(feedKey) {
+      Swal.fire({
+        title: 'กำลังโหลดข้อมูลตัวอย่าง Feed...',
+        text: `กำลังสร้างรายการจำลองจากโครงสร้างจริงของ Feed: ${feedKey}`,
+        timer: 600,
+        didOpen: () => Swal.showLoading()
+      });
+
+      setTimeout(() => {
+        let sampleItems = [];
+        if (feedKey === 'TCCB') {
+          const samplePlates = ['73-1635', '70-9312', '72-8297', '8กส1201'];
+          const sampleDrivers = ['นายจักรพงษ์ บุญนาค', 'นายพิทยา แคนถา', 'นายสมคิด ยอดขุนทด', 'นายทวีศักดิ์ คำปก'];
+          const customers = ['บริษัท มอนเด นิสชิน', 'COP-Warehouse คอลเกต', 'ARB (THAILAND) LIMITED', 'โรงงาน RPL คอลเกต', 'บริษัท คิงส์แพ็ค'];
+          for (let i = 1; i <= 18; i++) {
+            const pIdx = i % samplePlates.length;
+            sampleItems.push({
+              id: 'TCCB-' + i,
+              feed: 'TCCB',
+              feedName: 'TCCB ชลบุรี',
+              fileName: '09 TCCB ค่าขนส่งต่อตัน 1-15.8.69.xlsx',
+              sheetName: 'Ebook',
+              date: `${String((i % 15) + 1).padStart(2, '0')}/08/2569`,
+              ticketNo: `CB6900${2520 + i}`,
+              plate: samplePlates[pIdx],
+              driver: sampleDrivers[pIdx],
+              vehicleType: '6W 7.2 ตู้',
+              customer: customers[i % customers.length],
+              distance: 40 + (i * 10),
+              weight: parseFloat((2.1 + (i * 0.15)).toFixed(2)),
+              amount: parseFloat((1900 + (i * 85)).toFixed(2)),
+              note: 'อัตราต่อตัน 860 บ. โซน ' + ((i % 5) + 1)
+            });
+          }
+        } else if (feedKey === 'BILL_BOX') {
+          const samplePlates = ['61-5462', '70-8899', '72-3199', '73-0256', '74-5284'];
+          const sampleDrivers = ['นายธีรพัฒน์ ปาปะทา', 'นายสุรชัย แสนดี', 'นายณรงค์ ยอดจงรัมย์', 'นายระไมย การปลูก', 'นายดนตรี สุขใส'];
+          const dests = ['อุตสาหกรรมเกลือ โคราช', 'ขอนแก่นบริเวอรี่ ขอนแก่น', 'มาร์ชลบุรี สระบุรี', 'เวิลด์เพ็ท สมุทรปราการ', 'ไทยเพรซิเดนท์ฟูดส์'];
+          for (let i = 1; i <= 35; i++) {
+            const pIdx = i % samplePlates.length;
+            sampleItems.push({
+              id: 'BOX-' + i,
+              feed: 'BILL_BOX',
+              feedName: 'ผรม.ทั่วไทย วางบิลกล่อง',
+              fileName: 'ผรม.ทั่วไทย 1-15 ก.ย 2569 วางบิล.xlsx',
+              sheetName: 'กล่อง',
+              date: `${String((i % 15) + 1).padStart(2, '0')}/09/2569`,
+              ticketNo: `690012${10 + i}`,
+              plate: samplePlates[pIdx],
+              driver: sampleDrivers[pIdx],
+              vehicleType: '6 ล้อเปลือย',
+              customer: dests[i % dests.length],
+              distance: 80 + (i * 15),
+              weight: parseFloat((2.5 + (i * 0.12)).toFixed(2)),
+              amount: parseFloat((2200 + (i * 65)).toFixed(2)),
+              note: 'สินค้าเต็มเที่ยว (ตันปรับ DP)'
+            });
+          }
+        } else if (feedKey === 'TCSB') {
+          const samplePlates = ['70-5063', '72-2526', '72-0179', '73-1059'];
+          const sampleDrivers = ['นายนิคม รุ่งอุทัย', 'นายดนตรี สุขใส', 'นายเพลิน แก้วสิมมา', 'นายมานพ มีชัย'];
+          for (let i = 1; i <= 25; i++) {
+            const pIdx = i % samplePlates.length;
+            sampleItems.push({
+              id: 'SB-' + i,
+              feed: 'TCSB',
+              feedName: 'TCSB สระบุรี',
+              fileName: 'ทั่วไทยขนส่งมงคล 1-15 กย.69.xlsx',
+              sheetName: 'Sheet1',
+              date: `${String((i % 15) + 1).padStart(2, '0')}/09/2569`,
+              ticketNo: `SB6900${3770 + i}`,
+              plate: samplePlates[pIdx],
+              driver: sampleDrivers[pIdx],
+              vehicleType: '6W 7.2 เปลือย',
+              customer: 'P-M สายสระบุรี-แก่งคอย',
+              distance: 75 + (i * 12),
+              weight: parseFloat((1.8 + (i * 0.1)).toFixed(2)),
+              amount: parseFloat((1850 + (i * 50)).toFixed(2)),
+              note: 'นน.ที่คิด 2.8 ตัน'
+            });
+          }
+        }
+
+        appState.billingImports = (appState.billingImports || []).concat(sampleItems);
+        updateBillingUI();
+        Swal.fire({
+          icon: 'success',
+          title: `โหลดข้อมูลตัวอย่าง ${feedKey} สำเร็จ`,
+          text: `เพิ่มรายการเข้าสู่ Master Sheet จำนวน ${sampleItems.length} รายการ`,
+          timer: 1800,
+          showConfirmButton: false
+        });
+      }, 400);
+    }
+
+    function clearImportedBillingData() {
+      if (!appState.billingImports || appState.billingImports.length === 0) {
+        Swal.fire('ไม่มีข้อมูล', 'ยังไม่มีข้อมูลนำเข้าที่ต้องล้าง', 'info');
+        return;
+      }
+      Swal.fire({
+        title: 'ยืนยันล้างข้อมูลที่นำเข้าทั้งหมด?',
+        text: `จะทำการลบข้อมูลจำนวน ${appState.billingImports.length} รายการออกจากหน้านี้`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'ยืนยันล้างข้อมูล',
+        cancelButtonText: 'ยกเลิก'
+      }).then(res => {
+        if (res.isConfirmed) {
+          appState.billingImports = [];
+          updateBillingUI();
+          Swal.fire('ล้างข้อมูลสำเร็จ', 'ข้อมูลถูกล้างเรียบร้อยแล้ว', 'success');
+        }
+      });
+    }
+
+    function updateBillingUI() {
+      const items = appState.billingImports || [];
+      const tripsCount = items.length;
+      let totalAmount = 0;
+      let totalWeight = 0;
+      const feedsSet = new Set();
+      const platesSet = new Set();
+
+      items.forEach(it => {
+        totalAmount += (it.amount || 0);
+        totalWeight += (it.weight || 0);
+        if (it.feedName) feedsSet.add(it.feedName);
+        if (it.plate) platesSet.add(it.plate);
+      });
+
+      // Update Metric Cards
+      const metricTrips = document.getElementById('billingMetricTrips');
+      const metricAmount = document.getElementById('billingMetricAmount');
+      const metricWeight = document.getElementById('billingMetricWeight');
+      const metricFeeds = document.getElementById('billingMetricFeeds');
+
+      if (metricTrips) metricTrips.textContent = `${tripsCount.toLocaleString()} เที่ยว`;
+      if (metricAmount) metricAmount.textContent = `฿${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      if (metricWeight) metricWeight.textContent = `${totalWeight.toFixed(2)} ตัน`;
+      if (metricFeeds) metricFeeds.textContent = `${feedsSet.size} Feeds`;
+
+      // Update Filter Plate dropdown
+      const plateSelect = document.getElementById('billingFilterPlate');
+      if (plateSelect) {
+        const curVal = plateSelect.value;
+        const sortedPlates = Array.from(platesSet).sort();
+        let html = '<option value="ALL">ทั้งหมด (All Plates)</option>';
+        sortedPlates.forEach(p => {
+          html += `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`;
+        });
+        plateSelect.innerHTML = html;
+        if (sortedPlates.includes(curVal)) plateSelect.value = curVal;
+      }
+
+      // Update Filter Feed dropdown
+      const feedFilterSelect = document.getElementById('billingFilterFeed');
+      if (feedFilterSelect) {
+        const curVal = feedFilterSelect.value;
+        const sortedFeeds = Array.from(feedsSet).sort();
+        let html = '<option value="ALL">ทั้งหมด (All Feeds)</option>';
+        sortedFeeds.forEach(f => {
+          html += `<option value="${escapeHtml(f)}">${escapeHtml(f)}</option>`;
+        });
+        feedFilterSelect.innerHTML = html;
+        if (sortedFeeds.includes(curVal)) feedFilterSelect.value = curVal;
+      }
+
+      renderBillingMasterTable();
+    }
+
+    function renderBillingMasterTable() {
+      const tbody = document.getElementById('billingMasterTableBody');
+      const countEl = document.getElementById('billingTableCountText');
+      const subtotalEl = document.getElementById('billingTableSubtotalText');
+      if (!tbody) return;
+
+      const items = appState.billingImports || [];
+      if (items.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="11" class="py-8 text-center text-slate-400 font-sans text-xs">
+              <i class="fa-solid fa-cloud-arrow-up text-2xl block mb-2 text-slate-300"></i>
+              ยังไม่มีข้อมูลที่นำเข้า กรุณาลากไฟล์ Excel หรือคลิกปุ่มตัวอย่าง Feed ด้านบนเพื่อเริ่มต้น
+            </td>
+          </tr>
+        `;
+        if (countEl) countEl.textContent = 'แสดง 0 รายการ';
+        if (subtotalEl) subtotalEl.textContent = 'ยอดรวมหน้านี้: ฿0.00';
+        return;
+      }
+
+      const plateFilter = document.getElementById('billingFilterPlate') ? document.getElementById('billingFilterPlate').value : 'ALL';
+      const feedFilter = document.getElementById('billingFilterFeed') ? document.getElementById('billingFilterFeed').value : 'ALL';
+      const searchVal = document.getElementById('billingSearchInput') ? document.getElementById('billingSearchInput').value.trim().toLowerCase() : '';
+
+      const filtered = items.filter(it => {
+        if (plateFilter !== 'ALL' && it.plate !== plateFilter) return false;
+        if (feedFilter !== 'ALL' && it.feedName !== feedFilter) return false;
+        if (searchVal) {
+          const rowStr = `${it.ticketNo} ${it.plate} ${it.driver} ${it.customer} ${it.feedName} ${it.note}`.toLowerCase();
+          if (!rowStr.includes(searchVal)) return false;
+        }
+        return true;
+      });
+
+      let pageTotal = 0;
+      let html = '';
+
+      filtered.forEach((it, idx) => {
+        pageTotal += (it.amount || 0);
+        html += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+            <td class="py-2 px-3 text-center text-slate-500">${idx + 1}</td>
+            <td class="py-2 px-3 font-sans">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                ${escapeHtml(it.feedName || it.feed)}
+              </span>
+            </td>
+            <td class="py-2 px-3 whitespace-nowrap text-slate-600 dark:text-slate-400">${escapeHtml(it.date)}</td>
+            <td class="py-2 px-3 font-bold text-slate-800 dark:text-slate-200">${escapeHtml(it.ticketNo || '-')}</td>
+            <td class="py-2 px-3 font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">${escapeHtml(it.plate || '-')}</td>
+            <td class="py-2 px-3 font-sans font-medium text-slate-700 dark:text-slate-300 truncate max-w-[120px]" title="${escapeHtml(it.driver)}">${escapeHtml(it.driver || '-')}</td>
+            <td class="py-2 px-3 font-sans text-slate-500 text-[10px] truncate max-w-[100px]">${escapeHtml(it.vehicleType || '-')}</td>
+            <td class="py-2 px-3 font-sans text-slate-700 dark:text-slate-300 truncate max-w-[180px]" title="${escapeHtml(it.customer)}">${escapeHtml(it.customer || '-')}</td>
+            <td class="py-2 px-3 text-right text-slate-600 dark:text-slate-400">${it.distance > 0 ? it.distance.toLocaleString() : '-'}</td>
+            <td class="py-2 px-3 text-right text-slate-600 dark:text-slate-400">${it.weight > 0 ? it.weight.toFixed(2) : '-'}</td>
+            <td class="py-2 px-3 text-right font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">${it.amount > 0 ? '฿' + it.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      if (countEl) countEl.textContent = `แสดง ${filtered.length.toLocaleString()} จาก ${items.length.toLocaleString()} รายการ`;
+      if (subtotalEl) subtotalEl.textContent = `ยอดรวมที่เลือก: ฿${pageTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    // =========================================================================
+    // HIGH-PRECISION PRINT ENGINE (A4 Landscape & Portrait Generator)
+    // =========================================================================
+    function printBillingReport(reportType) {
+      const items = appState.billingImports || [];
+      if (items.length === 0) {
+        Swal.fire({
+          icon: 'info',
+          title: 'ยังไม่มีข้อมูล',
+          text: 'กรุณานำเข้าไฟล์ Excel หรือคลิกปุ่มตัวอย่าง Feed ด้านบนก่อนสั่งพิมพ์',
+          confirmButtonColor: '#1e40af'
+        });
+        return;
+      }
+
+      const plateFilter = document.getElementById('billingFilterPlate') ? document.getElementById('billingFilterPlate').value : 'ALL';
+      const feedFilter = document.getElementById('billingFilterFeed') ? document.getElementById('billingFilterFeed').value : 'ALL';
+      const searchVal = document.getElementById('billingSearchInput') ? document.getElementById('billingSearchInput').value.trim().toLowerCase() : '';
+
+      const filtered = items.filter(it => {
+        if (plateFilter !== 'ALL' && it.plate !== plateFilter) return false;
+        if (feedFilter !== 'ALL' && it.feedName !== feedFilter) return false;
+        if (searchVal) {
+          const rowStr = `${it.ticketNo} ${it.plate} ${it.driver} ${it.customer} ${it.feedName} ${it.note}`.toLowerCase();
+          if (!rowStr.includes(searchVal)) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        Swal.fire('ไม่พบข้อมูล', 'ไม่มีข้อมูลที่ตรงกับเงื่อนไขการกรองที่เลือก', 'warning');
+        return;
+      }
+
+      const printArea = document.getElementById('billingPrintableArea');
+      const titleModal = document.getElementById('billingPrintModalTitle');
+      const modal = document.getElementById('billingPrintModal');
+
+      if (reportType === 'trips') {
+        // REPORT 1: สรุปยอดวิ่งรถ (Trip Summary)
+        if (titleModal) titleModal.innerHTML = `<i class="fa-solid fa-truck-moving text-blue-600 mr-1.5"></i> ใบรายงานสรุปยอดวิ่งรถ (Trip Summary Report) - มาตรฐาน A4`;
+        
+        // Group by Vehicle Plate
+        const plateGroups = {};
+        filtered.forEach(it => {
+          const p = it.plate || 'ไม่ระบุทะเบียน';
+          if (!plateGroups[p]) plateGroups[p] = { trips: 0, weight: 0, distance: 0, amount: 0, driver: it.driver, items: [] };
+          plateGroups[p].trips++;
+          plateGroups[p].weight += (it.weight || 0);
+          plateGroups[p].distance += (it.distance || 0);
+          plateGroups[p].amount += (it.amount || 0);
+          plateGroups[p].items.push(it);
+        });
+
+        let totalTrips = filtered.length;
+        let grandAmount = 0;
+        let grandWeight = 0;
+        let grandDistance = 0;
+        filtered.forEach(it => {
+          grandAmount += (it.amount || 0);
+          grandWeight += (it.weight || 0);
+          grandDistance += (it.distance || 0);
+        });
+
+        let groupRowsHtml = '';
+        Object.keys(plateGroups).forEach((p, idx) => {
+          const g = plateGroups[p];
+          groupRowsHtml += `
+            <tr style="border-bottom: 1px solid #e2e8f0; font-size: 11px;">
+              <td style="padding: 6px 8px; text-align: center;">${idx + 1}</td>
+              <td style="padding: 6px 8px; font-weight: bold; color: #1e3a8a;">${escapeHtml(p)}</td>
+              <td style="padding: 6px 8px;">${escapeHtml(g.driver || '-')}</td>
+              <td style="padding: 6px 8px; text-align: center; font-weight: bold;">${g.trips} เที่ยว</td>
+              <td style="padding: 6px 8px; text-align: right;">${g.distance.toLocaleString()} กม.</td>
+              <td style="padding: 6px 8px; text-align: right;">${g.weight.toFixed(2)} ตัน</td>
+              <td style="padding: 6px 8px; text-align: right; font-weight: bold; color: #047857;">฿${g.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            </tr>
+          `;
+        });
+
+        // Detail Rows Table (Sample up to 50 rows per print page)
+        let detailRowsHtml = '';
+        filtered.slice(0, 100).forEach((it, idx) => {
+          detailRowsHtml += `
+            <tr style="border-bottom: 1px solid #f1f5f9; font-size: 10px;">
+              <td style="padding: 4px 6px; text-align: center;">${idx + 1}</td>
+              <td style="padding: 4px 6px;">${escapeHtml(it.date)}</td>
+              <td style="padding: 4px 6px; font-weight: bold;">${escapeHtml(it.ticketNo || '-')}</td>
+              <td style="padding: 4px 6px; font-weight: bold; color: #1e40af;">${escapeHtml(it.plate)}</td>
+              <td style="padding: 4px 6px;">${escapeHtml(it.driver)}</td>
+              <td style="padding: 4px 6px;">${escapeHtml(it.customer)}</td>
+              <td style="padding: 4px 6px; text-align: right;">${it.distance > 0 ? it.distance : '-'}</td>
+              <td style="padding: 4px 6px; text-align: right;">${it.weight > 0 ? it.weight.toFixed(2) : '-'}</td>
+              <td style="padding: 4px 6px; text-align: right; font-weight: bold;">${it.amount > 0 ? '฿' + it.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</td>
+            </tr>
+          `;
+        });
+
+        printArea.innerHTML = `
+          <div style="font-family: 'Sarabun', 'Prompt', sans-serif; color: #0f172a; line-height: 1.4;">
+            
+            <!-- Document Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1e3a8a; padding-bottom: 12px; margin-bottom: 14px;">
+              <div>
+                <h1 style="font-size: 18px; font-weight: 800; color: #1e3a8a; margin: 0;">ห้างหุ้นส่วนจำกัด ทั่วไทยขนส่งมงคล</h1>
+                <p style="font-size: 11px; color: #475569; margin: 2px 0 0 0;">
+                  61 หมู่ 5 ถ.อดิเรกสาร ต.เตาปูน อ.แก่งคอย จ.สระบุรี 18110 | โทร: 036-245101, 062-3285963
+                </p>
+                <h2 style="font-size: 14px; font-weight: bold; color: #0f172a; margin: 6px 0 0 0;">
+                  รายงานสรุปยอดเที่ยววิ่งรถบรรทุกและระยะทาง (Fleet Trip Summary Report)
+                </h2>
+              </div>
+              <div style="text-align: right; font-size: 11px; color: #334155;">
+                <div style="font-weight: bold; color: #1e3a8a; font-size: 13px;">งวดวันที่: 1 - 31 ตุลาคม 2569</div>
+                <div>พิมพ์เมื่อ: ${new Date().toLocaleDateString('th-TH')} ${new Date().toLocaleTimeString('th-TH')}</div>
+                <div>ผู้จัดทำ: ฝ่ายธุรการขนส่ง TTMK</div>
+              </div>
+            </div>
+
+            <!-- Group by Plate Summary Box -->
+            <div style="margin-bottom: 16px;">
+              <h3 style="font-size: 12px; font-weight: bold; background: #f8fafc; border-left: 4px solid #1e3a8a; padding: 4px 8px; margin: 0 0 8px 0;">
+                สรุปยอดวิ่งแยกตามทะเบียนรถ (${Object.keys(plateGroups).length} คัน)
+              </h3>
+              <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                  <tr style="background: #f1f5f9; border-bottom: 1.5px solid #cbd5e1; font-size: 11px; font-weight: bold;">
+                    <th style="padding: 6px 8px; text-align: center;">ลำดับ</th>
+                    <th style="padding: 6px 8px;">ทะเบียนรถ</th>
+                    <th style="padding: 6px 8px;">พนักงานขับรถ</th>
+                    <th style="padding: 6px 8px; text-align: center;">จำนวนเที่ยว</th>
+                    <th style="padding: 6px 8px; text-align: right;">ระยะทางรวม</th>
+                    <th style="padding: 6px 8px; text-align: right;">น้ำหนักรวม</th>
+                    <th style="padding: 6px 8px; text-align: right;">รวมเงินค่าขนส่ง</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${groupRowsHtml}
+                  <tr style="background: #f8fafc; font-weight: bold; border-top: 2px solid #94a3b8; font-size: 12px;">
+                    <td colspan="3" style="padding: 8px; text-align: center;">รวมยอดสุทธิทั้งสิ้น</td>
+                    <td style="padding: 8px; text-align: center; color: #1e3a8a;">${totalTrips} เที่ยว</td>
+                    <td style="padding: 8px; text-align: right;">${grandDistance.toLocaleString()} กม.</td>
+                    <td style="padding: 8px; text-align: right;">${grandWeight.toFixed(2)} ตัน</td>
+                    <td style="padding: 8px; text-align: right; color: #047857;">฿${grandAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Detailed Trips Table -->
+            <div style="margin-bottom: 16px;">
+              <h3 style="font-size: 12px; font-weight: bold; background: #f8fafc; border-left: 4px solid #059669; padding: 4px 8px; margin: 0 0 8px 0;">
+                รายการเที่ยววิ่งประกอบ (แสดงสูงสุด 100 รายการ)
+              </h3>
+              <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                  <tr style="background: #f1f5f9; border-bottom: 1.5px solid #cbd5e1; font-size: 10px; font-weight: bold;">
+                    <th style="padding: 5px 6px; text-align: center;">#</th>
+                    <th style="padding: 5px 6px;">วันที่</th>
+                    <th style="padding: 5px 6px;">เลขที่ชั่ง</th>
+                    <th style="padding: 5px 6px;">ทะเบียน</th>
+                    <th style="padding: 5px 6px;">พขร.</th>
+                    <th style="padding: 5px 6px;">ลูกค้า/ปลายทาง</th>
+                    <th style="padding: 5px 6px; text-align: right;">กม.</th>
+                    <th style="padding: 5px 6px; text-align: right;">ตัน</th>
+                    <th style="padding: 5px 6px; text-align: right;">ค่าขนส่ง</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${detailRowsHtml}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Signatures Section -->
+            <div style="display: flex; justify-content: space-between; margin-top: 35px; padding-top: 15px; border-top: 1px dashed #cbd5e1; text-align: center; font-size: 11px;">
+              <div style="width: 30%;">
+                <div style="height: 45px;"></div>
+                <div style="border-top: 1px solid #94a3b8; padding-top: 4px;">(......................................................)</div>
+                <div style="font-weight: bold; margin-top: 2px;">ผู้รวบรวมข้อมูล</div>
+                <div style="color: #64748b; font-size: 10px;">วันที่: ....../....../......</div>
+              </div>
+              <div style="width: 30%;">
+                <div style="height: 45px;"></div>
+                <div style="border-top: 1px solid #94a3b8; padding-top: 4px;">(......................................................)</div>
+                <div style="font-weight: bold; margin-top: 2px;">เจ้าหน้าที่ตรวจสอบ TSM</div>
+                <div style="color: #64748b; font-size: 10px;">วันที่: ....../....../......</div>
+              </div>
+              <div style="width: 30%;">
+                <div style="height: 45px;"></div>
+                <div style="border-top: 1px solid #94a3b8; padding-top: 4px;">(......................................................)</div>
+                <div style="font-weight: bold; margin-top: 2px;">ผู้จัดการฝ่ายขนส่ง / ผู้อนุมัติ</div>
+                <div style="color: #64748b; font-size: 10px;">วันที่: ....../....../......</div>
+              </div>
+            </div>
+
+          </div>
+        `;
+      } else {
+        // REPORT 2: ใบวางบิล / รายการตั้งเบิก (Billing Statement & Invoice)
+        if (titleModal) titleModal.innerHTML = `<i class="fa-solid fa-file-invoice text-emerald-600 mr-1.5"></i> ใบวางบิลและตั้งเบิกค่าขนส่ง (Billing & Invoice Statement) - มาตรฐาน A4`;
+
+        let subtotal = 0;
+        filtered.forEach(it => subtotal += (it.amount || 0));
+        const wht = subtotal * 0.01; // หัก ณ ที่จ่าย 1%
+        const grandTotal = subtotal - wht;
+
+        let invoiceRowsHtml = '';
+        filtered.slice(0, 40).forEach((it, idx) => {
+          invoiceRowsHtml += `
+            <tr style="border-bottom: 1px solid #e2e8f0; font-size: 11px;">
+              <td style="padding: 6px 8px; text-align: center;">${idx + 1}</td>
+              <td style="padding: 6px 8px; text-align: center;">${escapeHtml(it.date)}</td>
+              <td style="padding: 6px 8px; font-weight: bold;">${escapeHtml(it.ticketNo || '-')}</td>
+              <td style="padding: 6px 8px; font-weight: bold; color: #1e3a8a;">${escapeHtml(it.plate)}</td>
+              <td style="padding: 6px 8px;">${escapeHtml(it.customer)}</td>
+              <td style="padding: 6px 8px; text-align: center;">${it.weight > 0 ? it.weight.toFixed(2) + ' ตัน' : '1 เที่ยว'}</td>
+              <td style="padding: 6px 8px; text-align: right; font-weight: bold; color: #0f172a;">${it.amount > 0 ? '฿' + it.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</td>
+            </tr>
+          `;
+        });
+
+        printArea.innerHTML = `
+          <div style="font-family: 'Sarabun', 'Prompt', sans-serif; color: #0f172a; line-height: 1.4;">
+            
+            <!-- Invoice Header -->
+            <div style="border-bottom: 2px solid #059669; padding-bottom: 12px; margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <h1 style="font-size: 19px; font-weight: 800; color: #047857; margin: 0;">ห้างหุ้นส่วนจำกัด ทั่วไทยขนส่งมงคล</h1>
+                  <p style="font-size: 11px; color: #334155; margin: 3px 0 0 0;">
+                    61 หมู่ 5 ถนนอดิเรกสาร ตำบลเตาปูน อำเภอแก่งคอย จังหวัดสระบุรี 18110<br>
+                    <strong>เลขประจำตัวผู้เสียภาษีอากร:</strong> 0193540001017 | โทร: 036-245101
+                  </p>
+                </div>
+                <div style="border: 2px solid #059669; padding: 8px 14px; border-radius: 8px; text-align: center; background: #ecfdf5;">
+                  <h2 style="font-size: 16px; font-weight: 800; color: #047857; margin: 0;">ใบวางบิล / ใบแจ้งหนี้</h2>
+                  <div style="font-size: 11px; color: #065f46; font-weight: bold; margin-top: 2px;">BILLING STATEMENT</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customer & Invoice Meta Info -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 11px; background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+              <div style="width: 58%;">
+                <div style="font-weight: bold; color: #334155; margin-bottom: 2px;">เรียน: ลูกค้า / ผู้ว่าจ้างขนส่ง</div>
+                <div style="font-size: 13px; font-weight: bold; color: #0f172a;">บริษัท เอสซีจี แพคเกจจิ้ง จำกัด (มหาชน) และบริษัทในเครือ</div>
+                <div style="color: #64748b; margin-top: 2px;">งานขนส่งสินค้ากล่อง / แผ่นกระดาษ / สารเคมี ประจำงวดเดือนตุลาคม 2569</div>
+              </div>
+              <div style="width: 38%; text-align: right; line-height: 1.6;">
+                <div><strong>เลขที่ใบวางบิล:</strong> TTMK-INV-202610-001</div>
+                <div><strong>วันที่ออกเอกสาร:</strong> ${new Date().toLocaleDateString('th-TH')}</div>
+                <div><strong>กำหนดชำระ:</strong> ภายใน 15 วันทำการ</div>
+                <div><strong>งวดงาน:</strong> 1 - 31 ตุลาคม 2569</div>
+              </div>
+            </div>
+
+            <!-- Invoice Line Items Table -->
+            <div style="margin-bottom: 16px;">
+              <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                  <tr style="background: #f1f5f9; border-top: 1.5px solid #cbd5e1; border-bottom: 1.5px solid #cbd5e1; font-size: 11px; font-weight: bold;">
+                    <th style="padding: 7px 8px; text-align: center; width: 5%;">ลำดับ</th>
+                    <th style="padding: 7px 8px; text-align: center; width: 12%;">วันที่</th>
+                    <th style="padding: 7px 8px; width: 18%;">เลขที่ชั่ง/เอกสาร</th>
+                    <th style="padding: 7px 8px; width: 14%;">ทะเบียนรถ</th>
+                    <th style="padding: 7px 8px; width: 28%;">รายการ / ปลายทางส่งสินค้า</th>
+                    <th style="padding: 7px 8px; text-align: center; width: 10%;">ปริมาณ</th>
+                    <th style="padding: 7px 8px; text-align: right; width: 13%;">จำนวนเงิน (บาท)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${invoiceRowsHtml}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Financial Calculation Summary Box -->
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 25px;">
+              <div style="width: 48%; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; font-size: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <span style="color: #475569;">รวมยอดค่าขนส่งทั้งสิ้น (${filtered.length} เที่ยว):</span>
+                  <strong style="color: #0f172a;">฿${subtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px;">
+                  <span style="color: #dc2626;">หัก ภาษี ณ ที่จ่าย 1% (ค่าขนส่ง):</span>
+                  <strong style="color: #dc2626;">-฿${wht.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #047857;">
+                  <span style="font-weight: 800;">ยอดเงินที่ต้องชำระสุทธิ:</span>
+                  <strong style="font-weight: 800;">฿${grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bank Transfer Information & Signatures -->
+            <div style="display: flex; justify-content: space-between; gap: 20px; font-size: 11px;">
+              <div style="width: 50%; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px 12px;">
+                <strong style="color: #166534; display: block; margin-bottom: 3px;">ช่องทางการโอนชำระเงิน:</strong>
+                <div>ธนาคารกสิกรไทย สาขาแก่งคอย</div>
+                <div>ชื่อบัญชี: ห้างหุ้นส่วนจำกัด ทั่วไทยขนส่งมงคล</div>
+                <div>เลขที่บัญชี: 019-3-54000-1 (กระแสรายวัน)</div>
+              </div>
+              <div style="width: 45%; text-align: center;">
+                <div style="height: 38px;"></div>
+                <div style="border-top: 1px solid #94a3b8; padding-top: 4px;">(............................................................)</div>
+                <div style="font-weight: bold; margin-top: 2px;">ผู้มีอำนาจลงนาม / ประทับตรา</div>
+                <div style="color: #64748b; font-size: 10px;">หจก.ทั่วไทยขนส่งมงคล</div>
+              </div>
+            </div>
+
+          </div>
+        `;
+      }
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeBillingPrintModal() {
+      const modal = document.getElementById('billingPrintModal');
+      if (modal) modal.classList.add('hidden');
     }
 
     function escapeHtml(str) {
