@@ -433,63 +433,55 @@
                 <p class="text-[9px] text-slate-400">ขั้นตอนสุดท้ายก่อนออกรถ • มาตรฐานความปลอดภัย TSM & Auditor</p>
               </div>
             </div>
-            <span class="text-[9px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 font-mono">
-              ความพร้อม 3 จุด (เข็มขัด • กล้อง • หน้าปัดไมล์)
+            <span id="badgeReadinessRule" class="text-[9px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 font-mono">
+              บังคับตรวจ 3 รูป (เข็มขัด พขร. • ผขถ. • กล้อง)
             </span>
           </div>
 
-          <!-- จุดที่ 1: ภาพถ่ายการคาดเข็มขัดนิรภัย (Seatbelt Check) -->
+          <!-- จุดที่ 1: ภาพถ่ายการคาดเข็มขัดนิรภัย - พนักงานขับรถ (พขร.) -->
           <div class="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 space-y-2">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
                 <div class="flex items-center gap-1.5">
                   <span class="text-base">💺</span>
-                  <span class="text-xs font-bold text-white">1. ภาพถ่ายการคาดเข็มขัดนิรภัย (Seatbelt Check) *</span>
+                  <span class="text-xs font-bold text-white">1. ภาพถ่ายการคาดเข็มขัดนิรภัย: พนักงานขับรถ (พขร.) *</span>
                 </div>
                 <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
-                  ถ่ายภาพมุมกว้างในห้องโดยสาร แสดงการคาดเข็มขัดนิรภัยของ พขร. และ ผขถ. ชัดเจน
+                  ถ่ายภาพขณะ พขร. คาดเข็มขัดนิรภัยถูกต้องและกระชับตัว พร้อมปฏิบัติหน้าที่
                 </p>
               </div>
-              <span id="badgeSeatbeltStatus" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 bg-rose-500/20 text-rose-400 border border-rose-500/30 transition">
+              <span id="badgeSeatbeltDriverStatus" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 bg-rose-500/20 text-rose-400 border border-rose-500/30 transition">
                 ยังไม่แนบ
               </span>
             </div>
 
-            <!-- Checkbox: เที่ยวนี้ไม่มี พนักงานท้ายรถ (ผขถ.) -->
-            <label class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
-              <input type="checkbox" id="chkNoAssistant" onchange="handleNoAssistantToggle()" class="rounded text-amber-500 focus:ring-0 w-3.5 h-3.5">
-              <span class="text-[10px] text-amber-300/90 select-none">
-                เที่ยวนี้ไม่มี พนักงานท้ายรถ (ผขถ.) <span class="text-slate-400">(มีเฉพาะ พขร. ท่านเดียว)</span>
-              </span>
-            </label>
-
             <!-- Action Trigger & Preview Box -->
             <div>
-              <input type="file" id="inputSeatbeltPhoto" accept="image/*" capture="environment" class="hidden" onchange="handlePreDeparturePhotoChange(event, 'seatbelt')">
+              <input type="file" id="inputSeatbeltDriverPhoto" accept="image/*" capture="environment" class="hidden" onchange="handlePreDeparturePhotoChange(event, 'seatbeltDriver')">
               
               <!-- Button to Open Camera -->
-              <div id="seatbeltActionBox">
-                <button type="button" onclick="document.getElementById('inputSeatbeltPhoto').click()"
+              <div id="seatbeltDriverActionBox">
+                <button type="button" onclick="document.getElementById('inputSeatbeltDriverPhoto').click()"
                   class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-cyan-600/30 to-blue-600/30 hover:from-cyan-600/50 hover:to-blue-600/50 text-cyan-200 border border-cyan-500/40 text-xs font-mono font-bold flex items-center justify-center gap-2 transition active:scale-[0.98]">
                   <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
-                  📸 ถ่ายภาพ / แนบรูปการคาดเข็มขัดนิรภัย
+                  📸 ถ่ายภาพ / แนบรูป พขร. คาดเข็มขัดนิรภัย
                 </button>
               </div>
 
               <!-- Preview Box -->
-              <div id="seatbeltPreviewBox" class="hidden flex items-center gap-3 p-2 rounded-lg bg-slate-900 border border-cyan-500/30">
-                <img id="seatbeltImgPreview" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border border-slate-700 shrink-0 cursor-pointer" onclick="viewPhotoFullscreen('seatbelt')" title="คลิกเพื่อดูภาพขนาดใหญ่" alt="Seatbelt Preview">
+              <div id="seatbeltDriverPreviewBox" class="hidden flex items-center gap-3 p-2 rounded-lg bg-slate-900 border border-cyan-500/30">
+                <img id="seatbeltDriverImgPreview" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border border-slate-700 shrink-0 cursor-pointer" onclick="viewPhotoFullscreen('seatbeltDriver')" title="คลิกเพื่อดูภาพขนาดใหญ่" alt="Driver Seatbelt Preview">
                 <div class="flex-1 min-w-0">
                   <p class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
-                    <span>✓</span> แนบภาพเข็มขัดนิรภัยแล้ว
+                    <span>✓</span> แนบภาพ พขร. คาดเข็มขัดนิรภัยแล้ว
                   </p>
-                  <p id="seatbeltInfoText" class="text-[9px] text-slate-400 truncate mt-0.5">แสดงการคาดเข็มขัด พขร. และ ผขถ. ครบถ้วน</p>
+                  <p class="text-[9px] text-slate-400 truncate mt-0.5">พขร. คาดเข็มขัดนิรภัยเรียบร้อย</p>
                   <div class="mt-2 flex gap-2">
-                    <button type="button" onclick="document.getElementById('inputSeatbeltPhoto').click()" 
+                    <button type="button" onclick="document.getElementById('inputSeatbeltDriverPhoto').click()" 
                       class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-[10px] font-mono flex items-center gap-1 transition">
                       🔄 ถ่ายใหม่ (Retake)
                     </button>
-                    <button type="button" onclick="removePreDeparturePhoto('seatbelt')" 
+                    <button type="button" onclick="removePreDeparturePhoto('seatbeltDriver')" 
                       class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-rose-400 border border-rose-500/30 text-[10px] font-mono transition">
                       ลบรูป
                     </button>
@@ -499,13 +491,79 @@
             </div>
           </div>
 
-          <!-- จุดที่ 2: ภาพถ่ายกล้องบันทึกภาพหน้ารถ (Dashcam Operational Check) -->
+          <!-- จุดที่ 2: ภาพถ่ายการคาดเข็มขัดนิรภัย - พนักงานท้ายรถ (ผขถ.) -->
+          <div class="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-base">👷</span>
+                  <span class="text-xs font-bold text-white">2. ภาพถ่ายการคาดเข็มขัดนิรภัย: พนักงานท้ายรถ (ผขถ.) *</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
+                  ถ่ายภาพขณะ ผขถ. คาดเข็มขัดนิรภัยเรียบร้อย (ยกเว้นกดปุ่มเลือกไม่มี ผขถ.)
+                </p>
+              </div>
+              <span id="badgeSeatbeltAssistantStatus" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 bg-rose-500/20 text-rose-400 border border-rose-500/30 transition">
+                ยังไม่แนบ
+              </span>
+            </div>
+
+            <!-- Checkbox: เที่ยวนี้ไม่มี พนักงานท้ายรถ (ผขถ.) -->
+            <label class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800 cursor-pointer hover:border-slate-700 transition">
+              <input type="checkbox" id="chkNoAssistant" onchange="handleNoAssistantToggle()" class="rounded text-amber-500 focus:ring-0 w-3.5 h-3.5">
+              <span class="text-[10px] text-amber-300 select-none">
+                เที่ยวนี้ไม่มี พนักงานท้ายรถ (ผขถ.) <span class="text-slate-400">(กดเลือกเมื่อไม่มี ผขถ. เพื่อยกเว้นการถ่ายภาพจุดนี้)</span>
+              </span>
+            </label>
+
+            <!-- กล่องถ่ายรูป ผขถ. (จะซ่อนเมื่อติ๊กไม่มี ผขถ.) -->
+            <div id="seatbeltAssistantWrapper">
+              <input type="file" id="inputSeatbeltAssistantPhoto" accept="image/*" capture="environment" class="hidden" onchange="handlePreDeparturePhotoChange(event, 'seatbeltAssistant')">
+              
+              <!-- Button to Open Camera -->
+              <div id="seatbeltAssistantActionBox">
+                <button type="button" onclick="document.getElementById('inputSeatbeltAssistantPhoto').click()"
+                  class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-cyan-600/30 to-blue-600/30 hover:from-cyan-600/50 hover:to-blue-600/50 text-cyan-200 border border-cyan-500/40 text-xs font-mono font-bold flex items-center justify-center gap-2 transition active:scale-[0.98]">
+                  <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+                  📸 ถ่ายภาพ / แนบรูป ผขถ. คาดเข็มขัดนิรภัย
+                </button>
+              </div>
+
+              <!-- Preview Box -->
+              <div id="seatbeltAssistantPreviewBox" class="hidden flex items-center gap-3 p-2 rounded-lg bg-slate-900 border border-cyan-500/30">
+                <img id="seatbeltAssistantImgPreview" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border border-slate-700 shrink-0 cursor-pointer" onclick="viewPhotoFullscreen('seatbeltAssistant')" title="คลิกเพื่อดูภาพขนาดใหญ่" alt="Assistant Seatbelt Preview">
+                <div class="flex-1 min-w-0">
+                  <p class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+                    <span>✓</span> แนบภาพ ผขถ. คาดเข็มขัดนิรภัยแล้ว
+                  </p>
+                  <p class="text-[9px] text-slate-400 truncate mt-0.5">ผขถ. คาดเข็มขัดนิรภัยเรียบร้อย</p>
+                  <div class="mt-2 flex gap-2">
+                    <button type="button" onclick="document.getElementById('inputSeatbeltAssistantPhoto').click()" 
+                      class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-[10px] font-mono flex items-center gap-1 transition">
+                      🔄 ถ่ายใหม่ (Retake)
+                    </button>
+                    <button type="button" onclick="removePreDeparturePhoto('seatbeltAssistant')" 
+                      class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-rose-400 border border-rose-500/30 text-[10px] font-mono transition">
+                      ลบรูป
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ข้อความแสดงเมื่อไม่มี ผขถ. -->
+            <div id="noAssistantNotice" class="hidden p-2 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] text-center font-mono">
+              ✓ ยกเว้นการถ่ายภาพ ผขถ. (เนื่องจากเที่ยวนี้ไม่มีพนักงานท้ายรถ)
+            </div>
+          </div>
+
+          <!-- จุดที่ 3: ภาพถ่ายกล้องบันทึกภาพหน้ารถ (Dashcam Operational Check) -->
           <div class="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 space-y-2">
             <div class="flex items-start justify-between gap-2">
               <div class="flex-1">
                 <div class="flex items-center gap-1.5">
                   <span class="text-base">📹</span>
-                  <span class="text-xs font-bold text-white">2. ภาพถ่ายกล้องบันทึกภาพหน้ารถ (Dashcam Operational Check) *</span>
+                  <span class="text-xs font-bold text-white">3. ภาพถ่ายกล้องบันทึกภาพหน้ารถ (Dashcam Operational Check) *</span>
                 </div>
                 <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
                   ถ่ายภาพตัวกล้องหน้ารถขณะสตาร์ตเครื่อง ให้เห็นไฟสถานะบันทึก (REC) และมุมมองกล้องไม่ถูกบดบัง
@@ -543,59 +601,6 @@
                       🔄 ถ่ายใหม่ (Retake)
                     </button>
                     <button type="button" onclick="removePreDeparturePhoto('dashcam')" 
-                      class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-rose-400 border border-rose-500/30 text-[10px] font-mono transition">
-                      ลบรูป
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- จุดที่ 3: ภาพถ่ายหน้าปัดเรือนไมล์และไฟเตือน (Dashboard Check) -->
-          <div class="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 space-y-2">
-            <div class="flex items-start justify-between gap-2">
-              <div class="flex-1">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-base">🎛️</span>
-                  <span class="text-xs font-bold text-white">3. ภาพถ่ายหน้าปัดเรือนไมล์และไฟเตือน (Dashboard Check)</span>
-                </div>
-                <p class="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
-                  ถ่ายภาพหน้าปัดเรือนไมล์ขณะสตาร์ตเครื่อง แสดงเลขไมล์และเช็คว่าไม่มีไฟเตือนผิดปกติ
-                </p>
-              </div>
-              <span id="badgeDashboardStatus" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 bg-rose-500/20 text-rose-400 border border-rose-500/30 transition">
-                ยังไม่แนบ
-              </span>
-            </div>
-
-            <!-- Action Trigger & Preview Box -->
-            <div>
-              <input type="file" id="inputDashboardPhoto" accept="image/*" capture="environment" class="hidden" onchange="handlePreDeparturePhotoChange(event, 'dashboard')">
-              
-              <!-- Button to Open Camera -->
-              <div id="dashboardActionBox">
-                <button type="button" onclick="document.getElementById('inputDashboardPhoto').click()"
-                  class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-cyan-600/30 to-blue-600/30 hover:from-cyan-600/50 hover:to-blue-600/50 text-cyan-200 border border-cyan-500/40 text-xs font-mono font-bold flex items-center justify-center gap-2 transition active:scale-[0.98]">
-                  <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
-                  📸 ถ่ายภาพ / แนบรูปหน้าปัดเรือนไมล์
-                </button>
-              </div>
-
-              <!-- Preview Box -->
-              <div id="dashboardPreviewBox" class="hidden flex items-center gap-3 p-2 rounded-lg bg-slate-900 border border-cyan-500/30">
-                <img id="dashboardImgPreview" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border border-slate-700 shrink-0 cursor-pointer" onclick="viewPhotoFullscreen('dashboard')" title="คลิกเพื่อดูภาพขนาดใหญ่" alt="Dashboard Preview">
-                <div class="flex-1 min-w-0">
-                  <p class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
-                    <span>✓</span> แนบภาพหน้าปัดเรือนไมล์แล้ว
-                  </p>
-                  <p class="text-[9px] text-slate-400 truncate mt-0.5">แสดงเลขไมล์และไฟเตือนหน้าปัดปกติ</p>
-                  <div class="mt-2 flex gap-2">
-                    <button type="button" onclick="document.getElementById('inputDashboardPhoto').click()" 
-                      class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-[10px] font-mono flex items-center gap-1 transition">
-                      🔄 ถ่ายใหม่ (Retake)
-                    </button>
-                    <button type="button" onclick="removePreDeparturePhoto('dashboard')" 
                       class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-rose-400 border border-rose-500/30 text-[10px] font-mono transition">
                       ลบรูป
                     </button>
@@ -659,6 +664,8 @@
       defect_1: null,
       defect_2: null,
       seatbelt: null,
+      seatbeltDriver: null,
+      seatbeltAssistant: null,
       dashcam: null
     };
     let isNoAssistantChecked = false;
@@ -1906,11 +1913,17 @@
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
 
             capturedImages[type] = compressedBase64;
+            if (type === 'seatbeltDriver') {
+              capturedImages.seatbelt = compressedBase64;
+            }
             renderPreDeparturePhotoUI(type);
             playBeep(880, 'sine', 0.1);
             Swal.close();
           } catch (err) {
             capturedImages[type] = e.target.result;
+            if (type === 'seatbeltDriver') {
+              capturedImages.seatbelt = e.target.result;
+            }
             renderPreDeparturePhotoUI(type);
             Swal.close();
           }
@@ -1927,8 +1940,17 @@
       const previewBox = document.getElementById(type + 'PreviewBox');
       const actionBox = document.getElementById(type + 'ActionBox');
       const imgPreview = document.getElementById(type + 'ImgPreview');
-      const badgeId = type === 'seatbelt' ? 'badgeSeatbeltStatus' : (type === 'dashcam' ? 'badgeDashcamStatus' : 'badgeDashboardStatus');
+      
+      const badgeId = 'badge' + type.charAt(0).toUpperCase() + type.slice(1) + 'Status';
       const badge = document.getElementById(badgeId);
+
+      if (type === 'seatbeltAssistant' && isNoAssistantChecked) {
+        if (badge) {
+          badge.innerText = 'ยกเว้น ผขถ.';
+          badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 bg-amber-500/20 text-amber-400 border border-amber-500/30';
+        }
+        return;
+      }
 
       if (capturedImages[type]) {
         if (imgPreview) imgPreview.src = capturedImages[type];
@@ -1937,14 +1959,6 @@
         if (badge) {
           badge.innerText = 'แนบรูปแล้ว';
           badge.className = 'px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-        }
-        if (type === 'seatbelt') {
-          const infoText = document.getElementById('seatbeltInfoText');
-          if (infoText) {
-            infoText.innerText = isNoAssistantChecked 
-              ? 'แสดงการคาดเข็มขัดนิรภัย พขร. (เที่ยวนี้ไม่มี ผขถ.)' 
-              : 'แสดงการคาดเข็มขัดนิรภัย พขร. และ ผขถ. ครบถ้วน';
-          }
         }
       } else {
         if (previewBox) previewBox.classList.add('hidden');
@@ -1958,7 +1972,8 @@
 
     function removePreDeparturePhoto(type) {
       capturedImages[type] = null;
-      const inputId = type === 'seatbelt' ? 'inputSeatbeltPhoto' : (type === 'dashcam' ? 'inputDashcamPhoto' : 'inputDashboardPhoto');
+      if (type === 'seatbeltDriver') capturedImages.seatbelt = null;
+      const inputId = 'input' + type.charAt(0).toUpperCase() + type.slice(1) + 'Photo';
       const inputEl = document.getElementById(inputId);
       if (inputEl) inputEl.value = '';
       renderPreDeparturePhotoUI(type);
@@ -1968,20 +1983,30 @@
     function handleNoAssistantToggle() {
       const chk = document.getElementById('chkNoAssistant');
       isNoAssistantChecked = chk ? chk.checked : false;
-      const infoText = document.getElementById('seatbeltInfoText');
-      if (infoText && capturedImages.seatbelt) {
-        infoText.innerText = isNoAssistantChecked 
-          ? 'แสดงการคาดเข็มขัดนิรภัย พขร. (เที่ยวนี้ไม่มี ผขถ.)' 
-          : 'แสดงการคาดเข็มขัดนิรภัย พขร. และ ผขถ. ครบถ้วน';
+
+      const assistantWrapper = document.getElementById('seatbeltAssistantWrapper');
+      const notice = document.getElementById('noAssistantNotice');
+      const ruleBadge = document.getElementById('badgeReadinessRule');
+
+      if (isNoAssistantChecked) {
+        if (assistantWrapper) assistantWrapper.classList.add('hidden');
+        if (notice) notice.classList.remove('hidden');
+        if (ruleBadge) ruleBadge.innerText = 'ตรวจ 2 รูป (เข็มขัด พขร. • กล้อง)';
+      } else {
+        if (assistantWrapper) assistantWrapper.classList.remove('hidden');
+        if (notice) notice.classList.add('hidden');
+        if (ruleBadge) ruleBadge.innerText = 'บังคับตรวจ 3 รูป (เข็มขัด พขร. • ผขถ. • กล้อง)';
       }
+      renderPreDeparturePhotoUI('seatbeltAssistant');
     }
 
     function viewPhotoFullscreen(type) {
       const imgUrl = capturedImages[type];
       if (!imgUrl) return;
-      const title = type === 'seatbelt' 
-        ? 'ภาพถ่ายการคาดเข็มขัดนิรภัย (Seatbelt Check)' 
-        : (type === 'dashcam' ? 'ภาพถ่ายกล้องบันทึกภาพหน้ารถ (Dashcam Operational Check)' : 'ภาพถ่ายหน้าปัดเรือนไมล์และไฟเตือน (Dashboard Check)');
+      let title = 'ภาพถ่ายการตรวจสอบความพร้อม';
+      if (type === 'seatbeltDriver') title = 'ภาพถ่ายการคาดเข็มขัดนิรภัย: พนักงานขับรถ (พขร.)';
+      else if (type === 'seatbeltAssistant') title = 'ภาพถ่ายการคาดเข็มขัดนิรภัย: พนักงานท้ายรถ (ผขถ.)';
+      else if (type === 'dashcam') title = 'ภาพถ่ายกล้องบันทึกภาพหน้ารถ (Dashcam REC Status)';
       Swal.fire({
         title: title,
         imageUrl: imgUrl,
@@ -2038,18 +2063,20 @@
       }
 
       // Render Pre-Departure UI States
-      renderPreDeparturePhotoUI('seatbelt');
+      handleNoAssistantToggle();
+      renderPreDeparturePhotoUI('seatbeltDriver');
+      renderPreDeparturePhotoUI('seatbeltAssistant');
       renderPreDeparturePhotoUI('dashcam');
-      renderPreDeparturePhotoUI('dashboard');
 
       // Populate Thumbnails Grid
       const grid = document.getElementById('auditThumbnailsGrid');
       grid.innerHTML = '';
       
       const thumbData = [
-        { label: 'เข็มขัดนิรภัย', img: capturedImages.seatbelt },
+        { label: 'เข็มขัด พขร.', img: capturedImages.seatbeltDriver || capturedImages.seatbelt },
+        { label: 'เข็มขัด ผขถ.', img: !isNoAssistantChecked ? capturedImages.seatbeltAssistant : null },
         { label: 'กล้องหน้ารถ', img: capturedImages.dashcam },
-        { label: 'หน้าปัดไมล์', img: capturedImages.dashboard },
+        { label: 'หน้าปัดไมล์ (จันทร์)', img: capturedImages.dashboard },
         { label: 'หน้ารถรอบคัน', img: capturedImages.frontVehicle },
         { label: 'จุดชำรุด (ถ้ามี)', img: capturedImages.defect_1 }
       ];
@@ -2086,15 +2113,13 @@
         return;
       }
 
-      // 1. ตรวจสอบเงื่อนไข Validation: ภาพถ่ายการคาดเข็มขัดนิรภัย (Seatbelt Check)
-      if (!capturedImages.seatbelt) {
+      // 1. ตรวจสอบเงื่อนไข Validation: ภาพถ่ายการคาดเข็มขัดนิรภัย พขร.
+      if (!capturedImages.seatbeltDriver && !capturedImages.seatbelt) {
         playBeep(400, 'sawtooth', 0.15);
         Swal.fire({
           icon: 'warning',
-          title: 'ยังไม่ได้แนบภาพเข็มขัดนิรภัย',
-          text: isNoAssistantChecked 
-            ? 'กรุณาถ่ายภาพการคาดเข็มขัดนิรภัยของ พขร. ให้ชัดเจนก่อนส่งบันทึก' 
-            : 'กรุณาถ่ายภาพมุมกว้างในห้องโดยสาร แสดงการคาดเข็มขัดนิรภัยของ พขร. และ ผขถ. ชัดเจนก่อนส่งบันทึก (หรือติ๊กเลือก "เที่ยวนี้ไม่มี ผขถ." หากไม่มีผู้ช่วย)',
+          title: 'ยังไม่ได้แนบภาพเข็มขัดนิรภัย พขร.',
+          text: 'กรุณาถ่ายภาพการคาดเข็มขัดนิรภัยของ พนักงานขับรถ (พขร.) ให้ชัดเจนก่อนส่งบันทึก',
           confirmButtonColor: '#00f2fe',
           background: '#0a1120',
           color: '#fff'
@@ -2102,7 +2127,21 @@
         return;
       }
 
-      // 2. ตรวจสอบเงื่อนไข Validation: ภาพถ่ายกล้องบันทึกภาพหน้ารถ (Dashcam Operational Check)
+      // 2. ตรวจสอบเงื่อนไข Validation: ภาพถ่ายการคาดเข็มขัดนิรภัย ผขถ. (ยกเว้นกดเลือกไม่มี ผขถ.)
+      if (!isNoAssistantChecked && !capturedImages.seatbeltAssistant) {
+        playBeep(400, 'sawtooth', 0.15);
+        Swal.fire({
+          icon: 'warning',
+          title: 'ยังไม่ได้แนบภาพเข็มขัดนิรภัย ผขถ.',
+          text: 'กรุณาถ่ายภาพการคาดเข็มขัดนิรภัยของ พนักงานท้ายรถ (ผขถ.) ให้ครบถ้วน หรือกดติ๊กเลือก "เที่ยวนี้ไม่มี พนักงานท้ายรถ (ผขถ.)" หากไม่มีผู้ช่วยในเที่ยวนี้',
+          confirmButtonColor: '#00f2fe',
+          background: '#0a1120',
+          color: '#fff'
+        });
+        return;
+      }
+
+      // 3. ตรวจสอบเงื่อนไข Validation: ภาพถ่ายกล้องบันทึกภาพหน้ารถ (Dashcam Operational Check)
       if (!capturedImages.dashcam) {
         playBeep(400, 'sawtooth', 0.15);
         Swal.fire({
@@ -2161,11 +2200,20 @@
         checklist: questionsSummary,
         hasNoAssistant: isNoAssistantChecked,
         cabinReadiness: {
-          seatbeltAttached: !!capturedImages.seatbelt,
+          seatbeltDriverAttached: !!(capturedImages.seatbeltDriver || capturedImages.seatbelt),
+          seatbeltAssistantAttached: isNoAssistantChecked ? true : !!capturedImages.seatbeltAssistant,
           dashcamAttached: !!capturedImages.dashcam,
           noAssistant: isNoAssistantChecked
         },
-        images: capturedImages
+        images: {
+          seatbelt: capturedImages.seatbeltDriver || capturedImages.seatbelt,
+          seatbeltDriver: capturedImages.seatbeltDriver || capturedImages.seatbelt,
+          seatbeltAssistant: capturedImages.seatbeltAssistant,
+          dashcam: capturedImages.dashcam,
+          dashboard: capturedImages.dashboard,
+          frontVehicle: capturedImages.frontVehicle,
+          defect_1: capturedImages.defect_1
+        }
       };
 
       try {

@@ -122,7 +122,7 @@ function doPost(e) {
     const photoUrls = {};
     const photoBlobs = {};
 
-    const imageKeys = ['dashboard', 'frontVehicle', 'defect_1', 'defect_2', 'defect_3', 'seatbelt', 'dashcam'];
+    const imageKeys = ['dashboard', 'frontVehicle', 'defect_1', 'defect_2', 'defect_3', 'seatbelt', 'seatbeltDriver', 'seatbeltAssistant', 'dashcam'];
     for (let key of imageKeys) {
       if (data.images && data.images[key] && data.images[key].includes(",")) {
         try {
@@ -157,6 +157,16 @@ function doPost(e) {
 
     // 5. บันทึกผลลง Sheet 'Truck_Inspection_Logs'
     const timestamp = Utilities.formatDate(new Date(), "Asia/Bangkok", "dd/MM/yyyy HH:mm:ss");
+    const seatbeltDriverUrl = photoUrls['seatbeltDriver'] || photoUrls['seatbelt'] || "-";
+    const seatbeltAssistantUrl = photoUrls['seatbeltAssistant'] || "-";
+    const dashcamUrl = photoUrls['dashcam'] || "-";
+
+    try {
+      if (logSheet.getLastColumn() < 18) {
+        logSheet.getRange(1, 18).setValue("Img_Seatbelt_Assistant");
+      }
+    } catch(e) {}
+
     logSheet.appendRow([
       timestamp,
       driverInfo.driverId,
@@ -173,8 +183,9 @@ function doPost(e) {
       photoUrls['defect_1'],
       photoUrls['defect_2'],
       pdfUrl,
-      photoUrls['seatbelt'] || "-",
-      photoUrls['dashcam'] || "-"
+      seatbeltDriverUrl,
+      dashcamUrl,
+      seatbeltAssistantUrl
     ]);
 
     // 6. อัปเดตไฟล์รายงานสรุปรายเดือน (Monthly PDF Report) หลังบ้านอัตโนมัติทันที
@@ -219,36 +230,84 @@ function generateFCAM032PdfReport(data, driverInfo, photoBlobs) {
   const status = data.overallStatus || "พร้อมใช้งาน";
   const note = data.defectsNote || "ไม่มี";
 
-  // --- กล่องภาพถ่าย 3 ช่องมุมบนขวา (Pre-Departure Readiness Evidence 3 Boxes) ---
-  // กล่องที่ 1: เข็มขัดนิรภัย
-  let box1Html = `<div style="color: #94a3b8; font-size: 7px; text-align: center; padding-top: 25px;">[ ไม่มีภาพ ]</div>`;
-  if (data.images && data.images.seatbelt) {
-    box1Html = `<img src="${data.images.seatbelt}" style="width: 100%; height: 100%; object-fit: cover;" />`;
+  // --- กล่องภาพถ่ายความพร้อมในห้องโดยสาร (Pre-Departure Readiness Evidence) ---
+  const hasNoAssistant = Boolean(
+    data.hasNoAssistant ||
+    (data.cabinReadiness && data.cabinReadiness.noAssistant)
+  );
+
+  const seatbeltDriverImg = (data.images && (data.images.seatbeltDriver || data.images.seatbelt)) ||
+                            (photoBlobs && (photoBlobs.seatbeltDriver || photoBlobs.seatbelt));
+
+  const seatbeltAssistantImg = (data.images && data.images.seatbeltAssistant) ||
+                               (photoBlobs && photoBlobs.seatbeltAssistant);
+
+  const dashcamImg = (data.images && data.images.dashcam) ||
+                     (photoBlobs && photoBlobs.dashcam);
+
+  let boxSeatbeltDriverHtml = `<div style="color: #94a3b8; font-size: 7px; text-align: center; padding-top: 25px;">[ ไม่มีภาพ ]</div>`;
+  if (seatbeltDriverImg) {
+    boxSeatbeltDriverHtml = `<img src="${seatbeltDriverImg}" style="width: 100%; height: 100%; object-fit: cover;" />`;
   }
 
-  // กล่องที่ 2: กล้องหน้ารถ REC
-  let box2Html = `<div style="color: #94a3b8; font-size: 7px; text-align: center; padding-top: 25px;">[ ไม่มีภาพ ]</div>`;
-  if (data.images && data.images.dashcam) {
-    box2Html = `<img src="${data.images.dashcam}" style="width: 100%; height: 100%; object-fit: cover;" />`;
+  let boxSeatbeltAssistantHtml = `<div style="color: #94a3b8; font-size: 7px; text-align: center; padding-top: 25px;">[ ไม่มีภาพ ]</div>`;
+  if (seatbeltAssistantImg) {
+    boxSeatbeltAssistantHtml = `<img src="${seatbeltAssistantImg}" style="width: 100%; height: 100%; object-fit: cover;" />`;
   }
 
-  // กล่องที่ 3: หน้าปัดไมล์ / หน้ารถ / จุดชำรุด
-  let box3Title = "3. หน้าปัดเรือนไมล์";
-  let box3Sub = "เลขไมล์/ไฟเตือน";
-  let box3Html = `<div style="color: #94a3b8; font-size: 7px; text-align: center; padding-top: 25px;">[ ไม่มีภาพ ]</div>`;
+  let boxDashcamHtml = `<div style="color: #94a3b8; font-size: 7px; text-align: center; padding-top: 25px;">[ ไม่มีภาพ ]</div>`;
+  if (dashcamImg) {
+    boxDashcamHtml = `<img src="${dashcamImg}" style="width: 100%; height: 100%; object-fit: cover;" />`;
+  }
 
-  if (data.images && data.images.defect_1) {
-    box3Title = "3. จุดชำรุดแจ้งซ่อม";
-    box3Sub = "(พบข้อบกพร่อง)";
-    box3Html = `<img src="${data.images.defect_1}" style="width: 100%; height: 100%; object-fit: cover;" />`;
-  } else if (data.images && data.images.dashboard) {
-    box3Title = "3. หน้าปัดเรือนไมล์";
-    box3Sub = "เลขไมล์/ไฟเตือน";
-    box3Html = `<img src="${data.images.dashboard}" style="width: 100%; height: 100%; object-fit: cover;" />`;
-  } else if (data.images && data.images.frontVehicle) {
-    box3Title = "3. หน้ารถรอบคัน";
-    box3Sub = "สภาพตัวถัง";
-    box3Html = `<img src="${data.images.frontVehicle}" style="width: 100%; height: 100%; object-fit: cover;" />`;
+  let cabinPhotoBoxesHtml = "";
+  if (hasNoAssistant) {
+    // กรณีเที่ยวนี้ไม่มี ผขถ. -> ปรับแสดง 2 ช่องแบบเต็มพื้นที่ (เข็มขัด พขร. + กล้องหน้ารถ)
+    cabinPhotoBoxesHtml = `
+      <tr>
+        <td style="width: 50%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
+          <div style="font-size: 7.2px; font-weight: bold; color: #0f172a; line-height: 1.1;">1. เข็มขัดนิรภัย พขร.</div>
+          <div style="font-size: 6px; color: #b45309; margin-bottom: 2px;">(ไม่มี ผขถ. - มีเฉพาะ พขร.)</div>
+          <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
+            ${boxSeatbeltDriverHtml}
+          </div>
+        </td>
+        <td style="width: 50%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
+          <div style="font-size: 7.2px; font-weight: bold; color: #0f172a; line-height: 1.1;">2. กล้องบันทึกหน้ารถ</div>
+          <div style="font-size: 6px; color: #16a34a; margin-bottom: 2px;">ไฟ REC ปกติ</div>
+          <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
+            ${boxDashcamHtml}
+          </div>
+        </td>
+      </tr>
+    `;
+  } else {
+    // กรณีมีทั้ง พขร. และ ผขถ. -> แสดง 3 ช่อง (เข็มขัด พขร. + เข็มขัด ผขถ. + กล้องหน้ารถ)
+    cabinPhotoBoxesHtml = `
+      <tr>
+        <td style="width: 33.33%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
+          <div style="font-size: 7px; font-weight: bold; color: #0f172a; line-height: 1.1;">1. เข็มขัดนิรภัย (พขร.)</div>
+          <div style="font-size: 6px; color: #0369a1; margin-bottom: 2px;">พนักงานขับรถ</div>
+          <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
+            ${boxSeatbeltDriverHtml}
+          </div>
+        </td>
+        <td style="width: 33.33%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
+          <div style="font-size: 7px; font-weight: bold; color: #0f172a; line-height: 1.1;">2. เข็มขัดนิรภัย (ผขถ.)</div>
+          <div style="font-size: 6px; color: #0369a1; margin-bottom: 2px;">พนักงานท้ายรถ</div>
+          <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
+            ${boxSeatbeltAssistantHtml}
+          </div>
+        </td>
+        <td style="width: 33.33%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
+          <div style="font-size: 7px; font-weight: bold; color: #0f172a; line-height: 1.1;">3. กล้องหน้ารถ</div>
+          <div style="font-size: 6px; color: #16a34a; margin-bottom: 2px;">ไฟ REC ปกติ</div>
+          <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
+            ${boxDashcamHtml}
+          </div>
+        </td>
+      </tr>
+    `;
   }
 
   // --- แถวตารางเช็กลิสต์ (จัดแบบ 2 คอลัมน์คู่ขนาน ซ้าย-ขวา เพื่อให้อยู่ใน 1 หน้ากระดาษพอดี) ---
@@ -411,36 +470,7 @@ function generateFCAM032PdfReport(data, driverInfo, photoBlobs) {
                 ★ หมวดความพร้อมในห้องโดยสารก่อนออกรถ (Pre-Departure Readiness)
               </div>
               <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-                <tr>
-                  <!-- กล่อง 1: เข็มขัดนิรภัย -->
-                  <td style="width: 33.33%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
-                    <div style="font-size: 7px; font-weight: bold; color: #0f172a; line-height: 1.1;">1. เข็มขัดนิรภัย</div>
-                    <div style="font-size: 6px; color: ${data.hasNoAssistant ? '#b45309' : '#0369a1'}; margin-bottom: 2px;">
-                      ${data.hasNoAssistant ? 'เฉพาะ พขร.' : 'พขร. & ผขถ.'}
-                    </div>
-                    <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
-                      ${box1Html}
-                    </div>
-                  </td>
-
-                  <!-- กล่อง 2: กล้องหน้ารถ REC -->
-                  <td style="width: 33.33%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
-                    <div style="font-size: 7px; font-weight: bold; color: #0f172a; line-height: 1.1;">2. กล้องหน้ารถ</div>
-                    <div style="font-size: 6px; color: #16a34a; margin-bottom: 2px;">ไฟ REC ปกติ</div>
-                    <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
-                      ${box2Html}
-                    </div>
-                  </td>
-
-                  <!-- กล่อง 3: หน้าปัดไมล์ / หน้ารถ / จุดชำรุด -->
-                  <td style="width: 33.33%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
-                    <div style="font-size: 7px; font-weight: bold; color: #0f172a; line-height: 1.1;">${box3Title}</div>
-                    <div style="font-size: 6px; color: #64748b; margin-bottom: 2px;">${box3Sub}</div>
-                    <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
-                      ${box3Html}
-                    </div>
-                  </td>
-                </tr>
+                ${cabinPhotoBoxesHtml}
               </table>
             </div>
           </td>
