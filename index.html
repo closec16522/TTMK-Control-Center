@@ -5139,8 +5139,17 @@
         }
       }
       if (pIframe) {
-        // Use same-origin PDF preview to eliminate Google Drive frame-ancestors CSP and unload violations
-        pIframe.src = `./CheckTruck/downloaded_all_trucks.pdf?v=${Date.now()}`;
+        if (pdfUrl.includes('drive.google.com/file/d/')) {
+          const m = pdfUrl.match(/\/file\/d\/([^\/\?]+)/);
+          const fileId = m && m[1] ? m[1] : '';
+          if (fileId) {
+            pIframe.src = `https://docs.google.com/viewer?srcid=${fileId}&pid=explorer&efh=false&a=v&chrome=false&embedded=true`;
+          } else {
+            pIframe.src = `./CheckTruck/downloaded_all_trucks.pdf?v=${Date.now()}`;
+          }
+        } else {
+          pIframe.src = `${pdfUrl}?v=${Date.now()}`;
+        }
       }
 
       // If log has checklist items, render them dynamically
@@ -5289,8 +5298,17 @@
         }
       }
       if (mIframe) {
-        // Embed the updated PDF directly via same-origin path to ensure 100% reliable viewing without Google Drive iframe CSP block
-        mIframe.src = `./CheckTruck/downloaded_monthly.pdf?v=${Date.now()}`;
+        if (pdfUrl.includes('drive.google.com/file/d/')) {
+          const m = pdfUrl.match(/\/file\/d\/([^\/\?]+)/);
+          const fileId = m && m[1] ? m[1] : '';
+          if (fileId) {
+            mIframe.src = `https://docs.google.com/viewer?srcid=${fileId}&pid=explorer&efh=false&a=v&chrome=false&embedded=true`;
+          } else {
+            mIframe.src = `./CheckTruck/downloaded_monthly.pdf?v=${Date.now()}`;
+          }
+        } else {
+          mIframe.src = `${pdfUrl}?v=${Date.now()}`;
+        }
       }
     }
 
