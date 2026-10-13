@@ -1019,25 +1019,34 @@ window.handleMobileFormSubmit = async function(event) {
     showConfirmButton: false
   });
 
+  const emailVal = (document.getElementById("driverEmail")?.value || 
+                    appState.currentDriver?.email || 
+                    localStorage.getItem(CONFIG.STORAGE_KEY_DRIVER) || 
+                    localStorage.getItem("TTMK_ACTIVE_USER_EMAIL") || 
+                    "closec16522@gmail.com").trim().toLowerCase();
+
   const payload = {
     action: "save_maintenance",
+    email: emailVal,
+    driverEmail: emailVal,
     ticketId: ticketId,
     inspectionDate: date,
     vehiclePlate: plate,
-    vehicleType: document.getElementById("vehicleType").value,
+    vehicleType: document.getElementById("vehicleType")?.value || "รถบรรทุก 6 ล้อ",
     odometer: odo,
     driverName: driverName,
-    driverEmail: document.getElementById("driverEmail").value.trim(),
-    driverPhone: document.getElementById("driverPhone").value.trim(),
-    status: document.getElementById("ticketStatus").value,
-    maintenanceType: document.getElementById("maintenanceType").value,
-    systemAffected: document.getElementById("systemAffected").value,
-    urgency: document.getElementById("urgency").value,
+    driverPhone: document.getElementById("driverPhone")?.value?.trim() || "-",
+    status: document.getElementById("ticketStatus")?.value || "ซ่อมเสร็จแล้ว",
+    maintenanceType: document.getElementById("maintenanceType")?.value || "ตรวจซ่อมทั่วไป",
+    systemAffected: document.getElementById("systemAffected")?.value || "ไม่ระบุ",
+    urgency: document.getElementById("urgency")?.value || "ปกติ",
     symptom: symptom,
+    symptomDescription: symptom,
     garageName: garageName,
-    mechanicName: document.getElementById("mechanicName").value.trim(),
-    garagePhone: document.getElementById("garagePhone").value.trim(),
+    mechanicName: document.getElementById("mechanicName")?.value?.trim() || "-",
+    garagePhone: document.getElementById("garagePhone")?.value?.trim() || "-",
     items: appState.partItems,
+    parts: appState.partItems,
     partsCost: totals.partsSubtotal,
     laborCost: totals.laborSubtotal,
     vatAmount: totals.vatAmount,
@@ -1064,7 +1073,7 @@ window.handleMobileFormSubmit = async function(event) {
           <div class="text-left text-xs text-slate-300 space-y-2">
             <p>บันทึกงานซ่อมรหัส: <b class="font-digital text-amber-400">${ticketId}</b></p>
             <p>ยอดรวม: <b class="text-emerald-400">${totals.grandTotal.toLocaleString()} บาท</b></p>
-            <p class="text-[10px] text-slate-400">* ระบบจัดเก็บข้อมูลลง Google Sheet และ Google Drive เรียบร้อยแล้ว</p>
+            <p class="text-[10px] text-slate-400">* บันทึกลง Google Sheet (Maintenance_log) เรียบร้อยแล้ว</p>
           </div>
         `,
         background: '#0f172a',
@@ -1075,19 +1084,35 @@ window.handleMobileFormSubmit = async function(event) {
         resetMobileForm();
       });
     } else {
-      throw new Error(result?.message || 'Server error');
+      const errMsg = result?.message || 'Server error';
+      saveLocalTicketCache(payload, { serverError: errMsg });
+      Swal.fire({
+        icon: 'error',
+        title: 'บันทึกลง Sheet ไม่สำเร็จ',
+        html: `
+          <div class="text-left text-xs text-slate-300 space-y-2">
+            <p class="text-red-400 font-semibold">ข้อความจากเซิร์ฟเวอร์ Google Apps Script:</p>
+            <p class="p-2 bg-slate-900 rounded-lg text-slate-200 font-mono text-[11px] border border-slate-700">${escapeHtml(errMsg)}</p>
+            <p class="text-[11px] text-slate-400 leading-relaxed">* กรุณาเปิด Apps Script แล้วกด <b>Deploy > Manage Deployments > แก้ไขเป็นเวอร์ชันใหม่</b> เพื่ออัปเดตระบบ</p>
+          </div>
+        `,
+        background: '#0f172a',
+        color: '#fff',
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#ea580c'
+      });
     }
   } catch (err) {
     console.warn("GAS save fallback to local:", err);
-    saveLocalTicketCache(payload, { localOnly: true });
+    saveLocalTicketCache(payload, { localOnly: true, networkError: err.toString() });
 
     Swal.fire({
-      icon: 'success',
-      title: 'บันทึกข้อมูลเรียบร้อย (เครื่องจำไว้แล้ว)',
+      icon: 'warning',
+      title: 'เครือข่ายขัดข้อง (บันทึกในเครื่องแล้ว)',
       html: `
         <div class="text-left text-xs text-slate-300 space-y-1.5">
           <p>รหัสแจ้งซ่อม: <b class="font-digital text-amber-400">${ticketId}</b></p>
-          <p class="text-slate-400">ข้อมูลและรูปภาพถูกบันทึกในอุปกรณ์เรียบร้อยแล้ว</p>
+          <p class="text-slate-400">บันทึกข้อมูลและรูปภาพในเครื่องเรียบร้อยแล้ว</p>
         </div>
       `,
       background: '#0f172a',

@@ -158,7 +158,8 @@ function doPost(e) {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
 
     // 1. ตรวจสอบ Driver Registration
-    const driverCheck = checkDriverRegistration(data.email, ss);
+    const userEmail = (data.email || data.driverEmail || "").trim().toLowerCase();
+    const driverCheck = checkDriverRegistration(userEmail, ss);
     if (driverCheck.status !== "success") {
       return responseJSON(driverCheck);
     }
