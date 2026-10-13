@@ -104,7 +104,8 @@ function doPost(e) {
       const headers = [
         "Timestamp", "Driver_ID", "Driver_Name", "Email", "Vehicle_Plate", 
         "Vehicle_Type", "Odometer", "Overall_Status", "Checklist_Summary", "Defects_Note",
-        "Img_Dashboard", "Img_Front_Body", "Img_Defects_1", "Img_Defects_2", "PDF_Report_URL"
+        "Img_Dashboard", "Img_Front_Body", "Img_Defects_1", "Img_Defects_2", "PDF_Report_URL",
+        "Img_Seatbelt", "Img_Dashcam"
       ];
       logSheet.appendRow(headers);
       logSheet.setFrozenRows(1);
@@ -121,7 +122,7 @@ function doPost(e) {
     const photoUrls = {};
     const photoBlobs = {};
 
-    const imageKeys = ['dashboard', 'frontVehicle', 'defect_1', 'defect_2', 'defect_3'];
+    const imageKeys = ['dashboard', 'frontVehicle', 'defect_1', 'defect_2', 'defect_3', 'seatbelt', 'dashcam'];
     for (let key of imageKeys) {
       if (data.images && data.images[key] && data.images[key].includes(",")) {
         try {
@@ -171,7 +172,9 @@ function doPost(e) {
       photoUrls['frontVehicle'],
       photoUrls['defect_1'],
       photoUrls['defect_2'],
-      pdfUrl
+      pdfUrl,
+      photoUrls['seatbelt'] || "-",
+      photoUrls['dashcam'] || "-"
     ]);
 
     // 6. อัปเดตไฟล์รายงานสรุปรายเดือน (Monthly PDF Report) หลังบ้านอัตโนมัติทันที
@@ -232,32 +235,77 @@ function generateFCAM032PdfReport(data, driverInfo, photoBlobs) {
     });
   }
 
-  // รูปภาพประกอบ (แสดงเฉพาะรูปที่มีจริง)
-  let imagesHtml = "";
+  // 1. หมวดภาพถ่ายหลักฐานความพร้อมในห้องโดยสารก่อนออกรถ (Pre-Departure Readiness) - TSM Standard
+  let preDepartureHtml = "";
+  const hasSeatbelt = data.images && data.images.seatbelt;
+  const hasDashcam = data.images && data.images.dashcam;
+
+  if (hasSeatbelt || hasDashcam) {
+    const assistantNote = data.hasNoAssistant 
+      ? "<span style='color: #b45309; font-weight: bold;'>[เที่ยวนี้ไม่มี ผขถ. - มีเฉพาะ พขร.]</span>" 
+      : "<span style='color: #0369a1;'>[แสดงการคาดเข็มขัดนิรภัย พขร. และ ผขถ. ครบถ้วน]</span>";
+
+    preDepartureHtml = `
+      <div style="margin-top: 10px; border: 1.5px solid #0284c7; border-radius: 4px; overflow: hidden; background-color: #ffffff;">
+        <div style="background-color: #0f172a; color: #38bdf8; padding: 4px 8px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">
+          ★ หมวดความพร้อมในห้องโดยสารก่อนออกรถ (Pre-Departure Readiness Audit - TSM Safety Standard)
+        </div>
+        <table style="width: 100%; border-collapse: collapse; background-color: #f8fafc;">
+          <tr>
+            <td style="width: 50%; border: 1px solid #cbd5e1; padding: 6px; text-align: center; vertical-align: top;">
+              <div style="font-size: 9.5px; font-weight: bold; color: #0f172a; margin-bottom: 2px;">
+                1. ภาพถ่ายการคาดเข็มขัดนิรภัย (Seatbelt Check)
+              </div>
+              <div style="font-size: 8px; margin-bottom: 4px;">
+                ${assistantNote}
+              </div>
+              ${hasSeatbelt ? `
+                <img src="${data.images.seatbelt}" style="max-width: 100%; height: 130px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 3px;" />
+              ` : '<div style="padding: 30px; color: #94a3b8; font-size: 9px;">- ไม่มีภาพแนบ -</div>'}
+            </td>
+            <td style="width: 50%; border: 1px solid #cbd5e1; padding: 6px; text-align: center; vertical-align: top;">
+              <div style="font-size: 9.5px; font-weight: bold; color: #0f172a; margin-bottom: 2px;">
+                2. ภาพถ่ายกล้องหน้ารถขณะสตาร์ตเครื่อง (Dashcam REC Check)
+              </div>
+              <div style="font-size: 8px; color: #475569; margin-bottom: 4px;">
+                [ไฟสถานะบันทึก REC ชัดเจน มุมมองไม่ถูกบดบัง]
+              </div>
+              ${hasDashcam ? `
+                <img src="${data.images.dashcam}" style="max-width: 100%; height: 130px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 3px;" />
+              ` : '<div style="padding: 30px; color: #94a3b8; font-size: 9px;">- ไม่มีภาพแนบ -</div>'}
+            </td>
+          </tr>
+        </table>
+      </div>
+    `;
+  }
+
+  // 2. รูปภาพประกอบเพิ่มเติม (หน้าปัดไมล์ / หน้ารถ / จุดชำรุด)
+  let additionalImagesHtml = "";
   if (data.images && (data.images.dashboard || data.images.frontVehicle || data.images.defect_1)) {
-    imagesHtml += "<div style='display: flex; gap: 10px; margin-top: 10px;'>";
+    additionalImagesHtml += "<div style='display: flex; gap: 8px; margin-top: 8px;'>";
     if (data.images.dashboard) {
-      imagesHtml += `
-        <div style="flex: 1; border: 1px solid #94a3b8; padding: 5px; text-align: center;">
-          <div style="font-size: 9px; font-weight: bold; margin-bottom: 3px;">1. รูปหน้าปัดไมล์/ไฟเตือน (Dashboard)</div>
-          <img src="${data.images.dashboard}" style="max-width: 100%; height: 130px; object-fit: contain;" />
+      additionalImagesHtml += `
+        <div style="flex: 1; border: 1px solid #94a3b8; padding: 4px; text-align: center; background-color: #ffffff;">
+          <div style="font-size: 9px; font-weight: bold; margin-bottom: 2px;">3. รูปหน้าปัดไมล์/ไฟเตือน (Dashboard)</div>
+          <img src="${data.images.dashboard}" style="max-width: 100%; height: 110px; object-fit: contain;" />
         </div>`;
     }
     if (data.images.frontVehicle) {
-      imagesHtml += `
-        <div style="flex: 1; border: 1px solid #94a3b8; padding: 5px; text-align: center;">
-          <div style="font-size: 9px; font-weight: bold; margin-bottom: 3px;">2. รูปหน้ารถ/รอบคัน (Front Vehicle)</div>
-          <img src="${data.images.frontVehicle}" style="max-width: 100%; height: 130px; object-fit: contain;" />
+      additionalImagesHtml += `
+        <div style="flex: 1; border: 1px solid #94a3b8; padding: 4px; text-align: center; background-color: #ffffff;">
+          <div style="font-size: 9px; font-weight: bold; margin-bottom: 2px;">4. รูปหน้ารถ/รอบคัน (Front Vehicle)</div>
+          <img src="${data.images.frontVehicle}" style="max-width: 100%; height: 110px; object-fit: contain;" />
         </div>`;
     }
     if (data.images.defect_1) {
-      imagesHtml += `
-        <div style="flex: 1; border: 1px solid #dc2626; padding: 5px; text-align: center; background-color: #fef2f2;">
-          <div style="font-size: 9px; font-weight: bold; color: #dc2626; margin-bottom: 3px;">3. จุดชำรุดแจ้งซ่อม (Defect Photo)</div>
-          <img src="${data.images.defect_1}" style="max-width: 100%; height: 130px; object-fit: contain;" />
+      additionalImagesHtml += `
+        <div style="flex: 1; border: 1px solid #dc2626; padding: 4px; text-align: center; background-color: #fef2f2;">
+          <div style="font-size: 9px; font-weight: bold; color: #dc2626; margin-bottom: 2px;">5. จุดชำรุดแจ้งซ่อม (Defect Photo)</div>
+          <img src="${data.images.defect_1}" style="max-width: 100%; height: 110px; object-fit: contain;" />
         </div>`;
     }
-    imagesHtml += "</div>";
+    additionalImagesHtml += "</div>";
   }
 
   const htmlContent = `
@@ -323,7 +371,8 @@ function generateFCAM032PdfReport(data, driverInfo, photoBlobs) {
         <b>หมายเหตุ / จุดชำรุดที่พบเพิ่มเติม:</b> ${note}
       </div>
 
-      ${imagesHtml}
+      ${preDepartureHtml}
+      ${additionalImagesHtml}
 
       <table class="footer-sign">
         <tr>
