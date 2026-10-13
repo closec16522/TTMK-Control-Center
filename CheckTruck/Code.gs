@@ -207,6 +207,7 @@ function doPost(e) {
 
 /**
  * 1. สร้างไฟล์ PDF ใบรายงานตรวจสภาพรถประจำวัน (Daily Inspection Report)
+ * จัดหน้าขนาด A4 Portrait พอดีใน 1 หน้ากระดาษ พร้อมกล่องภาพถ่ายความพร้อม 3 ช่องมุมบนขวา
  */
 function generateFCAM032PdfReport(data, driverInfo, photoBlobs) {
   const timestamp = Utilities.formatDate(new Date(), "Asia/Bangkok", "dd/MM/yyyy HH:mm:ss");
@@ -218,95 +219,64 @@ function generateFCAM032PdfReport(data, driverInfo, photoBlobs) {
   const status = data.overallStatus || "พร้อมใช้งาน";
   const note = data.defectsNote || "ไม่มี";
 
-  // แถวตารางเช็กลิสต์
-  let checklistRowsHtml = "";
-  if (Array.isArray(data.checklist)) {
-    data.checklist.forEach((item, index) => {
+  // --- กล่องภาพถ่าย 3 ช่องมุมบนขวา (Pre-Departure Readiness Evidence 3 Boxes) ---
+  // กล่องที่ 1: เข็มขัดนิรภัย
+  let box1Html = `<div style="color: #94a3b8; font-size: 7px; text-align: center; padding-top: 25px;">[ ไม่มีภาพ ]</div>`;
+  if (data.images && data.images.seatbelt) {
+    box1Html = `<img src="${data.images.seatbelt}" style="width: 100%; height: 100%; object-fit: cover;" />`;
+  }
+
+  // กล่องที่ 2: กล้องหน้ารถ REC
+  let box2Html = `<div style="color: #94a3b8; font-size: 7px; text-align: center; padding-top: 25px;">[ ไม่มีภาพ ]</div>`;
+  if (data.images && data.images.dashcam) {
+    box2Html = `<img src="${data.images.dashcam}" style="width: 100%; height: 100%; object-fit: cover;" />`;
+  }
+
+  // กล่องที่ 3: หน้าปัดไมล์ / หน้ารถ / จุดชำรุด
+  let box3Title = "3. หน้าปัดเรือนไมล์";
+  let box3Sub = "เลขไมล์/ไฟเตือน";
+  let box3Html = `<div style="color: #94a3b8; font-size: 7px; text-align: center; padding-top: 25px;">[ ไม่มีภาพ ]</div>`;
+
+  if (data.images && data.images.defect_1) {
+    box3Title = "3. จุดชำรุดแจ้งซ่อม";
+    box3Sub = "(พบข้อบกพร่อง)";
+    box3Html = `<img src="${data.images.defect_1}" style="width: 100%; height: 100%; object-fit: cover;" />`;
+  } else if (data.images && data.images.dashboard) {
+    box3Title = "3. หน้าปัดเรือนไมล์";
+    box3Sub = "เลขไมล์/ไฟเตือน";
+    box3Html = `<img src="${data.images.dashboard}" style="width: 100%; height: 100%; object-fit: cover;" />`;
+  } else if (data.images && data.images.frontVehicle) {
+    box3Title = "3. หน้ารถรอบคัน";
+    box3Sub = "สภาพตัวถัง";
+    box3Html = `<img src="${data.images.frontVehicle}" style="width: 100%; height: 100%; object-fit: cover;" />`;
+  }
+
+  // --- แถวตารางเช็กลิสต์ (จัดแบบ 2 คอลัมน์คู่ขนาน ซ้าย-ขวา เพื่อให้อยู่ใน 1 หน้ากระดาษพอดี) ---
+  const checklist = Array.isArray(data.checklist) ? data.checklist : [];
+  const halfCount = Math.ceil(checklist.length / 2);
+  const leftItems = checklist.slice(0, halfCount);
+  const rightItems = checklist.slice(halfCount);
+
+  function renderChecklistCol(items) {
+    let rowsHtml = "";
+    items.forEach((item, index) => {
       const isDefect = item.status === "DEFECT";
-      const icon = isDefect ? "<b style='color:#dc2626;'>[X] ชำรุด/บกพร่อง</b>" : "<span style='color:#16a34a;'>[/] ปกติดี</span>";
+      const icon = isDefect ? "<b style='color:#dc2626; font-size:6.8px;'>[X] ชำรุด</b>" : "<span style='color:#15803d; font-weight:bold; font-size:6.8px;'>[/] ปกติดี</span>";
       const rowBg = isDefect ? "#fee2e2" : (index % 2 === 0 ? "#f8fafc" : "#ffffff");
-      checklistRowsHtml += `
+      const zonePrefix = item.zone ? `<b>[${item.zone}]</b> ` : "";
+      rowsHtml += `
         <tr style="background-color: ${rowBg};">
-          <td style="border: 1px solid #cbd5e1; padding: 4px; text-align: center; font-size: 10px;">${item.no || (index + 1)}</td>
-          <td style="border: 1px solid #cbd5e1; padding: 4px; font-size: 10px;"><b>[${item.zone || 'ทั่วไป'}]</b> ${item.text || item.question || ''}</td>
-          <td style="border: 1px solid #cbd5e1; padding: 4px; text-align: center; font-size: 10px;">${icon}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 1.5px 2px; text-align: center; font-size: 7.2px; font-weight: bold;">${item.no || (index + 1)}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 1.5px 3px; font-size: 7px; line-height: 1.15; color: #1e293b;">${zonePrefix}${item.text || item.question || ''}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 1.5px 2px; text-align: center; font-size: 6.8px;">${icon}</td>
         </tr>
       `;
     });
+    return rowsHtml;
   }
 
-  // 1. หมวดภาพถ่ายหลักฐานความพร้อมในห้องโดยสารก่อนออกรถ (Pre-Departure Readiness) - TSM Standard
-  let preDepartureHtml = "";
-  const hasSeatbelt = data.images && data.images.seatbelt;
-  const hasDashcam = data.images && data.images.dashcam;
-
-  if (hasSeatbelt || hasDashcam) {
-    const assistantNote = data.hasNoAssistant 
-      ? "<span style='color: #b45309; font-weight: bold;'>[เที่ยวนี้ไม่มี ผขถ. - มีเฉพาะ พขร.]</span>" 
-      : "<span style='color: #0369a1;'>[แสดงการคาดเข็มขัดนิรภัย พขร. และ ผขถ. ครบถ้วน]</span>";
-
-    preDepartureHtml = `
-      <div style="margin-top: 10px; border: 1.5px solid #0284c7; border-radius: 4px; overflow: hidden; background-color: #ffffff;">
-        <div style="background-color: #0f172a; color: #38bdf8; padding: 4px 8px; font-size: 10px; font-weight: bold; letter-spacing: 0.3px;">
-          ★ หมวดความพร้อมในห้องโดยสารก่อนออกรถ (Pre-Departure Readiness Audit - TSM Safety Standard)
-        </div>
-        <table style="width: 100%; border-collapse: collapse; background-color: #f8fafc;">
-          <tr>
-            <td style="width: 50%; border: 1px solid #cbd5e1; padding: 6px; text-align: center; vertical-align: top;">
-              <div style="font-size: 9.5px; font-weight: bold; color: #0f172a; margin-bottom: 2px;">
-                1. ภาพถ่ายการคาดเข็มขัดนิรภัย (Seatbelt Check)
-              </div>
-              <div style="font-size: 8px; margin-bottom: 4px;">
-                ${assistantNote}
-              </div>
-              ${hasSeatbelt ? `
-                <img src="${data.images.seatbelt}" style="max-width: 100%; height: 130px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 3px;" />
-              ` : '<div style="padding: 30px; color: #94a3b8; font-size: 9px;">- ไม่มีภาพแนบ -</div>'}
-            </td>
-            <td style="width: 50%; border: 1px solid #cbd5e1; padding: 6px; text-align: center; vertical-align: top;">
-              <div style="font-size: 9.5px; font-weight: bold; color: #0f172a; margin-bottom: 2px;">
-                2. ภาพถ่ายกล้องหน้ารถขณะสตาร์ตเครื่อง (Dashcam REC Check)
-              </div>
-              <div style="font-size: 8px; color: #475569; margin-bottom: 4px;">
-                [ไฟสถานะบันทึก REC ชัดเจน มุมมองไม่ถูกบดบัง]
-              </div>
-              ${hasDashcam ? `
-                <img src="${data.images.dashcam}" style="max-width: 100%; height: 130px; object-fit: contain; border: 1px solid #94a3b8; border-radius: 3px;" />
-              ` : '<div style="padding: 30px; color: #94a3b8; font-size: 9px;">- ไม่มีภาพแนบ -</div>'}
-            </td>
-          </tr>
-        </table>
-      </div>
-    `;
-  }
-
-  // 2. รูปภาพประกอบเพิ่มเติม (หน้าปัดไมล์ / หน้ารถ / จุดชำรุด)
-  let additionalImagesHtml = "";
-  if (data.images && (data.images.dashboard || data.images.frontVehicle || data.images.defect_1)) {
-    additionalImagesHtml += "<div style='display: flex; gap: 8px; margin-top: 8px;'>";
-    if (data.images.dashboard) {
-      additionalImagesHtml += `
-        <div style="flex: 1; border: 1px solid #94a3b8; padding: 4px; text-align: center; background-color: #ffffff;">
-          <div style="font-size: 9px; font-weight: bold; margin-bottom: 2px;">3. รูปหน้าปัดไมล์/ไฟเตือน (Dashboard)</div>
-          <img src="${data.images.dashboard}" style="max-width: 100%; height: 110px; object-fit: contain;" />
-        </div>`;
-    }
-    if (data.images.frontVehicle) {
-      additionalImagesHtml += `
-        <div style="flex: 1; border: 1px solid #94a3b8; padding: 4px; text-align: center; background-color: #ffffff;">
-          <div style="font-size: 9px; font-weight: bold; margin-bottom: 2px;">4. รูปหน้ารถ/รอบคัน (Front Vehicle)</div>
-          <img src="${data.images.frontVehicle}" style="max-width: 100%; height: 110px; object-fit: contain;" />
-        </div>`;
-    }
-    if (data.images.defect_1) {
-      additionalImagesHtml += `
-        <div style="flex: 1; border: 1px solid #dc2626; padding: 4px; text-align: center; background-color: #fef2f2;">
-          <div style="font-size: 9px; font-weight: bold; color: #dc2626; margin-bottom: 2px;">5. จุดชำรุดแจ้งซ่อม (Defect Photo)</div>
-          <img src="${data.images.defect_1}" style="max-width: 100%; height: 110px; object-fit: contain;" />
-        </div>`;
-    }
-    additionalImagesHtml += "</div>";
-  }
+  const leftColRows = renderChecklistCol(leftItems);
+  const rightColRows = renderChecklistCol(rightItems);
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -314,66 +284,207 @@ function generateFCAM032PdfReport(data, driverInfo, photoBlobs) {
     <head>
       <meta charset="utf-8">
       <style>
-        body { font-family: 'Garuda', 'Sarabun', sans-serif; color: #0f172a; padding: 15px; margin: 0; }
-        .header-box { border-bottom: 2px solid #0284c7; padding-bottom: 6px; margin-bottom: 8px; }
-        .title { font-size: 15px; font-weight: bold; color: #0f172a; margin: 0; }
-        .sub-title { font-size: 11px; color: #475569; margin-top: 2px; }
-        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 10px; }
-        .info-table td { padding: 3px 6px; border: 1px solid #cbd5e1; }
-        .info-header { background-color: #f1f5f9; font-weight: bold; color: #334155; }
-        .check-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-        .check-table th { background-color: #0f172a; color: #ffffff; padding: 5px; font-size: 10px; border: 1px solid #0f172a; }
-        .footer-sign { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 10px; }
-        .footer-sign td { width: 33%; text-align: center; padding: 8px; border: 1px solid #cbd5e1; }
+        @page {
+          size: A4 portrait;
+          margin: 5mm 6mm 4mm 6mm;
+        }
+        * {
+          box-sizing: border-box;
+        }
+        body {
+          font-family: 'Garuda', 'Sarabun', 'Tahoma', sans-serif;
+          color: #0f172a;
+          margin: 0;
+          padding: 0;
+          font-size: 7.5px;
+          line-height: 1.15;
+        }
+        .header-box {
+          border-bottom: 2px solid #0284c7;
+          padding-bottom: 2px;
+          margin-bottom: 4px;
+        }
+        .title {
+          font-size: 13px;
+          font-weight: bold;
+          color: #0f172a;
+          margin: 0;
+        }
+        .sub-title {
+          font-size: 8.5px;
+          color: #475569;
+          font-weight: bold;
+          margin-top: 1px;
+        }
+        .info-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 7.5px;
+        }
+        .info-table td {
+          padding: 1.8px 4px;
+          border: 1px solid #cbd5e1;
+        }
+        .info-header {
+          background-color: #f1f5f9;
+          font-weight: bold;
+          color: #334155;
+        }
+        .check-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .check-table th {
+          background-color: #0f172a;
+          color: #ffffff;
+          padding: 2px 3px;
+          font-size: 7.2px;
+          border: 1px solid #0f172a;
+        }
+        .footer-sign {
+          width: 100%;
+          margin-top: 4px;
+          border-collapse: collapse;
+          font-size: 7.5px;
+        }
+        .footer-sign td {
+          width: 33.33%;
+          text-align: center;
+          padding: 3px 6px;
+          border: 1px solid #cbd5e1;
+          background-color: #f8fafc;
+        }
       </style>
     </head>
     <body>
       <div class="header-box">
-        <h1 class="title">หจก. ทั่วไทยขนส่งมงคล (TTMK LOGISTICS)</h1>
-        <div class="sub-title">ใบรายการตรวจสภาพรถบรรทุกประจำวัน</div>
-      </div>
-
-      <table class="info-table">
-        <tr>
-          <td class="info-header" style="width: 18%;">พนักงานขับรถ:</td>
-          <td style="width: 32%;"><b>${driverName}</b> (${driverId})</td>
-          <td class="info-header" style="width: 18%;">ทะเบียนรถ 6 ล้อ:</td>
-          <td style="width: 32%; color: #b45309; font-weight: bold;">${plate}</td>
-        </tr>
-        <tr>
-          <td class="info-header">วัน-เวลาที่ตรวจ:</td>
-          <td>${timestamp}</td>
-          <td class="info-header">เลขไมล์ปัจจุบัน:</td>
-          <td><b>${odo}</b> กม.</td>
-        </tr>
-        <tr>
-          <td class="info-header">ระบบรถยนต์:</td>
-          <td>${vType}</td>
-          <td class="info-header">ผลการประเมินรวม:</td>
-          <td><b style="color: ${status === 'พร้อมใช้งาน' ? '#16a34a' : '#dc2626'};">${status}</b></td>
-        </tr>
-      </table>
-
-      <table class="check-table">
-        <thead>
+        <table style="width: 100%; border-collapse: collapse;">
           <tr>
-            <th style="width: 10%;">ข้อที่</th>
-            <th style="width: 65%;">รายการตรวจสภาพรถบรรทุก</th>
-            <th style="width: 25%;">ผลการตรวจ</th>
+            <td style="vertical-align: bottom;">
+              <h1 class="title">หจก. ทั่วไทยขนส่งมงคล (TTMK LOGISTICS)</h1>
+              <div class="sub-title">ใบรายการตรวจสภาพรถบรรทุก 6 ล้อ ประจำวัน (แบบฟอร์ม F-CAM-032_r3)</div>
+            </td>
+            <td style="text-align: right; vertical-align: bottom; font-size: 7.5px; color: #64748b;">
+              TSM Safety Standard • ตรวจก่อนปฏิบัติหน้าที่ประจำวัน
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          ${checklistRowsHtml}
-        </tbody>
-      </table>
-
-      <div style="margin-top: 8px; font-size: 10px; border: 1px solid #cbd5e1; padding: 6px; background-color: #f8fafc;">
-        <b>หมายเหตุ / จุดชำรุดที่พบเพิ่มเติม:</b> ${note}
+        </table>
       </div>
 
-      ${preDepartureHtml}
-      ${additionalImagesHtml}
+      <!-- ส่วนข้อมูลทั่วไป (ซ้าย 52%) + หมวดความพร้อมในห้องโดยสาร 3 กล่องภาพถ่าย (ขวา 48%) -->
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 3px;">
+        <tr>
+          <!-- ข้อมูลทั่วไป (ซ้าย 52%) -->
+          <td style="width: 52%; vertical-align: top; padding-right: 3px;">
+            <table class="info-table">
+              <tr>
+                <td class="info-header" style="width: 28%;">พนักงานขับรถ:</td>
+                <td style="width: 72%;"><b>${driverName}</b> (${driverId})</td>
+              </tr>
+              <tr>
+                <td class="info-header">ทะเบียนรถ 6 ล้อ:</td>
+                <td style="color: #b45309; font-weight: bold; font-size: 9.5px;">${plate}</td>
+              </tr>
+              <tr>
+                <td class="info-header">วัน-เวลาที่ตรวจ:</td>
+                <td>${timestamp}</td>
+              </tr>
+              <tr>
+                <td class="info-header">เลขไมล์ปัจจุบัน:</td>
+                <td><b>${odo}</b> กม. &nbsp;|&nbsp; ระบบ: <b>${vType}</b></td>
+              </tr>
+              <tr>
+                <td class="info-header">ผลประเมินรวม:</td>
+                <td><b style="color: ${status === 'พร้อมใช้งาน' ? '#16a34a' : '#dc2626'}; font-size: 8.5px;">${status}</b></td>
+              </tr>
+              <tr>
+                <td class="info-header">หมายเหตุแจ้งซ่อม:</td>
+                <td style="color: #475569; font-size: 7px;">${note}</td>
+              </tr>
+            </table>
+          </td>
 
+          <!-- หมวดความพร้อมในห้องโดยสารก่อนออกรถ 3 กล่องภาพถ่าย (ขวา 48%) -->
+          <td style="width: 48%; vertical-align: top; padding-left: 2px;">
+            <div style="border: 1.5px solid #0284c7; border-radius: 4px; overflow: hidden; background-color: #ffffff;">
+              <div style="background-color: #0f172a; color: #38bdf8; padding: 2px 4px; font-size: 8px; font-weight: bold; text-align: center; letter-spacing: 0.3px;">
+                ★ หมวดความพร้อมในห้องโดยสารก่อนออกรถ (Pre-Departure Readiness)
+              </div>
+              <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+                <tr>
+                  <!-- กล่อง 1: เข็มขัดนิรภัย -->
+                  <td style="width: 33.33%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
+                    <div style="font-size: 7px; font-weight: bold; color: #0f172a; line-height: 1.1;">1. เข็มขัดนิรภัย</div>
+                    <div style="font-size: 6px; color: ${data.hasNoAssistant ? '#b45309' : '#0369a1'}; margin-bottom: 2px;">
+                      ${data.hasNoAssistant ? 'เฉพาะ พขร.' : 'พขร. & ผขถ.'}
+                    </div>
+                    <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
+                      ${box1Html}
+                    </div>
+                  </td>
+
+                  <!-- กล่อง 2: กล้องหน้ารถ REC -->
+                  <td style="width: 33.33%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
+                    <div style="font-size: 7px; font-weight: bold; color: #0f172a; line-height: 1.1;">2. กล้องหน้ารถ</div>
+                    <div style="font-size: 6px; color: #16a34a; margin-bottom: 2px;">ไฟ REC ปกติ</div>
+                    <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
+                      ${box2Html}
+                    </div>
+                  </td>
+
+                  <!-- กล่อง 3: หน้าปัดไมล์ / หน้ารถ / จุดชำรุด -->
+                  <td style="width: 33.33%; border: 1px solid #cbd5e1; padding: 2px; text-align: center; vertical-align: top; background: #f8fafc;">
+                    <div style="font-size: 7px; font-weight: bold; color: #0f172a; line-height: 1.1;">${box3Title}</div>
+                    <div style="font-size: 6px; color: #64748b; margin-bottom: 2px;">${box3Sub}</div>
+                    <div style="width: 100%; height: 60px; border: 1px solid #cbd5e1; border-radius: 2px; overflow: hidden; background: #ffffff; display: flex; align-items: center; justify-content: center;">
+                      ${box3Html}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- ตารางรายการตรวจสภาพรถ 2 คอลัมน์ (ซ้าย-ขวา) พอดีใน 1 หน้ากระดาษ -->
+      <table style="width: 100%; border-collapse: collapse; margin-top: 1px;">
+        <tr>
+          <!-- คอลัมน์ซ้าย (ข้อที่ 1 ถึง half) -->
+          <td style="width: 50%; vertical-align: top; padding-right: 2px;">
+            <table class="check-table">
+              <thead>
+                <tr>
+                  <th style="width: 10%;">ข้อ</th>
+                  <th style="width: 66%;">รายการตรวจสภาพรถบรรทุก</th>
+                  <th style="width: 24%;">ผลตรวจ</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${leftColRows}
+              </tbody>
+            </table>
+          </td>
+
+          <!-- คอลัมน์ขวา (ข้อที่ half+1 ถึง จบ) -->
+          <td style="width: 50%; vertical-align: top; padding-left: 2px;">
+            <table class="check-table">
+              <thead>
+                <tr>
+                  <th style="width: 10%;">ข้อ</th>
+                  <th style="width: 66%;">รายการตรวจสภาพรถบรรทุก</th>
+                  <th style="width: 24%;">ผลตรวจ</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rightColRows}
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <!-- ส่วนลงชื่อท้ายเอกสาร -->
       <table class="footer-sign">
         <tr>
           <td>
@@ -607,6 +718,12 @@ function buildMonthlyReportHtml(targetPlate, targetMonthYear, ssInstance, option
     { no: "21", title: "4. โทรศัพท์มือถือ", major: false }
   ];
 
+  const sectionCabin = [
+    { no: "P1", title: "Safety Belt เข็มขัดนิรภัย คาดเรียบร้อย (พขร. & ผขถ.)", major: true, isCabin: true },
+    { no: "P2", title: "กล้องหน้ารถขณะสตาร์ตเครื่อง ไฟ REC พร้อมทำงานบันทึกตลอดทาง", major: true, isCabin: true },
+    { no: "P3", title: "ภาพถ่ายหลักฐานความพร้อมในห้องโดยสารครบถ้วนตามเกณฑ์ TSM", major: true, isCabin: true }
+  ];
+
   const sectionD = [
     { no: "22", title: "เครื่องมือประจำรถ" },
     { no: "23", title: "ระดับน้ำมันเครื่อง" },
@@ -649,7 +766,7 @@ function buildMonthlyReportHtml(targetPlate, targetMonthYear, ssInstance, option
     items.forEach((item, idx) => {
       const isAlt = idx % 2 === 1;
       const rowBg = isAlt ? "#f8fafc" : "#ffffff";
-      const titleStyle = item.isEV ? "color: #b91c1c; font-weight: bold;" : "color: #0f172a;";
+      const titleStyle = item.isCabin ? "color: #0369a1; font-weight: bold;" : (item.isEV ? "color: #b91c1c; font-weight: bold;" : "color: #0f172a;");
       const majorMark = item.major ? `<span style="color: #dc2626; font-weight: bold; font-size: 8px;">✓</span>` : `-`;
 
       let cells = "";
@@ -869,6 +986,16 @@ function buildMonthlyReportHtml(targetPlate, targetMonthYear, ssInstance, option
             <td></td>
           </tr>
           ${renderSectionRows(sectionC)}
+
+          <!-- หมวดความพร้อมในห้องโดยสารก่อนออกรถ -->
+          <tr class="sec-header" style="background-color: #0369a1;">
+            <td style="text-align: center;"></td>
+            <td colspan="2" style="font-weight: bold; letter-spacing: 0.3px;">★ หมวดความพร้อมในห้องโดยสารก่อนออกรถ (Pre-Departure Readiness) - TSM Standard</td>
+            ${dashRowHtml}
+            <td></td>
+            <td></td>
+          </tr>
+          ${renderSectionRows(sectionCabin)}
 
           <!-- แถวลงชื่อ พขร. รายวัน -->
           <tr style="background-color: #f1f5f9; font-weight: bold;">
