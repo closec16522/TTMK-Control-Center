@@ -144,52 +144,6 @@
             </button>
           </div>
 
-          <!-- Vehicle Plate Selector (Hidden by default, shown when driver clicks 'สลับคัน') -->
-          <div id="plateSelectContainer" class="hidden space-y-1.5 pt-1 border-t border-slate-800">
-            <label class="block text-[11px] font-semibold text-slate-400">
-              เลือกทะเบียนรถที่ต้องการแจ้งซ่อม <span class="text-amber-400">*</span>
-            </label>
-            <div class="relative">
-              <select id="vehiclePlate" required onchange="handlePlateChange()"
-                      class="w-full px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white font-bold text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition appearance-none">
-                <option value="">-- แตะเลือกทะเบียนรถ --</option>
-                <optgroup label="รถบรรทุกดีเซล (Diesel)">
-                  <option value="70-8899 กทม.">70-8899 กทม. (ทวีศักดิ์ คำปก)</option>
-                  <option value="70-9312 กทม.">70-9312 กทม. (พิทยา แคนถา / อรรถพล)</option>
-                  <option value="72-1979 สระบุรี">72-1979 สระบุรี (ดุรงค์ฤทธิ์ ล้ำเลิศ)</option>
-                  <option value="72-8139 สระบุรี">72-8139 สระบุรี (ธนันกรกานต์ / สมร)</option>
-                  <option value="8กส1201 กทม.">8กส1201 กทม. (นิชานันท์ เอื้อจิรพรชัย)</option>
-                  <option value="70-5544 กทม.">70-5544 กทม. (สมชาย วงศ์สวัสดิ์)</option>
-                  <option value="72-3199 สระบุรี">72-3199 สระบุรี (สุรชัย หงษา)</option>
-                  <option value="71-6543 อยุธยา">71-6543 อยุธยา (ธนวัฒน์ ใจดี)</option>
-                  <option value="73-2415 สระบุรี">73-2415 สระบุรี (ธีระพงษ์ ศรีสุข)</option>
-                  <option value="71-9820 กทม.">71-9820 กทม. (อนันต์ บุญรอด)</option>
-                  <option value="72-4411 นครปฐม">72-4411 นครปฐม (ประเสริฐ สุขสวัสดิ์)</option>
-                  <option value="73-9081 สระบุรี">73-9081 สระบุรี (มานะ ชนะศึก)</option>
-                  <option value="70-1122 กทม.">70-1122 กทม. (กิตติศักดิ์ เจริญดี)</option>
-                  <option value="72-9901 ฉะเชิงเทรา">72-9901 ฉะเชิงเทรา (วิเชียร สมบูรณ์)</option>
-                  <option value="73-0819 สระบุรี">73-0819 สระบุรี (อุดมศักดิ์ ภูบุตตะ)</option>
-                  <option value="71-8686 สระบุรี">71-8686 สระบุรี (ฉัตรชัย เรืองหุ่น)</option>
-                  <option value="70-4713 สระบุรี">70-4713 สระบุรี (แก๊ส ศรีลาพันธ๋)</option>
-                  <option value="73-1366 สระบุรี">73-1366 สระบุรี (สุรเดช พรายแก้ว)</option>
-                  <option value="73-2705 สระบุรี">73-2705 สระบุรี (รุ่งเพชร ศิริกาล)</option>
-                </optgroup>
-                <optgroup label="รถบรรทุกไฟฟ้า (100% EV)">
-                  <option value="73-1735 สระบุรี">73-1735 สระบุรี (พิศมัย พลเยี่ยม • BYD T8)</option>
-                  <option value="72-8297 สระบุรี">72-8297 สระบุรี (วิทวัส สอนพรม • BYD T8)</option>
-                  <option value="72-5079 สระบุรี">72-5079 สระบุรี (ทรงวุฒิ / กีรติ • NEX)</option>
-                  <option value="61-5463 กทม.">61-5463 กทม. (สมชาย ส่องสว่าง • NEX)</option>
-                </optgroup>
-                <option value="OTHER">-- ทะเบียนอื่น ๆ (ระบุเอง) --</option>
-              </select>
-              <div class="pointer-events-none absolute right-3.5 top-3 text-slate-400 text-xs">
-                <i class="fa-solid fa-chevron-down"></i>
-              </div>
-            </div>
-            <input type="text" id="customPlateInput" placeholder="พิมพ์ทะเบียนรถ เช่น 70-9999 กทม."
-                   class="w-full mt-1.5 px-3 py-2 rounded-xl border border-amber-500/50 bg-slate-800 text-amber-300 text-xs font-bold outline-none hidden">
-          </div>
-
           <!-- 2 Column: Odometer & Date -->
           <div class="grid grid-cols-2 gap-2.5">
             <!-- Odometer -->
@@ -214,7 +168,8 @@
             </div>
           </div>
 
-          <!-- Hidden details auto-bound for submit -->
+          <!-- Hidden details auto-bound for submit (Auto from Registered_Drivers) -->
+          <input type="hidden" id="vehiclePlate" value="">
           <input type="hidden" id="vehicleType" value="รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)">
           <input type="hidden" id="driverName" value="ทวีศักดิ์ คำปก">
           <input type="hidden" id="driverEmail" value="closec16522@gmail.com">

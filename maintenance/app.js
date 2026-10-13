@@ -98,15 +98,19 @@ function generateNewTicketId() {
 window.goToStep = function(step) {
   if (step === 2) {
     // Validate Step 1 inputs before advancing
-    const plate = document.getElementById("vehiclePlate")?.value?.trim();
-    const odo = document.getElementById("odometer")?.value?.trim();
-    const symptom = document.getElementById("symptomDescription")?.value?.trim();
+    const plateInput = document.getElementById("vehiclePlate");
+    const assignedDisplay = document.getElementById("assignedPlateDisplay");
+    let plate = (plateInput?.value || "").trim();
+    if (!plate && assignedDisplay && assignedDisplay.textContent) {
+      plate = assignedDisplay.textContent.replace(/\(ขับแทน\)/g, '').trim();
+      if (plateInput) plateInput.value = plate;
+    }
 
-    if (!plate) {
+    if (!plate || plate.includes("กำลังโหลด") || plate.includes("แตะเพื่อระบุ")) {
       Swal.fire({
         icon: 'warning',
-        title: 'กรุณาระบุทะเบียนรถ',
-        text: 'ระบบยังไม่พบข้อมูลทะเบียนรถ กรุณาเลือกหรือสลับคัน',
+        title: 'กรุณาระบุตัวตนผู้ขับ',
+        text: 'กรุณาแตะที่ชื่อผู้ใช้งานเพื่อเข้าสู่ระบบ หรือแตะสลับคัน',
         background: '#0f172a',
         color: '#fff',
         confirmButtonColor: '#f59e0b'
@@ -350,38 +354,87 @@ function applyDriverProfile(driver) {
 }
 
 window.toggleSwitchPlate = function() {
-  const container = document.getElementById("plateSelectContainer");
-  if (!container) return;
-  const isHidden = container.classList.contains("hidden");
-  if (isHidden) {
-    container.classList.remove("hidden");
-    const sel = document.getElementById("vehiclePlate");
-    if (sel) sel.focus();
-  } else {
-    container.classList.add("hidden");
-  }
-};
+  const fleetOptions = FLEET_PLATES.map(f => 
+    `<option value="${f.plate}">${f.plate} (${f.type})</option>`
+  ).join('');
 
-window.handlePlateChange = function() {
-  const plateSelect = document.getElementById("vehiclePlate");
-  const customInput = document.getElementById("customPlateInput");
-  if (!plateSelect) return;
-
-  if (plateSelect.value === "OTHER") {
-    if (customInput) customInput.classList.remove("hidden");
-  } else {
-    if (customInput) customInput.classList.add("hidden");
-    const val = plateSelect.value;
-    const assignedPlateDisplay = document.getElementById("assignedPlateDisplay");
-    if (assignedPlateDisplay && val) assignedPlateDisplay.textContent = val;
-
-    const matchedFleet = FLEET_PLATES.find(f => f.plate === val);
-    if (matchedFleet) {
-      const typeInput = document.getElementById("vehicleType");
-      if (typeInput) typeInput.value = matchedFleet.type;
+  Swal.fire({
+    title: 'สลับคัน (ขับแทน)',
+    html: `
+      <div class="text-left text-xs text-slate-300 space-y-3">
+        <p>เลือกรถคันที่ท่านขับแทนในวันนี้:</p>
+        <select id="swalSwitchPlateSelect" class="w-full p-2.5 rounded-xl border border-slate-700 bg-slate-900 text-white font-bold text-xs outline-none focus:border-amber-500">
+          <option value="">-- เลือกรถในกองยาน TTMK --</option>
+          ${fleetOptions}
+          <option value="CUSTOM">-- พิมพ์ทะเบียนอื่น ๆ --</option>
+        </select>
+        <div id="swalCustomPlateBox" class="hidden pt-1">
+          <label class="block text-[11px] text-slate-400 mb-1">พิมพ์ทะเบียนรถ:</label>
+          <input type="text" id="swalCustomPlateInput" placeholder="เช่น 70-9999 กทม."
+                 class="w-full p-2 rounded-xl border border-slate-700 bg-slate-900 text-amber-300 font-bold text-xs outline-none">
+        </div>
+      </div>
+    `,
+    didOpen: () => {
+      const sel = document.getElementById('swalSwitchPlateSelect');
+      const box = document.getElementById('swalCustomPlateBox');
+      if (sel) {
+        sel.addEventListener('change', () => {
+          if (sel.value === 'CUSTOM') {
+            box.classList.remove('hidden');
+            document.getElementById('swalCustomPlateInput')?.focus();
+          } else {
+            box.classList.add('hidden');
+          }
+        });
+      }
+    },
+    background: '#0f172a',
+    color: '#fff',
+    showCancelButton: true,
+    confirmButtonText: 'ยืนยันสลับคัน',
+    cancelButtonText: 'ยกเลิก',
+    confirmButtonColor: '#f59e0b',
+    cancelButtonColor: '#475569',
+    preConfirm: () => {
+      const sel = document.getElementById('swalSwitchPlateSelect').value;
+      const custom = document.getElementById('swalCustomPlateInput')?.value?.trim();
+      const chosen = (sel === 'CUSTOM' ? custom : sel);
+      if (!chosen) {
+        Swal.showValidationMessage('กรุณาเลือกรถที่ต้องการสลับคัน');
+        return false;
+      }
+      return chosen;
     }
-  }
+  }).then(result => {
+    if (result.isConfirmed && result.value) {
+      const newPlate = result.value;
+      const plateInput = document.getElementById("vehiclePlate");
+      if (plateInput) plateInput.value = newPlate;
+
+      const display = document.getElementById("assignedPlateDisplay");
+      if (display) display.textContent = newPlate + " (ขับแทน)";
+
+      const matchedFleet = FLEET_PLATES.find(f => f.plate === newPlate);
+      if (matchedFleet) {
+        const typeInput = document.getElementById("vehicleType");
+        if (typeInput) typeInput.value = matchedFleet.type;
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: 'สลับคันสำเร็จ',
+        text: `เปลี่ยนเป็นทะเบียน: ${newPlate}`,
+        timer: 1500,
+        showConfirmButton: false,
+        background: '#0f172a',
+        color: '#fff'
+      });
+    }
+  });
 };
+
+window.handlePlateChange = function() {};
 
 window.promptSwitchDriver = function() {
   const currentEmail = appState.currentDriver ? appState.currentDriver.email : '';
@@ -864,13 +917,17 @@ function compressImageBase64(dataUrl, callback) {
 window.handleMobileFormSubmit = async function(event) {
   event.preventDefault();
 
-  const plateSelect = document.getElementById("vehiclePlate");
-  const customInput = document.getElementById("customPlateInput");
-  let plate = plateSelect.value === "OTHER" ? customInput.value.trim() : plateSelect.value.trim();
+  const plateInput = document.getElementById("vehiclePlate");
+  const assignedDisplay = document.getElementById("assignedPlateDisplay");
+  let plate = (plateInput?.value || "").trim();
+  if (!plate && assignedDisplay && assignedDisplay.textContent) {
+    plate = assignedDisplay.textContent.replace(/\(ขับแทน\)/g, '').trim();
+    if (plateInput) plateInput.value = plate;
+  }
 
-  if (!plate) {
+  if (!plate || plate.includes("กำลังโหลด") || plate.includes("แตะเพื่อระบุ")) {
     goToStep(1);
-    Swal.fire({ icon: 'warning', title: 'กรุณาระบุทะเบียนรถ', background: '#0f172a', color: '#fff', confirmButtonColor: '#f59e0b' });
+    Swal.fire({ icon: 'warning', title: 'กรุณาระบุตัวตนผู้ขับ', text: 'กรุณาเข้าสู่ระบบด้วยอีเมลเพื่อดึงข้อมูลรถ หรือแตะสลับคัน', background: '#0f172a', color: '#fff', confirmButtonColor: '#f59e0b' });
     return;
   }
 
