@@ -30,6 +30,16 @@ function doGet(e) {
       return getMaintenanceLogs(params);
     }
 
+    if (action === "setup" || action === "create_sheet" || action === "init_sheet") {
+      const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+      const sheet = getOrCreateMaintenanceSheet(ss);
+      return responseJSON({
+        status: "success",
+        message: "สร้างแผ่นงาน Maintenance_log เรียบร้อยแล้ว พร้อมหัวตารางทั้ง 29 รายการ",
+        sheetName: sheet.getName()
+      });
+    }
+
     if (action === "get_ticket") {
       return getMaintenanceTicket(params.ticketId || params.id);
     }
@@ -51,6 +61,16 @@ function doGet(e) {
   } catch (err) {
     return responseJSON({ status: "error", message: err.toString() });
   }
+}
+
+/**
+ * ฟังก์ชันสำหรับกด "เรียกใช้ (Run)" บน Google Apps Script เพื่อสร้างแผ่นงาน Maintenance_log ทันที 1 คลิก
+ */
+function createMaintenanceSheetNow() {
+  const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  const sheet = getOrCreateMaintenanceSheet(ss);
+  Logger.log("✅ สร้างแผ่นงาน " + sheet.getName() + " สำเร็จแล้ว!");
+  return "✅ สร้างแผ่นงาน Maintenance_log เรียบร้อยแล้ว พร้อมหัวตารางทั้ง 29 คอลัมน์!";
 }
 
 /**

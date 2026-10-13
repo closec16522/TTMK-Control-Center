@@ -357,46 +357,25 @@
         <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-slate-800 shadow-sm space-y-3">
           <div class="flex items-center justify-between text-xs font-bold text-slate-300">
             <span class="flex items-center gap-1.5 text-amber-400">
-              <i class="fa-solid fa-warehouse"></i> 4. อู่ซ่อม / ศูนย์บริการ
-            </span>
-            <span class="text-[10px] text-slate-400">ดึงจากประวัติ</span>
-          </div>
-
-          <!-- Quick Garage Selection Chips -->
-          <div>
-            <span class="text-[10px] text-slate-400 block mb-1.5">แตะเลือกอู่ที่เคยซ่อม / ศูนย์บริการมาตรฐาน:</span>
-            <div id="garageChipsContainer" class="flex flex-wrap gap-1.5">
-              <!-- Dynamically populated or default chips -->
-              <button type="button" onclick="selectGarageChip('ศูนย์บริการ TTMK สระบุรี')" class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 transition">
-                🏢 ศูนย์บริการ TTMK
-              </button>
-              <button type="button" onclick="selectGarageChip('ศูนย์บริการ อีซูซุ สระบุรี')" class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 transition">
-                🚚 อีซูซุ สระบุรี
-              </button>
-              <button type="button" onclick="selectGarageChip('ศูนย์บริการ ฮีโน่ สระบุรี')" class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 transition">
-                🚛 ฮีโน่ สระบุรี
-              </button>
-              <button type="button" onclick="selectGarageChip('ร้านยางเจริญยนต์ สระบุรี')" class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 transition">
-                🛞 ร้านยางเจริญยนต์
-              </button>
-              <button type="button" onclick="selectGarageChip('อู่ช่างเล็ก ไดนาโม')" class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 transition">
-                💡 อู่ช่างเล็ก ไดนาโม
-              </button>
-            </div>
-          </div>
-
           <!-- Input Garage with HTML5 Datalist for Auto-complete -->
-          <div class="grid grid-cols-1 gap-2 pt-1">
+          <div class="grid grid-cols-1 gap-2">
             <div>
-              <label class="block text-[11px] font-semibold text-slate-400 mb-1">
+              <label class="block text-[11px] font-semibold text-slate-300 mb-1">
                 ชื่ออู่ / สถานที่ซ่อม <span class="text-amber-400">*</span>
               </label>
-              <input type="text" id="garageName" list="garageDatalist" required placeholder="แตะเลือกจากรายการ หรือพิมพ์ชื่ออู่..."
-                     class="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs outline-none focus:border-amber-500 font-bold">
+              <div class="relative">
+                <input type="text" id="garageName" list="garageDatalist" required placeholder="แตะเลือกจากรายการ หรือพิมพ์ชื่ออู่..."
+                       autocomplete="off"
+                       class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-xs outline-none focus:border-amber-500 font-bold pr-8">
+                <span class="pointer-events-none absolute right-3 top-3 text-slate-400 text-[10px]">
+                  <i class="fa-solid fa-chevron-down"></i>
+                </span>
+              </div>
               <datalist id="garageDatalist">
                 <!-- Dynamically populated from Maintenance_log -->
               </datalist>
             </div>
+
             
             <div class="grid grid-cols-2 gap-2 text-xs">
               <div>

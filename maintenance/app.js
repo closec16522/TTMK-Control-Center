@@ -237,31 +237,48 @@ async function loadRegisteredDrivers() {
  * ระบุตัวตนคนขับ และดึงทะเบียนรถประจำตัวจาก Registered_Drivers อัตโนมัติ
  */
 function initDriverIdentity() {
-  let savedEmail = localStorage.getItem(CONFIG.STORAGE_KEY_DRIVER) || 
-                   localStorage.getItem("TTMK_LAST_EMAIL") || 
-                   "closec16522@gmail.com"; // default dev/admin email
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramEmail = (urlParams.get("email") || "").trim().toLowerCase();
+
+  let savedEmail = paramEmail || 
+                   localStorage.getItem(CONFIG.STORAGE_KEY_DRIVER) || 
+                   localStorage.getItem("TTMK_SAVED_DRIVER_EMAIL") ||
+                   localStorage.getItem("TTMK_ACTIVE_USER_EMAIL") ||
+                   localStorage.getItem("TTMK_LAST_EMAIL");
+
+  if (savedEmail) {
+    savedEmail = savedEmail.trim().toLowerCase();
+  }
 
   let matchedDriver = null;
-
   if (savedEmail && appState.registeredDrivers.length > 0) {
-    const cleanEmail = savedEmail.trim().toLowerCase();
-    matchedDriver = appState.registeredDrivers.find(d => d.email === cleanEmail);
+    matchedDriver = appState.registeredDrivers.find(d => d.email === savedEmail);
   }
 
   if (matchedDriver) {
     applyDriverProfile(matchedDriver);
-  } else if (appState.registeredDrivers.length > 0) {
-    // Default to the first active registered driver
-    applyDriverProfile(appState.registeredDrivers[0]);
-  } else {
-    // Fallback default
+  } else if (savedEmail) {
     applyDriverProfile({
-      driverId: "DRV-999",
-      driverName: "ทวีศักดิ์ คำปก",
-      email: "closec16522@gmail.com",
-      phone: "062-3285963",
+      driverId: "DRV-USER",
+      driverName: savedEmail.split("@")[0],
+      email: savedEmail,
+      phone: "-",
       rawPlate: "70-8899"
     });
+  } else {
+    // ผู้ใช้งานครั้งแรก / ยังไม่มีการจำลองอีเมล -> ให้ระบุอีเมลของตนเอง
+    const assignedPlateDisplay = document.getElementById("assignedPlateDisplay");
+    if (assignedPlateDisplay) assignedPlateDisplay.textContent = "แตะเพื่อระบุอีเมลผู้แจ้ง";
+
+    const assignedDriverDisplay = document.getElementById("assignedDriverDisplay");
+    if (assignedDriverDisplay) assignedDriverDisplay.textContent = "ระบบจะดึงข้อมูลรถของท่านอัตโนมัติ";
+
+    const headerName = document.getElementById("headerDriverName");
+    if (headerName) headerName.textContent = "ระบุอีเมลผู้แจ้ง";
+
+    setTimeout(() => {
+      promptSwitchDriver();
+    }, 350);
   }
 }
 
@@ -326,6 +343,8 @@ function applyDriverProfile(driver) {
   // Remember this driver email for future app visits
   if (driver.email) {
     localStorage.setItem(CONFIG.STORAGE_KEY_DRIVER, driver.email);
+    localStorage.setItem("TTMK_SAVED_DRIVER_EMAIL", driver.email);
+    localStorage.setItem("TTMK_ACTIVE_USER_EMAIL", driver.email);
     localStorage.setItem("TTMK_LAST_EMAIL", driver.email);
   }
 }
@@ -365,74 +384,81 @@ window.handlePlateChange = function() {
 };
 
 window.promptSwitchDriver = function() {
-  const drivers = appState.registeredDrivers || [];
-  
-  let optionsHtml = '';
-  if (drivers.length > 0) {
-    optionsHtml = drivers.map(d => {
-      const isSelected = appState.currentDriver && (appState.currentDriver.email === d.email);
-      return `<option value="${escapeHtml(d.email)}"${isSelected ? ' selected' : ''}>${escapeHtml(d.driverName)} (รถ: ${escapeHtml(d.rawPlate || '-')})</option>`;
-    }).join('');
-  }
+  const currentEmail = appState.currentDriver ? appState.currentDriver.email : '';
 
   Swal.fire({
-    title: 'เลือกพนักงานขับรถ',
+    title: 'เข้าสู่ระบบพนักงานขับรถ',
     html: `
-      <div class="text-left text-xs text-slate-300 space-y-2.5">
-        <p>เลือกรายชื่อของท่านจากฐานข้อมูล <b>Registered_Drivers</b>:</p>
-        <select id="swalDriverSelect" class="w-full p-2.5 rounded-xl border border-slate-700 bg-slate-900 text-white text-xs outline-none focus:border-amber-500 font-bold">
-          ${optionsHtml || '<option value="">-- ไม่พบรายชื่อ --</option>'}
-        </select>
-        <div class="pt-1">
-          <p class="text-[10px] text-slate-400">หรือพิมพ์อีเมลของท่าน:</p>
-          <input type="email" id="swalDriverEmailInput" placeholder="เช่น somchai@gmail.com"
-                 value="${appState.currentDriver ? appState.currentDriver.email : ''}"
-                 class="w-full mt-1 p-2 rounded-xl border border-slate-700 bg-slate-900 text-white text-xs font-mono outline-none focus:border-amber-500">
+      <div class="text-left text-xs text-slate-300 space-y-3">
+        <label class="block text-slate-300 font-semibold">
+          กรุณากรอกอีเมลของท่าน:
+        </label>
+        <div class="relative">
+          <input type="email" id="swalDriverEmailInput" 
+                 placeholder="เช่น your.email@gmail.com"
+                 value="${escapeHtml(currentEmail)}"
+                 class="w-full px-3.5 py-3 rounded-xl border border-slate-700 bg-slate-900 text-white text-sm font-medium outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
         </div>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i>ระบบจะค้นหาทะเบียนรถประจำตัวและชื่อผู้ขับจากตาราง <b>Registered_Drivers</b> ให้อัตโนมัติ โดยท่านไม่ต้องเลือกทะเบียนเอง
+        </p>
       </div>
     `,
     background: '#0f172a',
     color: '#fff',
     showCancelButton: true,
-    confirmButtonText: 'ยืนยัน',
+    confirmButtonText: 'เข้าสู่ระบบ',
     cancelButtonText: 'ยกเลิก',
     confirmButtonColor: '#f59e0b',
-    cancelButtonColor: '#64748b',
+    cancelButtonColor: '#475569',
+    didOpen: () => {
+      const input = document.getElementById('swalDriverEmailInput');
+      if (input) {
+        input.focus();
+        if (input.value) input.select();
+      }
+    },
     preConfirm: () => {
-      const selectVal = document.getElementById('swalDriverSelect').value;
-      const inputVal = document.getElementById('swalDriverEmailInput').value.trim();
-      const chosenEmail = inputVal || selectVal;
-      if (!chosenEmail) {
-        Swal.showValidationMessage('กรุณาเลือกหรือระบุคนขับ');
+      const inputVal = (document.getElementById('swalDriverEmailInput').value || '').trim().toLowerCase();
+      if (!inputVal) {
+        Swal.showValidationMessage('กรุณากรอกอีเมลของท่าน');
         return false;
       }
-      return chosenEmail;
+      return inputVal;
     }
   }).then(result => {
     if (result.isConfirmed && result.value) {
-      const email = result.value.toLowerCase();
+      const email = result.value;
       const found = appState.registeredDrivers.find(d => d.email === email);
       if (found) {
         applyDriverProfile(found);
+        Swal.fire({
+          icon: 'success',
+          title: 'เข้าสู่ระบบสำเร็จ',
+          text: `ยินดีต้อนรับคุณ ${found.driverName} (รถประจำตัว: ${document.getElementById("vehiclePlate").value})`,
+          timer: 2000,
+          showConfirmButton: false,
+          background: '#0f172a',
+          color: '#fff'
+        });
       } else {
-        applyDriverProfile({
-          driverId: "DRV-CUSTOM",
-          driverName: "พนักงานขับรถ",
-          email: email,
-          phone: "062-3285963",
-          rawPlate: "70-8899"
+        Swal.fire({
+          icon: 'warning',
+          title: 'ไม่พบอีเมลในระบบ',
+          html: `<p class="text-xs text-slate-300">ไม่พบอีเมล <b>${escapeHtml(email)}</b> ในตาราง Registered_Drivers<br>กรุณาตรวจสอบการสะกดอีเมล หรือติดต่อผู้ดูแลระบบ</p>`,
+          confirmButtonText: 'ลองใหม่อีกครั้ง',
+          showCancelButton: true,
+          cancelButtonText: 'ยกเลิก',
+          confirmButtonColor: '#f59e0b',
+          cancelButtonColor: '#475569',
+          background: '#0f172a',
+          color: '#fff'
+        }).then(retry => {
+          if (retry.isConfirmed) {
+            promptSwitchDriver();
+          }
         });
       }
-
-      Swal.fire({
-        icon: 'success',
-        title: 'ยืนยันตัวตนสำเร็จ',
-        text: `เข้าสู่ระบบในชื่อ: ${appState.currentDriver.driverName} (รถประจำตัว: ${document.getElementById("vehiclePlate").value})`,
-        timer: 1700,
-        showConfirmButton: false,
-        background: '#0f172a',
-        color: '#fff'
-      });
     }
   });
 };
@@ -483,21 +509,10 @@ async function loadGaragesList() {
 
   appState.garagesList = Array.from(garageSet);
 
-  // Populate HTML5 Datalist
+  // Populate HTML5 Datalist ONLY (no bulky chips)
   const datalist = document.getElementById("garageDatalist");
   if (datalist) {
     datalist.innerHTML = appState.garagesList.map(g => `<option value="${escapeHtml(g)}"></option>`).join('');
-  }
-
-  // Populate Quick Chips
-  const chipsContainer = document.getElementById("garageChipsContainer");
-  if (chipsContainer) {
-    chipsContainer.innerHTML = appState.garagesList.slice(0, 6).map(g => `
-      <button type="button" onclick="selectGarageChip('${escapeHtml(g)}')" 
-              class="garage-chip px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-[11px] text-slate-200 active:scale-95 transition">
-        ${escapeHtml(g)}
-      </button>
-    `).join('');
   }
 }
 

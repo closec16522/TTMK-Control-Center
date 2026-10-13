@@ -115,8 +115,41 @@ function initialSetup() {
   var configHeaders = ["Config_Key", "Config_Value", "Description", "Last_Updated"];
   ensureColumnsMatch(configSheet, configHeaders, "#4C1D95");
   initDefaultSystemConfigs(configSheet);
+
+  // 4. ชีต Maintenance_log (บันทึกประวัติการซ่อมบำรุงรถ)
+  var mntSheet = ss.getSheetByName("Maintenance_log");
+  if (!mntSheet) {
+    mntSheet = ss.insertSheet("Maintenance_log");
+  }
+  var mntHeaders = [
+    "Timestamp", "Ticket_ID", "Inspection_Date", "Vehicle_Plate", "Vehicle_Type",
+    "Odometer", "Driver_Name", "Driver_Email", "Driver_Phone", "Maintenance_Type",
+    "Urgency", "System_Affected", "Symptom_Description", "Garage_Name", "Mechanic_Name",
+    "Garage_Phone", "Items_Count", "Items_Detail_JSON", "Items_Summary_Text", "Parts_Cost",
+    "Labor_Cost", "Vat_Amount", "Total_Cost", "Status", "Bill_Photo_Url",
+    "Defect_Photo_Url", "Parts_Photo_Url", "Finished_Photo_Url", "Remarks"
+  ];
+  ensureColumnsMatch(mntSheet, mntHeaders, "#0F172A");
   
   return "Setup & Column Migration Completed Successfully";
+}
+
+function createMaintenanceSheetNow() {
+  var ss = getAppSpreadsheet();
+  var mntSheet = ss.getSheetByName("Maintenance_log");
+  if (!mntSheet) {
+    mntSheet = ss.insertSheet("Maintenance_log");
+  }
+  var mntHeaders = [
+    "Timestamp", "Ticket_ID", "Inspection_Date", "Vehicle_Plate", "Vehicle_Type",
+    "Odometer", "Driver_Name", "Driver_Email", "Driver_Phone", "Maintenance_Type",
+    "Urgency", "System_Affected", "Symptom_Description", "Garage_Name", "Mechanic_Name",
+    "Garage_Phone", "Items_Count", "Items_Detail_JSON", "Items_Summary_Text", "Parts_Cost",
+    "Labor_Cost", "Vat_Amount", "Total_Cost", "Status", "Bill_Photo_Url",
+    "Defect_Photo_Url", "Parts_Photo_Url", "Finished_Photo_Url", "Remarks"
+  ];
+  ensureColumnsMatch(mntSheet, mntHeaders, "#0F172A");
+  return "สร้างแผ่นงาน Maintenance_log เรียบร้อยแล้ว!";
 }
 
 /**

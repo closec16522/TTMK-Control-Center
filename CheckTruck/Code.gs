@@ -16,6 +16,17 @@ function doGet(e) {
       return responseJSON(checkDriverRegistration(email));
     }
 
+    // ฟังก์ชันสร้างแผ่นงาน Maintenance_log อัตโนมัติ
+    if (e.parameter.action === "create_maintenance_sheet" || e.parameter.action === "setup_maintenance") {
+      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const sheet = getOrCreateMaintenanceSheet(ss);
+      return responseJSON({
+        status: "success",
+        message: "สร้างแผ่นงาน Maintenance_log เรียบร้อยแล้ว พร้อมหัวตารางทั้ง 29 รายการ",
+        sheetName: sheet.getName()
+      });
+    }
+
     // ฟังก์ชันสร้าง/ค้นหารายงานสรุปรายเดือนแบบตารางรวม Actual ประจำวัน
     if (e.parameter.action === "generate_monthly_pdf" || e.parameter.action === "get_monthly_pdf") {
       const plate = (e.parameter.plate || "").trim();
@@ -167,6 +178,11 @@ function doPost(e) {
       const targetPlate = String(data.vehiclePlate || driverInfo.plate || "");
       const targetMonth = String(data.month || Utilities.formatDate(new Date(), "Asia/Bangkok", "MM/yyyy"));
       return generateMonthlyTruckInspectionPdf(targetPlate, targetMonth, data.email);
+    }
+
+    // หากเป็นการบันทึกแจ้งซ่อมบำรุงผ่าน POST
+    if (data.action === "save_maintenance" || data.action === "create_ticket") {
+      return saveMaintenanceRecord(data, ss, driverInfo);
     }
 
     // 2. ตรวจสอบหรือสร้าง Sheet 'Truck_Inspection_Logs'
@@ -1375,3 +1391,128 @@ function responseJSON(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+/**
+ * =========================================================================
+ * ฟังก์ชันสำหรับระบบแจ้งซ่อมบำรุงรถ (Maintenance_log)
+ * =========================================================================
+ */
+
+function createMaintenanceSheetNow() {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const sheet = getOrCreateMaintenanceSheet(ss);
+  Logger.log("✅ สร้างแผ่นงาน " + sheet.getName() + " สำเร็จแล้ว!");
+  return "✅ สร้างแผ่นงาน Maintenance_log เรียบร้อยแล้ว พร้อมหัวตารางทั้ง 29 คอลัมน์!";
+}
+
+function getOrCreateMaintenanceSheet(ss) {
+  const SHEET_NAME = "Maintenance_log";
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(SHEET_NAME);
+    const headers = [
+      "Timestamp", "Ticket_ID", "Inspection_Date", "Vehicle_Plate", "Vehicle_Type",
+      "Odometer", "Driver_Name", "Driver_Email", "Driver_Phone", "Maintenance_Type",
+      "Urgency", "System_Affected", "Symptom_Description", "Garage_Name", "Mechanic_Name",
+      "Garage_Phone", "Items_Count", "Items_Detail_JSON", "Items_Summary_Text", "Parts_Cost",
+      "Labor_Cost", "Vat_Amount", "Total_Cost", "Status", "Bill_Photo_Url",
+      "Defect_Photo_Url", "Parts_Photo_Url", "Finished_Photo_Url", "Remarks"
+    ];
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    const headerRange = sheet.getRange(1, 1, 1, headers.length);
+    headerRange.setBackground("#0f172a");
+    headerRange.setFontColor("#f8fafc");
+    headerRange.setFontWeight("bold");
+    headerRange.setFontSize(10);
+    headerRange.setHorizontalAlignment("center");
+    sheet.setFrozenRows(1);
+    for (let c = 1; c <= headers.length; c++) sheet.setColumnWidth(c, 130);
+    sheet.setColumnWidth(2, 160);
+    sheet.setColumnWidth(13, 240);
+    sheet.setColumnWidth(18, 200);
+    sheet.setColumnWidth(19, 250);
+  }
+  return sheet;
+}
+
+function saveMaintenanceRecord(data, ss, driverInfo) {
+  const targetSheet = getOrCreateMaintenanceSheet(ss);
+  const now = new Date();
+  const timeFormatted = Utilities.formatDate(now, "Asia/Bangkok", "dd/MM/yyyy HH:mm:ss");
+  const dateCode = Utilities.formatDate(now, "Asia/Bangkok", "yyyyMMdd");
+  const lastRow = targetSheet.getLastRow();
+  const seq = String(Math.max(1, lastRow)).padStart(3, '0');
+  const ticketId = data.ticketId || `MNT-${dateCode}-${seq}`;
+
+  const MAINTENANCE_DRIVE_FOLDER_ID = "1YRkTR9dMz0PxKgF60edVF56Ckq909fMF";
+  let folder = null;
+  try {
+    folder = DriveApp.getFolderById(MAINTENANCE_DRIVE_FOLDER_ID);
+  } catch(e) {
+    folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+  }
+
+  function saveBase64Image(base64Data, prefix) {
+    if (!base64Data || !base64Data.includes("base64,")) return "";
+    try {
+      const parts = base64Data.split("base64,");
+      const decodedBytes = Utilities.base64Decode(parts[1]);
+      const blob = Utilities.newBlob(decodedBytes, "image/jpeg", `${prefix}_${ticketId}_${dateCode}.jpg`);
+      const file = folder.createFile(blob);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      return file.getUrl();
+    } catch(err) {
+      return "";
+    }
+  }
+
+  const images = data.images || {};
+  const billUrl = images.billPhoto ? saveBase64Image(images.billPhoto, "BILL") : (data.billUrl || "-");
+  const defectUrl = images.defectPhoto ? saveBase64Image(images.defectPhoto, "DEFECT") : (data.defectUrl || "-");
+  const partsSummaryText = (data.parts && Array.isArray(data.parts))
+    ? data.parts.map((p, i) => `${i + 1}. ${p.name || ''} (${p.qty || 1} x ${p.price || 0} = ${(p.qty || 1) * (p.price || 0)} บ.)`).join("\n")
+    : "-";
+
+  const rowData = [
+    timeFormatted,
+    ticketId,
+    data.inspectionDate || Utilities.formatDate(now, "Asia/Bangkok", "yyyy-MM-dd"),
+    data.vehiclePlate || (driverInfo ? driverInfo.plate : ""),
+    data.vehicleType || "รถบรรทุก 6 ล้อ",
+    Number(data.odometer) || 0,
+    data.driverName || (driverInfo ? driverInfo.name : ""),
+    data.email || "",
+    data.driverPhone || (driverInfo ? driverInfo.phone : ""),
+    data.maintenanceType || "ตรวจซ่อมทั่วไป",
+    data.urgency || "ปกติ",
+    data.systemAffected || "ไม่ระบุ",
+    data.symptomDescription || "-",
+    data.garageName || "-",
+    data.mechanicName || "-",
+    data.garagePhone || "-",
+    (data.parts && Array.isArray(data.parts)) ? data.parts.length : 0,
+    JSON.stringify(data.parts || []),
+    partsSummaryText,
+    Number(data.partsCost) || 0,
+    Number(data.laborCost) || 0,
+    Number(data.vatAmount) || 0,
+    Number(data.totalCost) || 0,
+    data.ticketStatus || "ซ่อมเสร็จแล้ว",
+    billUrl,
+    defectUrl,
+    "-",
+    "-",
+    data.remarks || "บันทึกจากระบบมือถือ TTMK"
+  ];
+
+  targetSheet.appendRow(rowData);
+  return responseJSON({
+    status: "success",
+    message: "บันทึกแจ้งซ่อมบำรุงและอัปโหลดไฟล์เรียบร้อยแล้ว",
+    ticketId: ticketId,
+    sheetRow: targetSheet.getLastRow(),
+    billUrl: billUrl,
+    defectUrl: defectUrl
+  });
+}
+
