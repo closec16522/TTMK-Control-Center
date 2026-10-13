@@ -644,7 +644,7 @@ function getAllTruckLogs() {
     if (!sheet) return [];
     var lastRow = sheet.getLastRow();
     if (lastRow <= 1) return [];
-    var lastCol = Math.max(sheet.getLastColumn(), 18);
+    var lastCol = Math.max(sheet.getLastColumn(), 19);
     var data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
     var list = [];
     for (var i = 0; i < data.length; i++) {
@@ -679,6 +679,7 @@ function getAllTruckLogs() {
         imgSeatbeltDriver: (r[15] || "").toString(),
         imgDashcam: (r[16] || "").toString(),
         imgSeatbeltAssistant: (r[17] || "").toString(),
+        monthlyPdfUrl: (r[18] || "").toString(),
         remarks: (r[9] || "ไม่มี").toString()
       });
     }

@@ -2544,8 +2544,11 @@
       <!-- Vehicle & Month Summary Card -->
       <div class="p-3.5 my-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
-          <span class="text-slate-500 text-[11px] block">ทะเบียนรถ:</span>
-          <strong id="monthlyModalPlate" class="text-blue-700 dark:text-blue-400 font-bold text-sm block">-</strong>
+          <span class="text-slate-500 text-[11px] block">ทะเบียนรถ (เปลี่ยนคัน):</span>
+          <select id="monthlyModalPlateSelect" onchange="openMonthlyReportModal(this.value)"
+                  class="mt-0.5 w-full bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-700 rounded-lg py-1 px-1.5 text-xs font-bold text-blue-700 dark:text-blue-400 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+          </select>
+          <strong id="monthlyModalPlate" class="hidden">-</strong>
         </div>
         <div>
           <span class="text-slate-500 text-[11px] block">พนักงานขับรถ:</span>
@@ -2556,8 +2559,8 @@
           <span class="text-slate-700 dark:text-slate-300 font-bold block">ตุลาคม 2569</span>
         </div>
         <div>
-          <span class="text-slate-500 text-[11px] block">สรุปการตรวจสภาพ:</span>
-          <span class="text-emerald-600 font-extrabold block">ผ่าน 100% ครบทุกวัน</span>
+          <span class="text-slate-500 text-[11px] block">สรุปการตรวจสภาพ (Actual):</span>
+          <span id="monthlyModalStatusBadge" class="text-emerald-600 font-extrabold block">-</span>
         </div>
       </div>
 
@@ -2579,39 +2582,39 @@
           <table class="w-full text-left text-[11px] text-slate-700 dark:text-slate-300 border-collapse">
             <thead class="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 sticky top-0">
               <tr>
-                <th class="py-2 px-2.5 border-b border-r border-slate-200 dark:border-slate-700 min-w-[180px]">รายการตรวจสอบ 15 ข้อ</th>
+                <th class="py-2 px-2.5 border-b border-r border-slate-200 dark:border-slate-700 min-w-[220px]">รายการตรวจสอบมาตรฐาน F-CAM-032_r3</th>
                 <!-- Days 1 to 31 -->
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">1</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">2</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">3</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">4</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">5</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">6</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">7</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">8</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">9</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">10</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold bg-blue-100 dark:bg-blue-900/40 text-blue-700">11</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold bg-blue-100 dark:bg-blue-900/40 text-blue-700">12</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">13</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">14</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">15</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">16</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">17</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">18</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">19</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">20</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">21</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">22</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">23</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">24</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">25</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">26</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">27</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">28</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">29</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">30</th>
-                <th class="py-2 px-1.5 text-center border-b border-slate-200 dark:border-slate-700 font-bold">31</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">1</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">2</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">3</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">4</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">5</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">6</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">7</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">8</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">9</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">10</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">11</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">12</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold bg-blue-100 dark:bg-blue-900/40 text-blue-700">13</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">14</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">15</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">16</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">17</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">18</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">19</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">20</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">21</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">22</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">23</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">24</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">25</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">26</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">27</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">28</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">29</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">30</th>
+                <th class="py-2 px-1 text-center border-b border-slate-200 dark:border-slate-700 font-bold">31</th>
               </tr>
             </thead>
             <tbody id="monthlyMatrixTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -2624,26 +2627,34 @@
       <!-- Tab Content 2: Monthly PDF Preview -->
       <div id="monthlyTabContentPdf" class="hidden space-y-3">
         <div class="rounded-2xl overflow-hidden border border-slate-300 dark:border-slate-700 bg-slate-900 shadow-xl">
-          <div class="p-3 bg-slate-800 flex items-center justify-between text-xs text-white">
-            <span class="flex items-center gap-2 font-bold text-slate-200">
+          <div class="p-3 bg-slate-800 flex flex-wrap items-center justify-between text-xs text-white gap-2">
+            <span class="flex items-center gap-2 font-bold text-slate-200 truncate">
               <i class="fa-solid fa-file-pdf text-red-400 text-sm"></i>
-              <span id="monthlyModalPdfTitle">F-CAM-032_r3_Monthly_Report_October_2026.pdf</span>
+              <span id="monthlyModalPdfTitle">TTMK_Monthly_102026_Report.pdf</span>
             </span>
             <div class="flex items-center gap-2">
+              <button type="button" onclick="regenerateMonthlyPdfNow()" id="btnRegenMonthlyPdf"
+                      class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition flex items-center gap-1 shadow">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span>อัปเดต Actual ล่าสุด</span>
+              </button>
               <a id="monthlyModalPdfDirectLink" href="./CheckTruck/downloaded_monthly.pdf" target="_blank"
                  class="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-[11px] font-bold transition flex items-center gap-1">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                <span>เปิดเต็มจอ</span>
+                <span>เปิดเต็มจอ Drive</span>
               </a>
               <a id="monthlyModalPdfDownloadBtn" href="./CheckTruck/downloaded_monthly.pdf" download
                  class="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold shadow transition flex items-center gap-1">
                 <i class="fa-solid fa-download"></i>
-                <span>ดาวน์โหลด PDF รายเดือน</span>
+                <span>ดาวน์โหลด PDF</span>
               </a>
             </div>
           </div>
           <iframe id="monthlyModalPdfIframe" src="about:blank" data-src="./CheckTruck/downloaded_monthly.pdf" class="w-full h-[540px] bg-slate-100 border-0"></iframe>
         </div>
+        <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center pt-0.5">
+          <i class="fa-solid fa-circle-info mr-1 text-indigo-400"></i> หากเบราว์เซอร์ไม่แสดงตัวอย่างในกรอบ กรุณากดปุ่ม <strong>"เปิดเต็มจอ Drive"</strong> หรือ <strong>"ดาวน์โหลด PDF"</strong>
+        </p>
       </div>
 
       <!-- Signatures Footer -->
@@ -2974,6 +2985,7 @@
         const imgSeatbeltDriver = getVal(15);
         const imgDashcam = getVal(16);
         const imgSeatbeltAssistant = getVal(17);
+        const monthlyPdfUrl = getVal(18);
 
         // Don't add completely empty rows
         if (!vehiclePlate && !driverName) return;
@@ -2999,6 +3011,7 @@
           imgSeatbeltDriver,
           imgDashcam,
           imgSeatbeltAssistant,
+          monthlyPdfUrl,
           remarks: defectsNote
         });
       });
@@ -3983,7 +3996,12 @@
               <div class="inline-flex items-center gap-1.5">
                 <button type="button" onclick="openTruckReportModal(${index})"
                         class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition active:scale-95">
-                  <i class="fa-solid fa-file-pdf mr-1 text-red-200"></i> ดูรายงาน & PDF
+                  <i class="fa-solid fa-file-pdf mr-1 text-red-200"></i> ดูรายงานวัน
+                </button>
+                <button type="button" onclick="openMonthlyReportModal('${escapeHtml(log.vehiclePlate)}')"
+                        class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 shadow-sm transition active:scale-95"
+                        title="ดูรายงานสรุปประจำเดือนคันนี้ (F-CAM-032_r3)">
+                  <i class="fa-solid fa-calendar-check mr-1"></i> รายเดือน
                 </button>
                 ${hasPdf ? `
                   <a href="${driveLink}" target="_blank" title="เปิดไฟล์ PDF ใน Google Drive โดยตรง"
@@ -5180,52 +5198,306 @@
       }
     }
 
-    function openMonthlyReportModal() {
-      const mIframe = document.getElementById('monthlyModalPdfIframe');
-      if (mIframe && (!mIframe.src || mIframe.src === '' || mIframe.src.endsWith('about:blank'))) {
-        mIframe.src = mIframe.dataset.src || './CheckTruck/downloaded_monthly.pdf';
+    window.currentMonthlyPlate = "25912";
+
+    function parseInspectionDateInfo(rawVal) {
+      if (!rawVal) return null;
+      let d = null, m = null, y = null;
+      const str = String(rawVal).trim();
+      const dmy = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      if (dmy) {
+        d = parseInt(dmy[1], 10);
+        m = parseInt(dmy[2], 10);
+        y = parseInt(dmy[3], 10);
+      } else {
+        const ymd = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+        if (ymd) {
+          y = parseInt(ymd[1], 10);
+          m = parseInt(ymd[2], 10);
+          d = parseInt(ymd[3], 10);
+        } else {
+          const dt = new Date(str);
+          if (!isNaN(dt.getTime())) {
+            d = dt.getDate();
+            m = dt.getMonth() + 1;
+            y = dt.getFullYear();
+          }
+        }
       }
-      const select = document.getElementById('calendarPlateFilter');
-      const plate = select ? select.value : "70-8899 กทม.";
-      const drv = appState.drivers.find(d => d.vehiclePlate === plate) || { driverName: "นายทวีศักดิ์ คำปก (Mr.Taweesak)" };
+      if (d === null || m === null || y === null) return null;
+      if (y > 2400) y -= 543;
+      return { day: d, month: m, year: y };
+    }
+
+    function setMonthlyPdfLinks(pdfUrl, fileName) {
+      const titleEl = document.getElementById('monthlyModalPdfTitle');
+      const directLink = document.getElementById('monthlyModalPdfDirectLink');
+      const downloadBtn = document.getElementById('monthlyModalPdfDownloadBtn');
+      const mIframe = document.getElementById('monthlyModalPdfIframe');
+
+      if (titleEl && fileName) titleEl.textContent = fileName;
+      if (directLink) directLink.href = pdfUrl;
+      if (downloadBtn) downloadBtn.href = pdfUrl;
+      if (mIframe) {
+        let embedUrl = pdfUrl;
+        if (embedUrl.includes('drive.google.com/file/d/')) {
+          embedUrl = embedUrl.replace(/\/view(\?.*)?$/, '/preview');
+        }
+        mIframe.src = embedUrl;
+      }
+    }
+
+    async function loadMonthlyPdfForPlate(plate, forceRegen = false) {
+      window.currentMonthlyPlate = plate;
+      const cleanPlate = (plate || "").replace(/[^a-zA-Z0-9ก-๙]/g, '').trim();
+      const expectedFileName = `TTMK_Monthly_102026_${cleanPlate || '25912'}.pdf`;
+      const titleEl = document.getElementById('monthlyModalPdfTitle');
+
+      // 1. Check if any truckLog for this plate already has monthlyPdfUrl from Drive (if not forceRegen)
+      if (!forceRegen && appState.truckLogs && appState.truckLogs.length > 0) {
+        const foundLog = appState.truckLogs.find(l => {
+          const lp = (l.vehiclePlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+          const targetP = cleanPlate.toLowerCase();
+          return (lp === targetP || lp.includes(targetP) || targetP.includes(lp)) && l.monthlyPdfUrl && l.monthlyPdfUrl.includes('drive.google.com');
+        });
+        if (foundLog && foundLog.monthlyPdfUrl) {
+          setMonthlyPdfLinks(foundLog.monthlyPdfUrl, expectedFileName);
+          return;
+        }
+      }
+
+      // 2. Query GAS endpoint to find or generate real monthly PDF
+      if (titleEl) {
+        titleEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-amber-400"></i> กำลังเชื่อมโยง ${expectedFileName}...`;
+      }
+
+      try {
+        const gasUrl = `${CONFIG.GAS_TRUCK_URL}?action=${forceRegen ? 'generate_monthly_pdf' : 'get_monthly_pdf'}&plate=${encodeURIComponent(plate)}&month=10/2026`;
+        const resp = await fetch(gasUrl);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.status === 'success' && data.pdfUrl) {
+            setMonthlyPdfLinks(data.pdfUrl, data.fileName || expectedFileName);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('loadMonthlyPdfForPlate GAS query error:', err);
+      }
+
+      // Fallback
+      setMonthlyPdfLinks('./CheckTruck/downloaded_monthly.pdf', expectedFileName);
+    }
+
+    async function regenerateMonthlyPdfNow() {
+      const btn = document.getElementById('btnRegenMonthlyPdf');
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังประมวลผล Actual...`;
+      }
+
+      try {
+        await loadMonthlyPdfForPlate(window.currentMonthlyPlate || "25912", true);
+        Swal.fire({
+          icon: 'success',
+          title: 'อัปเดตไฟล์รายเดือนสำเร็จ',
+          text: 'ประมวลผลข้อมูลการตรวจ Actual ประจำเดือนตุลาคม 2569 และสร้างไฟล์ PDF ฉบับล่าสุดใน Google Drive เรียบร้อยแล้ว',
+          timer: 2200,
+          showConfirmButton: false
+        });
+      } catch (err) {
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: 'ไม่สามารถติดต่อ Google Apps Script ได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง'
+        });
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+        }
+      }
+    }
+
+    function openMonthlyReportModal(plateParam) {
+      let plate = plateParam;
+      if (!plate) {
+        const select = document.getElementById('calendarPlateFilter');
+        plate = select ? select.value : "25912";
+      }
+      if (!plate || plate === '-') plate = "25912";
+      window.currentMonthlyPlate = plate;
+
+      const cleanPlate = plate.replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+      const drv = appState.drivers.find(d => {
+        const dp = (d.vehiclePlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+        return dp && (dp === cleanPlate || cleanPlate.includes(dp) || dp.includes(cleanPlate));
+      }) || { driverName: "นายทวีศักดิ์ คำปก (Mr.Taweesak)" };
 
       document.getElementById('monthlyModalPlate').textContent = plate;
       document.getElementById('monthlyModalDriver').textContent = drv.driverName;
       document.getElementById('monthlySignDriver').textContent = drv.driverName;
 
-      const items = [
-        "1. สภาพดอกยาง & ความลึกร่องยาง",
-        "2. แรงดันลมยางตามมาตรฐาน",
-        "3. น็อตล้อขันแน่นครบทุกตัว",
-        "4. ระบบเบรกลมหลัก",
-        "5. เบรกมือ (Parking Brake)",
-        "6. ระดับน้ำมันเบรกและท่อลม",
-        "7. ระบบไฟหน้าสูง-ต่ำ",
-        "8. ไฟเลี้ยว 4 ทิศทาง",
-        "9. ไฟเบรกและไฟท้าย",
-        "10. ไฟถอยและสัญญาณเสียงถอย",
-        "11. ระดับน้ำมันเครื่อง",
-        "12. น้ำหล่อเย็นหม้อน้ำ",
-        "13. แบตเตอรี่และขั้วไฟ",
-        "14. ถังดับเพลิงประจำรถ",
-        "15. ป้ายเตือนและกรวยสะท้อนแสง"
+      // Populate & sync plate select inside modal
+      const plateSelect = document.getElementById('monthlyModalPlateSelect');
+      if (plateSelect) {
+        if (plateSelect.options.length === 0) {
+          const plates = [];
+          appState.drivers.forEach(d => {
+            if (d.vehiclePlate && d.vehiclePlate !== '-' && !plates.includes(d.vehiclePlate)) plates.push(d.vehiclePlate);
+          });
+          if (plates.length === 0) plates.push("25912", "70-8899 กทม.", "72-8297 สระบุรี", "8กส1201");
+          plateSelect.innerHTML = plates.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
+        }
+        plateSelect.value = plate;
+      }
+
+      // Extract actual inspection logs for this vehicle in October 2026
+      const monthlyDaysMap = {};
+      (appState.truckLogs || []).forEach(log => {
+        const rowPlate = (log.vehiclePlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+        const isMatch = rowPlate && (rowPlate === cleanPlate || cleanPlate.includes(rowPlate) || rowPlate.includes(cleanPlate));
+        if (!isMatch) return;
+
+        const dmy = parseInspectionDateInfo(log.date || log.timestamp);
+        if (dmy && dmy.month === 10 && (dmy.year === 2026 || dmy.year === 2569)) {
+          if (!monthlyDaysMap[dmy.day]) {
+            monthlyDaysMap[dmy.day] = log;
+          }
+        }
+      });
+
+      const inspectedDays = Object.keys(monthlyDaysMap).map(Number);
+      const inspectedCount = inspectedDays.length;
+      const passedCount = Object.values(monthlyDaysMap).filter(l => {
+        const st = (l.status || '').toLowerCase();
+        return st.includes('ผ่าน') || st.includes('พร้อมใช้งาน') || st === 'pass';
+      }).length;
+      const defectCount = inspectedCount - passedCount;
+
+      const statusBadge = document.getElementById('monthlyModalStatusBadge');
+      if (statusBadge) {
+        if (inspectedCount > 0) {
+          statusBadge.innerHTML = `<span class="text-emerald-600 font-extrabold"><i class="fa-solid fa-circle-check"></i> ตรวจแล้ว ${inspectedCount} วัน (ปกติ ${passedCount}${defectCount > 0 ? `, ข้อบกพร่อง ${defectCount}` : ''})</span>`;
+        } else {
+          statusBadge.innerHTML = `<span class="text-slate-400 font-bold"><i class="fa-solid fa-clock"></i> ยังไม่มีบันทึกในเดือนนี้</span>`;
+        }
+      }
+
+      // Build official 27+ items inspection matrix matching F-CAM-032_r3
+      const sections = [
+        {
+          title: "หมวด A: สภาพรถและอุปกรณ์ทั่วไป (ข้อ 1 - 9)",
+          items: [
+            { no: 1, title: "1. ระดับน้ำมันเบรคและคลัตซ์ พร้อมใช้งาน ไม่รั่วซึม" },
+            { no: 2, title: "2. ที่ปัดน้ำฝนและระดับน้ำฉีดกระจก พร้อมใช้งาน" },
+            { no: 3, title: "3. เบรคมือใช้งานได้ปกติ ล็อกแน่นหนา" },
+            { no: 4, title: "4. ระบบเบรคใช้งานได้ปกติ ไม่มีเสียงลมรั่ว" },
+            { no: 5, title: "5. Safety Belt เข็มขัดนิรภัย ใช้งานได้ปกติ" },
+            { no: 6, title: "6. กระจกหน้า / มองข้าง / มองหลัง / มองมุม ไม่แตกร้าว" },
+            { no: 7, title: "7. ไฟส่องสว่างหน้ารถ และไฟสัญญาณพร้อมใช้งาน" },
+            { no: 8, title: "8. สภาพยางรถ 6 ล้อ (ดอกยางหน้า > 3 มม., ยางหลัง > 2 มม., น็อตแน่น)" },
+            { no: 9, title: "9. สัญญาณแตร ทำงานเสียงดังชัดเจน" }
+          ]
+        },
+        {
+          title: "หมวด B: อุปกรณ์มาตรฐานประจำรถ (ข้อ 10 - 17)",
+          items: [
+            { no: 10, title: "10. หมอนรองล้อ 2 อัน มีประจำรถพร้อมใช้งาน" },
+            { no: 11, title: "11. กรวยยางสะท้อนแสง 2 อัน มีประจำรถพร้อมใช้งาน" },
+            { no: 12, title: "12. ถังดับเพลิง ขนาด 10 ปอนด์ พร้อมใช้งาน เกจ์เขียว" },
+            { no: 13, title: "13. กล้องหน้ารถและเมมโมรี่การ์ด พร้อมบันทึกซ้ำ" },
+            { no: 14, title: "14. ไฟกระพริบฉุกเฉิน ป้ายสามเหลี่ยมสะท้อนแสง" },
+            { no: 15, title: "15. ระบบ GPS ทำงานปกติ ส่งสัญญาณระบุตำแหน่งได้" },
+            { no: 16, title: "16. ผ้าแดง (แขวนท้ายรถ) มีประจำรถพร้อมใช้งาน" },
+            { no: 17, title: "17. สติกเกอร์เตือน \"อย่าลืมล็อคกลอนประตูตู้\" ติดชัดเจน" }
+          ]
+        },
+        {
+          title: "หมวด C: อุปกรณ์ประจำตัว พขร. (ข้อ 18 - 21)",
+          items: [
+            { no: 18, title: "18. เครื่องแบบบริษัท SCG JWD สวมใส่ถูกต้องเรียบร้อย" },
+            { no: 19, title: "19. รองเท้าเซฟตี้ สวมใส่พร้อมปฏิบัติงาน" },
+            { no: 20, title: "20. บัตรประจำตัวที่บริษัท SCG JWD ออกให้ พกติดตัว" },
+            { no: 21, title: "21. โทรศัพท์มือถือ แบตเตอรี่พร้อมใช้งาน" }
+          ]
+        },
+        {
+          title: "ความพร้อมในห้องโดยสาร (Cabin & Pre-Departure Readiness)",
+          items: [
+            { no: "P1", title: "P1. การคาดเข็มขัดนิรภัย พขร. และ ผขถ. ถูกต้อง" },
+            { no: "P2", title: "P2. กล้องหน้ารถขณะสตาร์ตเครื่อง ไฟ REC บันทึกตลอดทาง" }
+          ]
+        },
+        {
+          title: "หมวด D: ตรวจสอบประจำสัปดาห์ (Weekly Checklist ข้อ 22 - 27)",
+          items: [
+            { no: 22, title: "22. เครื่องมือประจำรถ ครบชุดพร้อมใช้งาน" },
+            { no: 23, title: "23. ระดับน้ำมันเครื่อง อยู่ในเกณฑ์ปกติ" },
+            { no: 24, title: "24. ระดับน้ำในหม้อน้ำระบายความร้อน & แบตเตอรี่" },
+            { no: 25, title: "25. ผ้าใบสะอาดไม่มีรอยรั่ว / สภาพตู้ไม่บุบ ไม่เป็นรู" },
+            { no: 26, title: "26. พื้นรถสะอาด ไม่มีเศษกรวด หิน ดิน ทราย ไม่มีกลิ่น" },
+            { no: 27, title: "27. หลอดไฟท้าย / ไฟเบรก / ไฟเลี้ยวหลัง สมบูรณ์ ไม่แตก ไม่ดับ" }
+          ]
+        }
       ];
 
       const tbody = document.getElementById('monthlyMatrixTableBody');
       if (tbody) {
-        tbody.innerHTML = items.map((item, idx) => {
-          let daysCheck = '';
-          for (let d = 1; d <= 31; d++) {
-            daysCheck += `<td class="py-1.5 px-1 text-center font-bold text-emerald-600 border-r border-slate-100 dark:border-slate-800">✔</td>`;
-          }
-          return `
-            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition border-b border-slate-100 dark:border-slate-800">
-              <td class="py-1.5 px-2.5 font-semibold text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap">${escapeHtml(item)}</td>
-              ${daysCheck}
+        let rowsHtml = '';
+        sections.forEach(sec => {
+          rowsHtml += `
+            <tr class="bg-slate-100 dark:bg-slate-800/80 font-bold text-slate-800 dark:text-slate-200">
+              <td colspan="32" class="py-1.5 px-2.5 text-[11px] text-indigo-700 dark:text-indigo-300 font-extrabold uppercase tracking-wide">
+                ${escapeHtml(sec.title)}
+              </td>
             </tr>
           `;
-        }).join('');
+
+          sec.items.forEach(it => {
+            let daysTds = '';
+            for (let d = 1; d <= 31; d++) {
+              const dayInsp = monthlyDaysMap[d];
+              if (dayInsp) {
+                let isDefect = false;
+                if (dayInsp.checklist) {
+                  try {
+                    const cl = typeof dayInsp.checklist === 'string' ? JSON.parse(dayInsp.checklist) : dayInsp.checklist;
+                    if (Array.isArray(cl)) {
+                      const matchedQ = cl.find(q => {
+                        const qNo = parseInt(q.no, 10);
+                        if (!isNaN(qNo) && qNo === it.no) return true;
+                        return String(q.text || q.question || '').includes(it.title.substring(3, 10));
+                      });
+                      if (matchedQ && matchedQ.status === 'DEFECT') isDefect = true;
+                    }
+                  } catch(e) {}
+                }
+
+                if (isDefect) {
+                  daysTds += `<td class="py-1 px-1 text-center font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 border-r border-slate-100 dark:border-slate-800 cursor-pointer" title="วันที่ ${d}/10/2026: พบข้อบกพร่อง (ผู้ตรวจ: ${escapeHtml(dayInsp.driverName)}) - คลิกเปิดรายงานวัน" onclick="openTruckReportForDay('${escapeHtml(plate)}', '${d < 10 ? '0'+d : d}/10/2026')">✗</td>`;
+                } else {
+                  daysTds += `<td class="py-1 px-1 text-center font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-r border-slate-100 dark:border-slate-800 cursor-pointer" title="วันที่ ${d}/10/2026: ผ่านเกณฑ์ปกติ (ผู้ตรวจ: ${escapeHtml(dayInsp.driverName)}) - คลิกเปิดรายงานวัน" onclick="openTruckReportForDay('${escapeHtml(plate)}', '${d < 10 ? '0'+d : d}/10/2026')">✔</td>`;
+                }
+              } else {
+                daysTds += `<td class="py-1 px-1 text-center text-slate-300 dark:text-slate-600 border-r border-slate-100 dark:border-slate-800" title="วันที่ ${d}/10/2026: ไม่มีการตรวจ">-</td>`;
+              }
+            }
+
+            rowsHtml += `
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition border-b border-slate-100 dark:border-slate-800">
+                <td class="py-1 px-2.5 font-medium text-slate-800 dark:text-slate-200 border-r border-slate-200 dark:border-slate-700 whitespace-nowrap">${escapeHtml(it.title)}</td>
+                ${daysTds}
+              </tr>
+            `;
+          });
+        });
+        tbody.innerHTML = rowsHtml;
       }
+
+      // Pre-load PDF for this plate in background
+      loadMonthlyPdfForPlate(plate, false);
 
       switchMonthlyTab('matrix');
       document.getElementById('monthlyReportModal').classList.remove('hidden');
@@ -5244,6 +5516,12 @@
         btnPdf.className = "flex-1 py-1.5 px-2 rounded-lg font-bold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition text-center";
         contentMatrix.classList.add('hidden');
         contentPdf.classList.remove('hidden');
+
+        // Check if iframe has loaded
+        const mIframe = document.getElementById('monthlyModalPdfIframe');
+        if (mIframe && (!mIframe.src || mIframe.src === '' || mIframe.src.endsWith('about:blank'))) {
+          loadMonthlyPdfForPlate(window.currentMonthlyPlate || "25912", false);
+        }
       } else {
         btnPdf.className = "flex-1 py-1.5 px-2 rounded-lg font-bold text-slate-600 dark:text-slate-400 hover:text-indigo-600 transition text-center";
         btnMatrix.className = "flex-1 py-1.5 px-2 rounded-lg font-bold bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm transition text-center";

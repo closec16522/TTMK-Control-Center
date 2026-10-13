@@ -16,11 +16,32 @@ function doGet(e) {
       return responseJSON(checkDriverRegistration(email));
     }
 
-    // ฟังก์ชันสร้างรายงานสรุปรายเดือนแบบตารางรวม Actual ประจำวัน
-    if (e.parameter.action === "generate_monthly_pdf") {
+    // ฟังก์ชันสร้าง/ค้นหารายงานสรุปรายเดือนแบบตารางรวม Actual ประจำวัน
+    if (e.parameter.action === "generate_monthly_pdf" || e.parameter.action === "get_monthly_pdf") {
       const plate = (e.parameter.plate || "").trim();
       const monthYear = (e.parameter.month || Utilities.formatDate(new Date(), "Asia/Bangkok", "MM/yyyy")).trim();
       const email = (e.parameter.email || "").trim();
+      const forceRegen = (e.parameter.regenerate === "true");
+
+      if (!forceRegen && plate) {
+        try {
+          const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
+          const safePlate = (plate || "").replace(/[^a-zA-Z0-9ก-๙]/g, '') || "TRUCK";
+          const cleanMonth = monthYear.replace(/[^0-9]/g, '');
+          const fileName = `TTMK_Monthly_${cleanMonth}_${safePlate}.pdf`;
+          const existingFiles = folder.getFilesByName(fileName);
+          if (existingFiles.hasNext()) {
+            const f = existingFiles.next();
+            return responseJSON({
+              status: "success",
+              pdfUrl: f.getUrl(),
+              fileName: fileName,
+              cached: true
+            });
+          }
+        } catch(fe) {}
+      }
+
       return generateMonthlyTruckInspectionPdf(plate, monthYear, email);
     }
 
@@ -62,7 +83,7 @@ function doGet(e) {
         if (!logSheet) return responseJSON({ status: "error", message: "Sheet not found" });
         const lastRow = logSheet.getLastRow();
         if (lastRow <= 1) return responseJSON({ status: "success", total: 0, logs: [] });
-        const lastCol = Math.max(logSheet.getLastColumn(), 18);
+        const lastCol = Math.max(logSheet.getLastColumn(), 19);
         const rows = logSheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
         const logs = rows.map((r, idx) => {
           let ts = r[0];
@@ -95,6 +116,7 @@ function doGet(e) {
             imgSeatbeltDriver: (r[15] || "").toString(),
             imgDashcam: (r[16] || "").toString(),
             imgSeatbeltAssistant: (r[17] || "").toString(),
+            monthlyPdfUrl: (r[18] || "").toString(),
             remarks: (r[9] || "ไม่มี").toString()
           };
         });
@@ -246,6 +268,15 @@ function doPost(e) {
       const targetPlate = String(data.vehiclePlate || driverInfo.plate || "");
       const autoMonthlyResult = updateOrCreateMonthlyReport(targetPlate, currentMonthYear, folder, null, data.email);
       monthlyPdfUrl = autoMonthlyResult.pdfUrl || "-";
+
+      // บันทึก Link รายงานประจำเดือนลงในคอลัมน์ที่ 19 ของ Google Sheet
+      const lastRow = logSheet.getLastRow();
+      if (logSheet.getLastColumn() < 19) {
+        logSheet.getRange(1, 19).setValue("Monthly_PDF_Report_URL");
+      }
+      if (monthlyPdfUrl && monthlyPdfUrl !== "-") {
+        logSheet.getRange(lastRow, 19).setValue(monthlyPdfUrl);
+      }
     } catch (mErr) {
       Logger.log("Auto Monthly PDF Error: " + mErr.toString());
     }
