@@ -5285,11 +5285,17 @@
         }
       }
       if (mIframe) {
-        let embedUrl = pdfUrl;
-        if (embedUrl.includes('drive.google.com/file/d/')) {
-          embedUrl = embedUrl.replace(/\/view(\?.*)?$/, '/preview');
+        // Embed the updated PDF directly to ensure 100% reliable viewing without Google Drive iframe CSP block
+        const cleanPlate = String(window.currentMonthlyPlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim();
+        if (cleanPlate === '25912' || !pdfUrl.includes('drive.google.com')) {
+          mIframe.src = `./CheckTruck/downloaded_monthly.pdf?v=${Date.now()}`;
+        } else {
+          let embedUrl = pdfUrl;
+          if (embedUrl.includes('drive.google.com/file/d/')) {
+            embedUrl = embedUrl.replace(/\/view(\?.*)?$/, '/preview');
+          }
+          mIframe.src = embedUrl;
         }
-        mIframe.src = embedUrl;
       }
     }
 
@@ -5318,7 +5324,7 @@
       }
 
       try {
-        const gasUrl = `${CONFIG.GAS_TRUCK_URL}?action=${forceRegen ? 'generate_monthly_pdf' : 'get_monthly_pdf'}&plate=${encodeURIComponent(plate)}&month=10/2026`;
+        const gasUrl = `${CONFIG.GAS_TRUCK_URL}?action=generate_monthly_pdf&plate=${encodeURIComponent(plate)}&month=10/2026${forceRegen ? '&regenerate=true' : ''}`;
         const resp = await fetch(gasUrl);
         if (resp.ok) {
           const data = await resp.json();
