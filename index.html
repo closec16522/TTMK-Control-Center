@@ -5144,7 +5144,7 @@
           const m = pdfUrl.match(/\/file\/d\/([^\/\?]+)/);
           const fileId = m && m[1] ? m[1] : '';
           if (fileId) {
-            pIframe.src = `https://docs.google.com/viewer?srcid=${fileId}&pid=explorer&efh=false&a=v&chrome=false&embedded=true`;
+            pIframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
           } else {
             pIframe.src = `./CheckTruck/downloaded_all_trucks.pdf?v=${Date.now()}`;
           }
@@ -5303,7 +5303,7 @@
           const m = pdfUrl.match(/\/file\/d\/([^\/\?]+)/);
           const fileId = m && m[1] ? m[1] : '';
           if (fileId) {
-            mIframe.src = `https://docs.google.com/viewer?srcid=${fileId}&pid=explorer&efh=false&a=v&chrome=false&embedded=true`;
+            mIframe.src = `https://drive.google.com/file/d/${fileId}/preview`;
           } else {
             mIframe.src = `./CheckTruck/downloaded_monthly.pdf?v=${Date.now()}`;
           }
