@@ -118,6 +118,9 @@ window.goToStep = function(step) {
       return;
     }
 
+    const odo = document.getElementById("odometer")?.value?.trim();
+    const symptom = document.getElementById("symptomDescription")?.value?.trim();
+
     if (!odo || Number(odo) <= 0) {
       Swal.fire({
         icon: 'warning',
