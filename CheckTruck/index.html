@@ -2188,6 +2188,13 @@
         });
       });
 
+      // เรียงลำดับคำถามตามเลขข้อจากน้อยไปมาก (1 ถึง 27) เสมอ
+      questionsSummary.sort((a, b) => {
+        const numA = parseInt(a.no, 10) || 999;
+        const numB = parseInt(b.no, 10) || 999;
+        return numA - numB;
+      });
+
       const payload = {
         standardDoc: 'DAILY_INSPECTION',
         email: registeredDriver ? registeredDriver.email : 'closec16522@gmail.com',

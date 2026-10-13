@@ -47,6 +47,18 @@ function getRealAlcoholLogs() {
   return [];
 }
 
+// Real Truck Inspection Logs Reader
+function getRealTruckLogs() {
+  try {
+    const p = path.join(BASE_DIR, 'truck_logs_enriched.json');
+    if (fs.existsSync(p)) {
+      const logs = JSON.parse(fs.readFileSync(p, 'utf8'));
+      if (Array.isArray(logs) && logs.length > 0) return logs;
+    }
+  } catch(e) {}
+  return REAL_TRUCK_LOGS;
+}
+
 // Real Truck Inspection Logs Snapshot (F-CAM-032_r3)
 const REAL_TRUCK_LOGS = [
   {
@@ -292,12 +304,13 @@ const server = http.createServer((req, res) => {
     // API Routes for Local Dev and High-Speed Sync
     if (parsedUrl === '/api/all-data') {
         const alcLogs = getRealAlcoholLogs();
+        const trkLogs = getRealTruckLogs();
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({ 
             success: true, 
             drivers: REAL_DRIVERS, 
             alcoholLogs: alcLogs, 
-            truckLogs: REAL_TRUCK_LOGS, 
+            truckLogs: trkLogs, 
             config: SYSTEM_CONFIG 
         }));
         return;
@@ -343,8 +356,9 @@ const server = http.createServer((req, res) => {
     }
 
     if (parsedUrl === '/api/truck-logs') {
+        const trkLogs = getRealTruckLogs();
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ success: true, count: REAL_TRUCK_LOGS.length, logs: REAL_TRUCK_LOGS, folderId: DRIVE_FOLDER_TRUCK }));
+        res.end(JSON.stringify({ success: true, count: trkLogs.length, logs: trkLogs, folderId: DRIVE_FOLDER_TRUCK }));
         return;
     }
 

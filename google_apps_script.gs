@@ -438,6 +438,16 @@ function doGet(e) {
     })).setMimeType(ContentService.MimeType.JSON);
   }
 
+  // ดึงประวัติการตรวจสภาพรถบรรทุก 6 ล้อทั้งหมดจากชีต Truck_Inspection_Logs
+  if (action === "listTruckLogs" || action === "getTruckLogs") {
+    var truckLogs = getAllTruckLogs();
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true,
+      total: truckLogs.length,
+      logs: truckLogs
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
   return ContentService.createTextOutput(JSON.stringify({
     success: true,
     system: "ระบบตรวจวัดแอลกอฮอล์และความพร้อมพนักงาน หจก. ทั่วไทยขนส่งมงคล",
@@ -619,6 +629,60 @@ function getAllAlcoholLogs() {
       });
     }
     return list;
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * ดึงประวัติการตรวจสอบสภาพรถบรรทุก 6 ล้อทั้งหมดจากชีต Truck_Inspection_Logs
+ */
+function getAllTruckLogs() {
+  try {
+    var ss = getAppSpreadsheet();
+    var sheet = ss.getSheetByName("Truck_Inspection_Logs");
+    if (!sheet) return [];
+    var lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return [];
+    var lastCol = Math.max(sheet.getLastColumn(), 18);
+    var data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+    var list = [];
+    for (var i = 0; i < data.length; i++) {
+      var r = data[i];
+      var ts = r[0];
+      if (ts instanceof Date) {
+        ts = Utilities.formatDate(ts, "Asia/Bangkok", "dd/MM/yyyy HH:mm:ss");
+      } else {
+        ts = (ts || "").toString().trim();
+      }
+      var dateStr = ts.split(' ')[0] || '';
+      var timeStr = ts.split(' ')[1] || '';
+      list.push({
+        row: i + 2,
+        timestamp: ts,
+        date: dateStr,
+        time: timeStr,
+        driverId: (r[1] || "").toString(),
+        driverName: (r[2] || "").toString(),
+        email: (r[3] || "").toString(),
+        vehiclePlate: (r[4] || "").toString(),
+        vehicleType: (r[5] || "").toString(),
+        mileage: (r[6] !== undefined && r[6] !== null && r[6] !== '') ? (r[6].toString().includes('กม.') ? r[6].toString() : r[6].toString() + ' กม.') : '',
+        status: (r[7] || "พร้อมใช้งาน").toString(),
+        checklist: (r[8] || "").toString(),
+        defectsNote: (r[9] || "ไม่มี").toString(),
+        imgDashboard: (r[10] || "").toString(),
+        imgFrontVehicle: (r[11] || "").toString(),
+        imgDefect1: (r[12] || "").toString(),
+        imgDefect2: (r[13] || "").toString(),
+        pdfUrl: (r[14] || "").toString(),
+        imgSeatbeltDriver: (r[15] || "").toString(),
+        imgDashcam: (r[16] || "").toString(),
+        imgSeatbeltAssistant: (r[17] || "").toString(),
+        remarks: (r[9] || "ไม่มี").toString()
+      });
+    }
+    return list.reverse();
   } catch (e) {
     return [];
   }
