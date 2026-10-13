@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Permissions-Policy" content="unload=*">
   <title>หจก.ทั่วไทยขนส่งมงคล | TTMK Control Center Dashboard & TSM Safety Platform</title>
 
   <!-- Favicon -->
@@ -2482,7 +2483,7 @@
                 </a>
               </div>
             </div>
-            <iframe id="truckModalPdfIframe" src="about:blank" data-src="./CheckTruck/downloaded_all_trucks.pdf" class="w-full h-[580px] bg-slate-100 border-0"></iframe>
+            <iframe id="truckModalPdfIframe" src="about:blank" data-src="./CheckTruck/downloaded_all_trucks.pdf" allow="unload" class="w-full h-[580px] bg-slate-100 border-0"></iframe>
           </div>
         </div>
 
@@ -2670,7 +2671,7 @@
               </a>
             </div>
           </div>
-          <iframe id="monthlyModalPdfIframe" src="about:blank" data-src="./CheckTruck/downloaded_monthly.pdf" class="w-full h-[540px] bg-slate-100 border-0"></iframe>
+          <iframe id="monthlyModalPdfIframe" src="about:blank" data-src="./CheckTruck/downloaded_monthly.pdf" allow="unload" class="w-full h-[540px] bg-slate-100 border-0"></iframe>
         </div>
         <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center pt-0.5">
           <i class="fa-solid fa-circle-info mr-1 text-indigo-400"></i> หากเบราว์เซอร์ไม่แสดงตัวอย่างในกรอบเนื่องจากระบบความปลอดภัย กรุณากดปุ่ม <strong>"เปิดดูไฟล์เต็มจอใน Google Drive"</strong> ด้านบน
