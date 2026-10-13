@@ -50,8 +50,28 @@
     }
   </script>
 
+  <!-- Local Available Evidence Manifest -->
+  <script src="./assets/alcohol_manifest.js"></script>
+
   <!-- Global Safe Evidence Image Fallback Handler (Pre-DOM Execution) -->
   <script>
+    window.isLocalEvidenceAvailable = function(localUrl) {
+      if (!localUrl) return false;
+      if (!window.LOCAL_ALCOHOL_FILES) return true;
+      const baseName = localUrl.split('/').pop().split('?')[0];
+      return window.LOCAL_ALCOHOL_FILES.has(baseName);
+    };
+
+    window.resolveEvidenceSrc = function(localUrl, fileId, fallbackCanvas) {
+      if (localUrl && window.isLocalEvidenceAvailable(localUrl)) {
+        return localUrl;
+      }
+      if (fileId && fileId !== '-') {
+        return "https://lh3.googleusercontent.com/d/" + fileId + "=w1200";
+      }
+      return fallbackCanvas || "";
+    };
+
     window.handleEvidenceImgError = function(img) {
       if (!img) return;
       img.referrerPolicy = "no-referrer";
@@ -60,33 +80,27 @@
       const localUrl = img.dataset.localUrl;
       const fallbackSrc = img.dataset.fallbackSrc;
 
-      // Step 0: Try local downloaded authentic file if we haven't yet
-      if (step === 0 && localUrl && img.src !== localUrl) {
+      // Step 0: Try lh3 CDN with no-referrer
+      if (step === 0 && driveId && driveId !== '-') {
         img.dataset.retryStep = "1";
-        img.src = localUrl;
+        img.src = "https://lh3.googleusercontent.com/d/" + driveId + "=w1200";
         return;
       }
-      // Step 1: Try Google Drive high-res thumbnail with no-referrer
-      if (step <= 1 && driveId) {
+      // Step 1: Try Google Drive high-res thumbnail
+      if (step <= 1 && driveId && driveId !== '-') {
         img.dataset.retryStep = "2";
         img.src = "https://drive.google.com/thumbnail?id=" + driveId + "&sz=w1200";
         return;
       }
-      // Step 2: Try Google Drive lh3 CDN with no-referrer
-      if (step === 2 && driveId) {
+      // Step 2: Try local file only if present in manifest
+      if (step === 2 && localUrl && window.isLocalEvidenceAvailable(localUrl) && img.src !== localUrl) {
         img.dataset.retryStep = "3";
-        img.src = "https://lh3.googleusercontent.com/d/" + driveId;
+        img.src = localUrl;
         return;
       }
-      // Step 3: Try Google Drive uc export view
-      if (step === 3 && driveId) {
+      // Step 3: Final fallback to canvas
+      if (fallbackSrc) {
         img.dataset.retryStep = "4";
-        img.src = "https://drive.google.com/uc?export=view&id=" + driveId;
-        return;
-      }
-      // Step 4: Final fallback to canvas
-      if (step <= 4 && fallbackSrc) {
-        img.dataset.retryStep = "5";
         img.src = fallbackSrc;
       }
     };
@@ -6095,29 +6109,40 @@
     function preloadAllEvidencePhotos(logs) {
       if (!logs || !Array.isArray(logs)) return;
       logs.forEach(log => {
-        if (log.localFaceUrl && !window.cachedFaceImgs[log.localFaceUrl]) {
+        const faceSrc = resolveEvidenceSrc(log.localFaceUrl, log.faceFileId);
+        if (faceSrc && !window.cachedFaceImgs[faceSrc]) {
           const img = new Image();
           img.referrerPolicy = "no-referrer";
-          img.src = log.localFaceUrl;
-          window.cachedFaceImgs[log.localFaceUrl] = img;
+          img.src = faceSrc;
+          window.cachedFaceImgs[faceSrc] = img;
+          if (log.localFaceUrl) window.cachedFaceImgs[log.localFaceUrl] = img;
         }
-        if (log.localMeterUrl && !window.cachedMeterImgs[log.localMeterUrl]) {
+
+        const meterSrc = resolveEvidenceSrc(log.localMeterUrl, log.meterFileId);
+        if (meterSrc && !window.cachedMeterImgs[meterSrc]) {
           const img = new Image();
           img.referrerPolicy = "no-referrer";
-          img.src = log.localMeterUrl;
-          window.cachedMeterImgs[log.localMeterUrl] = img;
+          img.src = meterSrc;
+          window.cachedMeterImgs[meterSrc] = img;
+          if (log.localMeterUrl) window.cachedMeterImgs[log.localMeterUrl] = img;
         }
-        if (log.localBpUrl && !window.cachedBpImgs[log.localBpUrl]) {
+
+        const bpSrc = resolveEvidenceSrc(log.localBpUrl, log.bpFileId);
+        if (bpSrc && !window.cachedBpImgs[bpSrc]) {
           const img = new Image();
           img.referrerPolicy = "no-referrer";
-          img.src = log.localBpUrl;
-          window.cachedBpImgs[log.localBpUrl] = img;
+          img.src = bpSrc;
+          window.cachedBpImgs[bpSrc] = img;
+          if (log.localBpUrl) window.cachedBpImgs[log.localBpUrl] = img;
         }
-        if (log.localReportUrl && !window.cachedReportImgs[log.localReportUrl]) {
+
+        const repSrc = resolveEvidenceSrc(log.localReportUrl, log.reportCardFileId);
+        if (repSrc && !window.cachedReportImgs[repSrc]) {
           const img = new Image();
           img.referrerPolicy = "no-referrer";
-          img.src = log.localReportUrl;
-          window.cachedReportImgs[log.localReportUrl] = img;
+          img.src = repSrc;
+          window.cachedReportImgs[repSrc] = img;
+          if (log.localReportUrl) window.cachedReportImgs[log.localReportUrl] = img;
         }
       });
     }
@@ -6700,9 +6725,7 @@
       const expectedBpUrl = log.localBpUrl || (log.bpFileId ? `./assets/alcohol_evidence/BP_${drvId}_${timeCode}.jpg` : '');
 
       function resolveEvidenceSrc(localUrl, fileId, fallbackCanvas) {
-        if (localUrl) return localUrl;
-        if (fileId) return "https://drive.google.com/thumbnail?id=" + fileId + "&sz=w1200";
-        return fallbackCanvas;
+        return window.resolveEvidenceSrc(localUrl, fileId, fallbackCanvas);
       }
 
       const repImg = document.getElementById('alcModalReportImg');
