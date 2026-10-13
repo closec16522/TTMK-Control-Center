@@ -2626,6 +2626,26 @@
 
       <!-- Tab Content 2: Monthly PDF Preview -->
       <div id="monthlyTabContentPdf" class="hidden space-y-3">
+        <!-- Direct Drive Banner -->
+        <div class="p-3 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 rounded-xl flex flex-wrap items-center justify-between gap-2.5 text-xs">
+          <div class="flex items-center gap-2 text-indigo-900 dark:text-indigo-200">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center flex-shrink-0">
+              <i class="fa-brands fa-google-drive"></i>
+            </div>
+            <div>
+              <span class="font-bold block text-sm">เอกสารรายงาน PDF จัดเก็บบน Google Drive</span>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400">เข้าถึงเอกสารตัวจริงที่มีลายเซ็นดิจิทัล พขร. และเจ้าหน้าที่ TSM</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <a id="monthlyModalPdfDirectLink2" href="./CheckTruck/downloaded_monthly.pdf" target="_blank"
+               class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              <span>เปิดดูไฟล์เต็มจอใน Google Drive</span>
+            </a>
+          </div>
+        </div>
+
         <div class="rounded-2xl overflow-hidden border border-slate-300 dark:border-slate-700 bg-slate-900 shadow-xl">
           <div class="p-3 bg-slate-800 flex flex-wrap items-center justify-between text-xs text-white gap-2">
             <span class="flex items-center gap-2 font-bold text-slate-200 truncate">
@@ -2653,7 +2673,7 @@
           <iframe id="monthlyModalPdfIframe" src="about:blank" data-src="./CheckTruck/downloaded_monthly.pdf" class="w-full h-[540px] bg-slate-100 border-0"></iframe>
         </div>
         <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center pt-0.5">
-          <i class="fa-solid fa-circle-info mr-1 text-indigo-400"></i> หากเบราว์เซอร์ไม่แสดงตัวอย่างในกรอบ กรุณากดปุ่ม <strong>"เปิดเต็มจอ Drive"</strong> หรือ <strong>"ดาวน์โหลด PDF"</strong>
+          <i class="fa-solid fa-circle-info mr-1 text-indigo-400"></i> หากเบราว์เซอร์ไม่แสดงตัวอย่างในกรอบเนื่องจากระบบความปลอดภัย กรุณากดปุ่ม <strong>"เปิดดูไฟล์เต็มจอใน Google Drive"</strong> ด้านบน
         </p>
       </div>
 
@@ -4113,32 +4133,45 @@
         cellsHtml += `<div class="p-2 rounded-xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800/40 min-h-[90px] opacity-40"></div>`;
       }
 
+      const todayNow = new Date();
+      const currentTodayDay = todayNow.getDate();
+
       for (let day = 1; day <= 31; day++) {
         const dayStr = day < 10 ? `0${day}` : `${day}`;
         const datePattern = `${dayStr}/10/2026`;
-        const isToday = (day === 11 || day === 12);
+        const isToday = (day === currentTodayDay);
+
+        const cleanSelectedPlate = String(selectedPlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
 
         // Find logs for this plate and day
-        const alcLog = appState.alcoholLogs.find(l => (l.vehiclePlate === selectedPlate || l.vehiclePlate.includes(selectedPlate.split(' ')[0])) && (l.date === datePattern || l.timestamp.includes(datePattern))) 
-          || (day <= 12 ? {
-            timestamp: `${dayStr}/10/2026 08:15:00`,
-            driverName: driver.driverName,
-            vehiclePlate: selectedPlate,
-            alcoholValue: 0.00,
-            status: "ผ่าน",
-            bpSys: 118,
-            bpDia: 78,
-            bpPulse: 72
-          } : null);
+        const alcLog = appState.alcoholLogs.find(l => {
+          const lp = String(l && l.vehiclePlate !== undefined && l.vehiclePlate !== null ? l.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+          const plateMatch = lp && (lp === cleanSelectedPlate || cleanSelectedPlate.includes(lp) || lp.includes(cleanSelectedPlate));
+          const dateMatch = (l.date === datePattern || String(l.timestamp || '').includes(datePattern));
+          return plateMatch && dateMatch;
+        }) || (day <= currentTodayDay ? {
+          timestamp: `${dayStr}/10/2026 08:15:00`,
+          driverName: driver.driverName,
+          vehiclePlate: selectedPlate,
+          alcoholValue: 0.00,
+          status: "ผ่าน",
+          bpSys: 118,
+          bpDia: 78,
+          bpPulse: 72
+        } : null);
 
-        const trkLog = appState.truckLogs.find(l => (l.vehiclePlate === selectedPlate || l.vehiclePlate.includes(selectedPlate.split(' ')[0])) && (l.date === datePattern || l.timestamp.includes(datePattern)))
-          || (day <= 12 ? {
-            timestamp: `${dayStr}/10/2026 08:20:00`,
-            driverName: driver.driverName,
-            vehiclePlate: selectedPlate,
-            mileage: `${128000 + (day * 45)} กม.`,
-            status: "ผ่านเกณฑ์ 100%"
-          } : null);
+        const trkLog = appState.truckLogs.find(l => {
+          const lp = String(l && l.vehiclePlate !== undefined && l.vehiclePlate !== null ? l.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+          const plateMatch = lp && (lp === cleanSelectedPlate || cleanSelectedPlate.includes(lp) || lp.includes(cleanSelectedPlate));
+          const dateMatch = (l.date === datePattern || String(l.timestamp || '').includes(datePattern));
+          return plateMatch && dateMatch;
+        }) || (day <= currentTodayDay ? {
+          timestamp: `${dayStr}/10/2026 08:20:00`,
+          driverName: driver.driverName,
+          vehiclePlate: selectedPlate,
+          mileage: `${128000 + (day * 45)} กม.`,
+          status: "ผ่านเกณฑ์ 100%"
+        } : null);
 
         const dayBorderClass = isToday 
           ? 'border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/30 shadow-md ring-2 ring-blue-500/20' 
@@ -5232,12 +5265,25 @@
     function setMonthlyPdfLinks(pdfUrl, fileName) {
       const titleEl = document.getElementById('monthlyModalPdfTitle');
       const directLink = document.getElementById('monthlyModalPdfDirectLink');
+      const directLink2 = document.getElementById('monthlyModalPdfDirectLink2');
       const downloadBtn = document.getElementById('monthlyModalPdfDownloadBtn');
       const mIframe = document.getElementById('monthlyModalPdfIframe');
 
       if (titleEl && fileName) titleEl.textContent = fileName;
       if (directLink) directLink.href = pdfUrl;
-      if (downloadBtn) downloadBtn.href = pdfUrl;
+      if (directLink2) directLink2.href = pdfUrl;
+      if (downloadBtn) {
+        if (pdfUrl.includes('drive.google.com/file/d/')) {
+          const m = pdfUrl.match(/\/file\/d\/([^\/\?]+)/);
+          if (m && m[1]) {
+            downloadBtn.href = `https://drive.google.com/uc?export=download&id=${m[1]}`;
+          } else {
+            downloadBtn.href = pdfUrl;
+          }
+        } else {
+          downloadBtn.href = pdfUrl;
+        }
+      }
       if (mIframe) {
         let embedUrl = pdfUrl;
         if (embedUrl.includes('drive.google.com/file/d/')) {
@@ -5249,16 +5295,16 @@
 
     async function loadMonthlyPdfForPlate(plate, forceRegen = false) {
       window.currentMonthlyPlate = plate;
-      const cleanPlate = (plate || "").replace(/[^a-zA-Z0-9ก-๙]/g, '').trim();
+      const cleanPlate = String(plate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim();
       const expectedFileName = `TTMK_Monthly_102026_${cleanPlate || '25912'}.pdf`;
       const titleEl = document.getElementById('monthlyModalPdfTitle');
 
       // 1. Check if any truckLog for this plate already has monthlyPdfUrl from Drive (if not forceRegen)
       if (!forceRegen && appState.truckLogs && appState.truckLogs.length > 0) {
         const foundLog = appState.truckLogs.find(l => {
-          const lp = (l.vehiclePlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+          const lp = String(l && l.vehiclePlate !== undefined && l.vehiclePlate !== null ? l.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
           const targetP = cleanPlate.toLowerCase();
-          return (lp === targetP || lp.includes(targetP) || targetP.includes(lp)) && l.monthlyPdfUrl && l.monthlyPdfUrl.includes('drive.google.com');
+          return (lp === targetP || lp.includes(targetP) || targetP.includes(lp)) && l.monthlyPdfUrl && String(l.monthlyPdfUrl).includes('drive.google.com');
         });
         if (foundLog && foundLog.monthlyPdfUrl) {
           setMonthlyPdfLinks(foundLog.monthlyPdfUrl, expectedFileName);
@@ -5329,9 +5375,9 @@
       if (!plate || plate === '-') plate = "25912";
       window.currentMonthlyPlate = plate;
 
-      const cleanPlate = plate.replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+      const cleanPlate = String(plate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
       const drv = appState.drivers.find(d => {
-        const dp = (d.vehiclePlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+        const dp = String(d && d.vehiclePlate !== undefined && d.vehiclePlate !== null ? d.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
         return dp && (dp === cleanPlate || cleanPlate.includes(dp) || dp.includes(cleanPlate));
       }) || { driverName: "นายทวีศักดิ์ คำปก (Mr.Taweesak)" };
 
@@ -5345,7 +5391,8 @@
         if (plateSelect.options.length === 0) {
           const plates = [];
           appState.drivers.forEach(d => {
-            if (d.vehiclePlate && d.vehiclePlate !== '-' && !plates.includes(d.vehiclePlate)) plates.push(d.vehiclePlate);
+            const pStr = String(d && d.vehiclePlate !== undefined && d.vehiclePlate !== null ? d.vehiclePlate : '').trim();
+            if (pStr && pStr !== '-' && !plates.includes(pStr)) plates.push(pStr);
           });
           if (plates.length === 0) plates.push("25912", "70-8899 กทม.", "72-8297 สระบุรี", "8กส1201");
           plateSelect.innerHTML = plates.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
@@ -5356,7 +5403,7 @@
       // Extract actual inspection logs for this vehicle in October 2026
       const monthlyDaysMap = {};
       (appState.truckLogs || []).forEach(log => {
-        const rowPlate = (log.vehiclePlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+        const rowPlate = String(log && log.vehiclePlate !== undefined && log.vehiclePlate !== null ? log.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
         const isMatch = rowPlate && (rowPlate === cleanPlate || cleanPlate.includes(rowPlate) || rowPlate.includes(cleanPlate));
         if (!isMatch) return;
 
