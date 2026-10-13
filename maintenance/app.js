@@ -11,7 +11,7 @@ const CONFIG = {
   DRIVE_FOLDER_ID: "1YRkTR9dMz0PxKgF60edVF56Ckq909fMF",
   SHEET_NAME: "Maintenance_log",
   DRIVERS_SHEET: "Registered_Drivers",
-  DEFAULT_GAS_URL: "https://script.google.com/macros/s/AKfycbwvZxSw_p62y6ZwegF8iUiEdxyEJrF01yB37AumDHwgLcSFBoRSZUmwgvdtLJ-6hCFE/exec",
+  DEFAULT_GAS_URL: "https://script.google.com/macros/s/AKfycbxkyA3Ion2-rStHiNbiRhDGF105yy71O41LKdSH79CXyLw94ukyOoKBRUPj6dYZAmWn/exec",
   STORAGE_KEY_LOGS: "TTMK_MAINTENANCE_LOGS",
   STORAGE_KEY_DRIVER: "TTMK_SAVED_DRIVER_EMAIL",
   STORAGE_KEY_GARAGES: "TTMK_SAVED_GARAGES"

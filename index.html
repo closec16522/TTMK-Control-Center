@@ -1965,13 +1965,17 @@
         <div id="erpVehiclesPanel" class="glass-panel p-5 space-y-4">
           <!-- Toolbar -->
           <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-            <div>
-              <h3 class="font-bold text-sm md:text-base text-slate-800 dark:text-white flex items-center gap-2">
-                <i class="fa-solid fa-truck-moving text-blue-600"></i>
-                <span>ทะเบียนกองรถ 6 ล้อ TTMK Fleet Master</span>
-              </h3>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="font-bold text-sm md:text-base text-slate-800 dark:text-white flex items-center gap-2">
+                  <i class="fa-solid fa-truck-moving text-blue-600"></i>
+                  <span>ทะเบียนกองรถ 6 ล้อ TTMK Fleet Master</span>
+                </h3>
+                <span id="erpFleetSourceBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                  <i class="fa-solid fa-database text-[9px] text-blue-500"></i> Local Storage / Default
+                </span>
+              </div>
               <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                แสดงข้อมูลสเปกเครื่องยนต์, ระบบขับเคลื่อน, ระยะทางสะสม, และสถานะการเดินรถ
+                แสดงข้อมูลสเปกเครื่องยนต์, ระบบขับเคลื่อน, ระยะทางสะสม, และสถานะการเดินรถ (เชื่อมโยง Google Sheet: <code>Fleet_Vehicles</code>)
               </p>
             </div>
 
@@ -2001,6 +2005,13 @@
                 <option value="กำลังวิ่งงาน">กำลังวิ่งงาน</option>
                 <option value="ซ่อมบำรุง">ซ่อมบำรุง</option>
               </select>
+
+              <button type="button" onclick="syncFleetVehiclesFromSheet()"
+                      title="ซิงค์ข้อมูลรถจาก Google Sheet: Fleet_Vehicles"
+                      class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+                <i id="fleetSyncBtnIcon" class="fa-solid fa-arrows-rotate"></i>
+                <span>ซิงค์ชีต</span>
+              </button>
 
               <button type="button" onclick="openErpVehicleModal()"
                       class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
@@ -3635,7 +3646,7 @@
       SPREADSHEET_ID: "1JM-i8_nrGR7-VDEY82QZ5l5JMJTIBOIsuqOSQSrcD3Y",
       GAS_URL: "https://script.google.com/macros/s/AKfycbxbyJ1yWNodowMh-OLxqBuFvH-Pk-TLwg7dRv_lwT7bbTJBu5MH_lhqxE3KwJ7lDH407g/exec",
       GAS_TRUCK_URL: "https://script.google.com/macros/s/AKfycbwvZxSw_p62y6ZwegF8iUiEdxyEJrF01yB37AumDHwgLcSFBoRSZUmwgvdtLJ-6hCFE/exec",
-      GAS_MAINTENANCE_URL: "https://script.google.com/macros/s/AKfycbwvZxSw_p62y6ZwegF8iUiEdxyEJrF01yB37AumDHwgLcSFBoRSZUmwgvdtLJ-6hCFE/exec",
+      GAS_MAINTENANCE_URL: "https://script.google.com/macros/s/AKfycbxkyA3Ion2-rStHiNbiRhDGF105yy71O41LKdSH79CXyLw94ukyOoKBRUPj6dYZAmWn/exec",
       DRIVE_FOLDER_ALCOHOL: "1tfKH6EOBFdG0c4Wm2MPO-R61NP5mAc0c",
       DRIVE_FOLDER_TRUCK: "1ryLhwkO1lnv-2qgLbDDl0XyVaq8S2Szs",
       DRIVE_FOLDER_MAINTENANCE: "1YRkTR9dMz0PxKgF60edVF56Ckq909fMF"
@@ -4058,6 +4069,40 @@
       return result.reverse();
     }
 
+    // ฟังก์ชันแปลงข้อมูลรถบรรทุก 6 ล้อจาก Google Sheet (แผ่นงาน Fleet_Vehicles) ผ่าน GViz API
+    function parseGvizFleetRows(rows) {
+      if (!rows || !Array.isArray(rows)) return [];
+      const result = [];
+      rows.forEach(r => {
+        const c = r.c || [];
+        const getVal = (i) => {
+          if (!c[i]) return '';
+          if (c[i].f !== null && c[i].f !== undefined) return String(c[i].f).trim();
+          if (c[i].v !== null && c[i].v !== undefined) return String(c[i].v).trim();
+          return '';
+        };
+
+        const fleetId = getVal(0);
+        const plate = getVal(1);
+        if (!fleetId && !plate) return;
+
+        result.push({
+          fleetId: fleetId || plate,
+          plate: plate || fleetId,
+          province: getVal(2) || 'สระบุรี',
+          brand: getVal(3) || 'ISUZU Forward',
+          type: getVal(4) || 'รถบรรทุก 6 ล้อตู้ทึบ',
+          fuelType: getVal(5) || (getVal(4).includes('EV') ? 'EV' : 'Diesel'),
+          engine: getVal(6) || '-',
+          driver: getVal(7) || '-',
+          odo: parseInt(getVal(8).replace(/,/g, ''), 10) || 0,
+          status: getVal(9) || 'พร้อมใช้งาน',
+          location: getVal(10) || '14.1500, 100.6500'
+        });
+      });
+      return result;
+    }
+
     // Default Seed Maintenance Logs (เมื่อยังไม่มีรายการบันทึกจริงใน Google Sheet)
     function getDefaultMaintenanceLogs() {
       return [
@@ -4285,6 +4330,31 @@
                 if (liveMntLogs && liveMntLogs.length > 0) {
                   appState.maintenanceLogs = liveMntLogs;
                   loaded = true;
+                }
+              }
+            }
+          }
+        } catch(e){}
+
+        // 3.1 Query Google Sheet directly via GViz for Fleet_Vehicles (ทะเบียนกองรถ 6 ล้อ Master Data)
+        try {
+          const gvizFleetResp = await fetch(`https://docs.google.com/spreadsheets/d/${CONFIG.SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Fleet_Vehicles`);
+          if (gvizFleetResp.ok) {
+            const gvizFleetText = await gvizFleetResp.text();
+            const startIdx = gvizFleetText.indexOf('{');
+            const endIdx = gvizFleetText.lastIndexOf('}');
+            if (startIdx >= 0 && endIdx >= 0) {
+              const gvizData = JSON.parse(gvizFleetText.substring(startIdx, endIdx + 1));
+              if (gvizData.table && gvizData.table.rows && gvizData.table.rows.length > 0) {
+                // ตรวจสอบว่าแผ่นงานมีคอลัมน์ของ Fleet_ID จริง
+                const firstLabel = (gvizData.table.cols && gvizData.table.cols[0] && gvizData.table.cols[0].label) || '';
+                if (firstLabel.toLowerCase().includes('fleet') || firstLabel.includes('Fleet') || firstLabel.includes('รหัส')) {
+                  const liveVehicles = parseGvizFleetRows(gvizData.table.rows);
+                  if (liveVehicles && liveVehicles.length > 0) {
+                    appState.vehicles = liveVehicles;
+                    appState.isFleetFromSheet = true;
+                    try { localStorage.setItem('TTMK_ERP_VEHICLES', JSON.stringify(liveVehicles)); } catch(e){}
+                  }
                 }
               }
             }
@@ -4583,6 +4653,70 @@
           </tr>
         `;
       }).join('');
+
+      const sourceBadge = document.getElementById('erpFleetSourceBadge');
+      if (sourceBadge) {
+        if (appState.isFleetFromSheet) {
+          sourceBadge.innerHTML = `<i class="fa-solid fa-cloud-arrow-down text-[9px] text-emerald-500"></i> Google Sheet: Fleet_Vehicles`;
+          sourceBadge.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800";
+        } else {
+          sourceBadge.innerHTML = `<i class="fa-solid fa-database text-[9px] text-blue-500"></i> Local Storage / Default`;
+          sourceBadge.className = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700";
+        }
+      }
+    }
+
+    async function syncFleetVehiclesFromSheet() {
+      const syncIcon = document.getElementById('fleetSyncBtnIcon');
+      if (syncIcon) syncIcon.classList.add('fa-spin');
+      try {
+        const resp = await fetch(`https://docs.google.com/spreadsheets/d/${CONFIG.SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Fleet_Vehicles`);
+        if (resp.ok) {
+          const text = await resp.text();
+          const startIdx = text.indexOf('{');
+          const endIdx = text.lastIndexOf('}');
+          if (startIdx >= 0 && endIdx >= 0) {
+            const data = JSON.parse(text.substring(startIdx, endIdx + 1));
+            const firstLabel = (data.table && data.table.cols && data.table.cols[0] && data.table.cols[0].label) || '';
+            if (firstLabel.toLowerCase().includes('fleet') || firstLabel.includes('Fleet') || firstLabel.includes('รหัส')) {
+              const liveVehicles = parseGvizFleetRows(data.table.rows);
+              if (liveVehicles && liveVehicles.length > 0) {
+                appState.vehicles = liveVehicles;
+                appState.isFleetFromSheet = true;
+                saveErpVehicles();
+                Swal.fire({
+                  icon: 'success',
+                  title: 'ซิงค์ข้อมูลรถสำเร็จ',
+                  text: `ดึงข้อมูลจาก Google Sheet: Fleet_Vehicles จำนวน ${liveVehicles.length} คันเรียบร้อยแล้ว`,
+                  timer: 1800,
+                  showConfirmButton: false
+                });
+                return;
+              }
+            }
+          }
+        }
+
+        // If sheet Fleet_Vehicles is not created or columns not set
+        Swal.fire({
+          icon: 'info',
+          title: 'ยังไม่พบแผ่นงาน Fleet_Vehicles',
+          html: `<div class="text-left text-xs space-y-2">
+            <p>ใน Google Sheet ปัจจุบันยังไม่มีแท็บ <b>Fleet_Vehicles</b></p>
+            <p>คุณสามารถสร้างแท็บนี้ใน Google Sheet ได้ง่ายๆ โดย:</p>
+            <ol class="list-decimal pl-4 space-y-1">
+              <li>เปิด Google Apps Script ของชีตนี้</li>
+              <li>เลือกฟังก์ชัน <b>createFleetVehiclesSheetNow</b> แล้วกด <b>เรียกใช้ (Run)</b></li>
+              <li>ระบบจะสร้างแท็บ <b>Fleet_Vehicles</b> พร้อมข้อมูลรถ 18 คันอัตโนมัติทันที 1 คลิก</li>
+            </ol>
+          </div>`,
+          confirmButtonText: 'รับทราบ'
+        });
+      } catch(err) {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: err.toString() });
+      } finally {
+        if (syncIcon) syncIcon.classList.remove('fa-spin');
+      }
     }
 
     function openErpVehicleModal(fleetId = '') {

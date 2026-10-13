@@ -40,6 +40,11 @@ function doGet(e) {
       });
     }
 
+    if (action === "create_fleet_sheet" || action === "setup_fleet") {
+      const msg = createFleetVehiclesSheetNow();
+      return responseJSON({ status: "success", message: msg });
+    }
+
     if (action === "get_ticket") {
       return getMaintenanceTicket(params.ticketId || params.id);
     }
@@ -71,6 +76,65 @@ function createMaintenanceSheetNow() {
   const sheet = getOrCreateMaintenanceSheet(ss);
   Logger.log("✅ สร้างแผ่นงาน " + sheet.getName() + " สำเร็จแล้ว!");
   return "✅ สร้างแผ่นงาน Maintenance_log เรียบร้อยแล้ว พร้อมหัวตารางทั้ง 29 คอลัมน์!";
+}
+
+/**
+ * ฟังก์ชันสร้างแผ่นงาน Fleet_Vehicles ใน Google Sheet เพื่อบันทึกข้อมูลรถบรรทุก 6 ล้อ TTMK Fleet Master
+ */
+function createFleetVehiclesSheetNow() {
+  const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  let sheet = ss.getSheetByName("Fleet_Vehicles");
+  if (!sheet) {
+    sheet = ss.insertSheet("Fleet_Vehicles");
+  }
+
+  const headers = [
+    "Fleet_ID", "Vehicle_Plate", "Province", "Brand", "Body_Type",
+    "Fuel_Type", "Engine_Spec", "Assigned_Driver", "Odometer", "Status",
+    "GPS_Location", "Last_Updated"
+  ];
+
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  const headerRange = sheet.getRange(1, 1, 1, headers.length);
+  headerRange.setBackground("#1e3a8a");
+  headerRange.setFontColor("#f8fafc");
+  headerRange.setFontWeight("bold");
+  headerRange.setHorizontalAlignment("center");
+  sheet.setFrozenRows(1);
+
+  // ข้อมูลกองรถเริ่มต้น 18 คัน (4 EV 100% / 14 ดีเซล Euro 5)
+  const initialFleet = [
+    ["TTMK-EV-01", "73-1735", "สระบุรี", "BYD T8", "รถบรรทุก 6 ล้อตู้ทึบ EV", "EV", "Electric Motor 180kW (CATL 255kWh)", "พิศมัย พลเยี่ยม", 48250, "พร้อมใช้งาน", "14.5835, 100.9737", "2026-10-13"],
+    ["TTMK-EV-02", "72-8297", "สระบุรี", "BYD T8", "รถบรรทุก 6 ล้อคอกผ้าใบ EV", "EV", "Electric Motor 180kW (CATL 255kWh)", "วิทวัส สอนพรม", 52100, "กำลังวิ่งงาน", "13.6925, 99.9284", "2026-10-13"],
+    ["TTMK-EV-03", "72-5079", "สระบุรี", "NEX Point", "รถบรรทุก 6 ล้อตู้แห้ง EV", "EV", "Electric Motor 160kW (BYD Blade 220kWh)", "ทรงวุฒิ ฉวีรัมย์", 39180, "พร้อมใช้งาน", "13.7202, 99.8940", "2026-10-13"],
+    ["TTMK-EV-04", "61-5463", "กทม.", "NEX Point", "รถบรรทุก 6 ล้อตู้ทึบ EV", "EV", "Electric Motor 160kW (BYD Blade 220kWh)", "วิวัฒน์ อุ่นสว่าง", 28400, "พร้อมใช้งาน", "13.7563, 100.5018", "2026-10-13"],
+    ["TTMK-DSL-01", "70-8899", "กทม.", "ISUZU Forward", "รถบรรทุก 6 ล้อตู้ทึบ", "Diesel", "ISUZU 4HK1-TCS 210PS Euro 5", "ทวีศักดิ์ คำปก", 168400, "พร้อมใช้งาน", "13.7563, 100.5018", "2026-10-13"],
+    ["TTMK-DSL-02", "70-9312", "กทม.", "HINO 500", "รถบรรทุก 6 ล้อคอก", "Diesel", "HINO J08E-WD 240PS Euro 5", "อรรถพล ยอดสิงห์", 142100, "กำลังวิ่งงาน", "13.6526, 100.2738", "2026-10-13"],
+    ["TTMK-DSL-03", "72-1979", "สระบุรี", "ISUZU Forward", "รถบรรทุก 6 ล้อตู้ทึบ", "Diesel", "ISUZU FTR 240PS Euro 5", "ดุรงค์ฤทธิ์ สำเลิศ", 155300, "พร้อมใช้งาน", "13.5501, 100.3359", "2026-10-13"],
+    ["TTMK-DSL-04", "72-8139", "สระบุรี", "ISUZU Forward", "รถบรรทุก 6 ล้อตู้แห้ง", "Diesel", "ISUZU FTR 240PS Euro 5", "สมร มหาพันธ์", 139800, "พร้อมใช้งาน", "13.6688, 100.0854", "2026-10-13"],
+    ["TTMK-DSL-05", "8กส1201", "กทม.", "HINO FC9J", "รถบรรทุก 6 ล้อตู้ทึบ", "Diesel", "HINO FC9J 210PS", "นิชานันท์ เอื้อจิรพรชัย", 112500, "พร้อมใช้งาน", "13.6900, 100.7501", "2026-10-13"],
+    ["TTMK-DSL-06", "70-5544", "กทม.", "ISUZU Forward", "รถบรรทุก 6 ล้อตู้ทึบ", "Diesel", "ISUZU FTR 240PS", "สมชาย วงศ์สวัสดิ์", 178200, "กำลังวิ่งงาน", "15.6987, 100.1220", "2026-10-13"],
+    ["TTMK-DSL-07", "72-3199", "สระบุรี", "HINO Victor", "รถบรรทุก 6 ล้อคอก", "Diesel", "HINO Victor 240PS", "สุรชัย หงษา", 145000, "พร้อมใช้งาน", "13.0827, 100.8800", "2026-10-13"],
+    ["TTMK-DSL-08", "71-6543", "อยุธยา", "ISUZU Forward", "รถบรรทุก 6 ล้อตู้ทึบ", "Diesel", "ISUZU FTR 240PS", "ธนวัฒน์ ใจดี", 124300, "พร้อมใช้งาน", "14.3532, 100.5684", "2026-10-13"],
+    ["TTMK-DSL-09", "73-2415", "สระบุรี", "ISUZU Forward", "รถบรรทุก 6 ล้อตู้ทึบ", "Diesel", "ISUZU FTR 240PS", "ธีระพงษ์ ศรีสุข", 161200, "ซ่อมบำรุง", "14.5289, 100.9101", "2026-10-13"],
+    ["TTMK-DSL-10", "71-9820", "กทม.", "HINO FC9J", "รถบรรทุก 6 ล้อคอก", "Diesel", "HINO FC9J 210PS", "อนันต์ บุญรอด", 133900, "พร้อมใช้งาน", "13.7563, 100.5018", "2026-10-13"],
+    ["TTMK-DSL-11", "72-4411", "นครปฐม", "ISUZU Forward", "รถบรรทุก 6 ล้อตู้แห้ง", "Diesel", "ISUZU 4HK1-TCS 210PS", "ประเสริฐ สุขสวัสดิ์", 149000, "พร้อมใช้งาน", "13.8199, 100.0443", "2026-10-13"],
+    ["TTMK-DSL-12", "73-9081", "สระบุรี", "ISUZU Forward", "รถบรรทุก 6 ล้อตู้ทึบ", "Diesel", "ISUZU FTR 240PS", "มานะ ชนะศึก", 182300, "กำลังวิ่งงาน", "14.5835, 100.9737", "2026-10-13"],
+    ["TTMK-DSL-13", "70-1122", "กทม.", "HINO 500", "รถบรรทุก 6 ล้อตู้ทึบ", "Diesel", "HINO 500 Dominator 210PS", "กิตติศักดิ์ เจริญดี", 98400, "พร้อมใช้งาน", "13.6526, 100.2738", "2026-10-13"],
+    ["TTMK-DSL-14", "72-9901", "ฉะเชิงเทรา", "ISUZU Forward", "รถบรรทุก 6 ล้อคอก", "Diesel", "ISUZU FTR 240PS", "วิเชียร สมบูรณ์", 154200, "ซ่อมบำรุง", "13.6904, 101.0779", "2026-10-13"]
+  ];
+
+  if (sheet.getLastRow() <= 1) {
+    sheet.getRange(2, 1, initialFleet.length, headers.length).setValues(initialFleet);
+  }
+
+  for (let c = 1; c <= headers.length; c++) sheet.setColumnWidth(c, 130);
+  sheet.setColumnWidth(4, 160);
+  sheet.setColumnWidth(5, 180);
+  sheet.setColumnWidth(7, 240);
+
+  Logger.log("✅ สร้างแผ่นงาน Fleet_Vehicles เรียบร้อยแล้ว!");
+  return "✅ สร้างแผ่นงาน Fleet_Vehicles เรียบร้อยแล้ว พร้อมข้อมูลรถ 18 คัน!";
 }
 
 /**
