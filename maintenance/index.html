@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ระบบแจ้งซ่อมและบันทึกประวัติการซ่อมบำรุง | TTMK Maintenance</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>🔧</text></svg>">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            prompt: ['Prompt', 'sans-serif'],
+            sarabun: ['Sarabun', 'sans-serif']
+          },
+          colors: {
+            navy: {
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#020617'
+            },
+            ttmk: {
+              blue: '#1d4ed8',
+              orange: '#ea580c',
+              gold: '#f59e0b',
+              emerald: '#059669'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+    }
+    .print-only {
+      display: none;
+    }
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'Sarabun', sans-serif !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      .a4-page {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+    }
+    /* Smooth custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- ============================================================== -->
+  <!-- TOP NAVIGATION HEADER (NO-PRINT)                               -->
+  <!-- ============================================================== -->
+  <header class="no-print bg-slate-900 text-white sticky top-0 z-40 shadow-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-2.5">
+        <a href="../index.html" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition text-xs flex items-center gap-1 shadow-sm" title="กลับหน้าระบบหลัก">
+          <i class="fa-solid fa-chevron-left"></i>
+          <span class="hidden sm:inline">หน้าหลัก TTMK</span>
+        </a>
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow">
+          <i class="fa-solid fa-screwdriver-wrench text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-xs sm:text-sm font-bold tracking-tight text-white flex items-center gap-1.5 leading-tight">
+            <span>ระบบแจ้งซ่อมและบันทึกประวัติการบำรุงรักษา</span>
+            <span class="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono font-semibold hidden md:inline">FLEET MAINTENANCE</span>
+          </h1>
+          <p class="text-[10px] text-slate-400 font-sans">
+            หจก. ทั่วไทยขนส่งมงคล (TTMK Logistics)
+          </p>
+        </div>
+      </div>
+
+      <!-- Driver Identity & Quick Links -->
+      <div class="flex items-center space-x-1.5 sm:space-x-2 text-xs">
+        
+        <!-- Driver Info Pill -->
+        <button type="button" onclick="promptSwitchDriver()" id="btnDriverHeader" class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-200 transition shadow-sm text-[11px]" title="คลิกเพื่อระบุหรือเปลี่ยนผู้แจ้งซ่อม">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" id="driverStatusDot"></span>
+          <i class="fa-solid fa-user text-[10px] text-amber-400"></i>
+          <span id="headerDriverName" class="font-semibold truncate max-w-[100px] sm:max-w-none">ระบุตัวตน</span>
+          <span class="text-[9px] text-slate-400 hidden lg:inline">(เปลี่ยนคนขับ)</span>
+        </button>
+
+        <!-- Google Drive Folder Link -->
+        <a href="https://drive.google.com/drive/folders/1YRkTR9dMz0PxKgF60edVF56Ckq909fMF" target="_blank"
+           class="p-1.5 sm:px-2 sm:py-1 bg-blue-900/60 hover:bg-blue-800 text-blue-200 border border-blue-700/60 rounded-lg transition flex items-center gap-1 text-[11px] shadow-sm" title="เปิดโฟลเดอร์ Google Drive เก็บรูปภาพและบิล">
+          <i class="fa-brands fa-google-drive text-amber-400 text-xs"></i>
+          <span class="hidden md:inline">Drive บิล/รูปภาพ</span>
+        </a>
+
+        <!-- Google Sheet Link -->
+        <a href="https://docs.google.com/spreadsheets/d/1JM-i8_nrGR7-VDEY82QZ5l5JMJTIBOIsuqOSQSrcD3Y/edit" target="_blank"
+           class="p-1.5 sm:px-2 sm:py-1 bg-emerald-900/60 hover:bg-emerald-800 text-emerald-200 border border-emerald-700/60 rounded-lg transition flex items-center gap-1 text-[11px] shadow-sm" title="เปิด Google Sheet บันทึกข้อมูล Maintenance_log">
+          <i class="fa-solid fa-table-cells text-emerald-400 text-xs"></i>
+          <span class="hidden md:inline">Sheet ข้อมูล</span>
+        </a>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================== -->
+  <!-- NAVIGATION TABS (NO-PRINT)                                     -->
+  <!-- ============================================================== -->
+  <div class="no-print bg-white border-b border-slate-200 sticky top-[53px] z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 flex items-center justify-between overflow-x-auto">
+      <nav class="flex space-x-1 sm:space-x-2 py-1.5" aria-label="Tabs">
+        <button type="button" onclick="switchNavTab('form')" id="tabBtnForm"
+                class="nav-tab-btn active px-3 sm:px-4 py-2 rounded-lg font-bold text-xs sm:text-sm flex items-center gap-2 transition bg-amber-500 text-white shadow-sm">
+          <i class="fa-solid fa-circle-plus"></i>
+          <span>บันทึกแจ้งซ่อมใหม่</span>
+        </button>
+
+        <button type="button" onclick="switchNavTab('history')" id="tabBtnHistory"
+                class="nav-tab-btn px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-2 transition">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>ประวัติและรายการซ่อมบำรุง</span>
+          <span id="badgeHistoryCount" class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.2 rounded-full font-bold">0</span>
+        </button>
+
+        <button type="button" onclick="switchNavTab('print')" id="tabBtnPrint"
+                class="nav-tab-btn px-3 sm:px-4 py-2 rounded-lg font-semibold text-xs sm:text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 flex items-center gap-2 transition">
+          <i class="fa-solid fa-file-invoice"></i>
+          <span>ใบแจ้งซ่อมมาตรฐาน A4</span>
+        </button>
+      </nav>
+
+      <!-- Refresh / Sync Button -->
+      <button type="button" onclick="fetchMaintenanceLogs(true)" class="p-2 text-slate-500 hover:text-blue-600 text-xs flex items-center gap-1 transition" title="รีเฟรชข้อมูลจาก Google Sheet">
+        <i class="fa-solid fa-rotate" id="syncSpinner"></i>
+        <span class="hidden sm:inline text-[11px]">ซิงก์ข้อมูล</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MAIN CONTENT CONTAINER                                         -->
+  <!-- ============================================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-6">
+
+    <!-- ============================================================ -->
+    <!-- TAB 1: FORM - บันทึกแจ้งซ่อมใหม่                             -->
+    <!-- ============================================================ -->
+    <section id="sectionForm" class="tab-section block space-y-5">
+      
+      <!-- Top Header Banner -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            <i class="fa-solid fa-truck-wrench"></i> บันทึกข้อมูลงานซ่อมและใบเสร็จ
+          </div>
+          <h2 class="text-base sm:text-lg font-extrabold text-white">
+            แบบฟอร์มบันทึกการซ่อมบำรุงและเบิกจ่ายค่าซ่อมรถ 6 ล้อ
+          </h2>
+          <p class="text-xs text-slate-300 font-sans max-w-2xl leading-relaxed">
+            บันทึกอาการเสีย, ระบบที่ชำรุด, รายการอะไหล่ที่เปลี่ยน (เพิ่มได้หลายรายการ), บิลค่าซ่อม และรูปภาพก่อน-หลังซ่อม จัดเก็บลง Google Sheet <code class="text-amber-300 font-mono">Maintenance_log</code> และ Google Drive อัตโนมัติ
+          </p>
+        </div>
+        <div class="flex items-center gap-2 self-stretch md:self-auto justify-end">
+          <button type="button" onclick="resetForm()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition border border-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-eraser"></i> ล้างฟอร์ม
+          </button>
+        </div>
+      </div>
+
+      <form id="maintenanceForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
+        
+        <!-- CARD 1: ข้อมูลรถและผู้แจ้งซ่อม -->
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">1</span>
+              <span>ข้อมูลรถบรรทุกและผู้แจ้งซ่อม (Vehicle & Reporter)</span>
+            </h3>
+            <span class="text-[11px] text-slate-400 font-mono" id="formCurrentTicketId">MNT-AUTO</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            
+            <!-- ทะเบียนรถ (Vehicle Plate) -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                ทะเบียนรถบรรทุก 6 ล้อ <span class="text-red-500">*</span>
+              </label>
+              <select id="vehiclePlate" required onchange="handlePlateChange()"
+                      class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs font-bold text-slate-800 transition">
+                <option value="">-- เลือกทะเบียนรถ --</option>
+                <!-- Diesel Vehicles -->
+                <optgroup label="รถบรรทุกดีเซล (Diesel 6 ล้อ)">
+                  <option value="70-8899 กทม." selected>70-8899 กทม. (ทวีศักดิ์ คำปก)</option>
+                  <option value="70-9312 กทม.">70-9312 กทม. (อรรถพล ยอดสิงห์)</option>
+                  <option value="72-1979 สระบุรี">72-1979 สระบุรี (ดุรงค์ฤทธิ์ สำเลิศ)</option>
+                  <option value="72-8139 สระบุรี">72-8139 สระบุรี (สมร มหาพันธ์)</option>
+                  <option value="8กส1201 กทม.">8กส1201 กทม. (นิชานันท์)</option>
+                  <option value="70-5544 กทม.">70-5544 กทม. (สมชาย วงศ์สวัสดิ์)</option>
+                  <option value="72-3189 ชลบุรี">72-3189 ชลบุรี (สุรชัย หงษา)</option>
+                  <option value="71-6543 อยุธยา">71-6543 อยุธยา (ธนวัฒน์ ใจดี)</option>
+                  <option value="73-2415 สระบุรี">73-2415 สระบุรี (ธีระพงษ์ ศรีสุข)</option>
+                  <option value="71-9820 กทม.">71-9820 กทม. (อนันต์ บุญรอด)</option>
+                  <option value="72-4411 นครปฐม">72-4411 นครปฐม (ประเสริฐ สุขสวัสดิ์)</option>
+                  <option value="73-9081 สระบุรี">73-9081 สระบุรี (มานะ ชนะศึก)</option>
+                  <option value="70-1122 กทม.">70-1122 กทม. (กิตติศักดิ์ เจริญดี)</option>
+                  <option value="72-9901 ฉะเชิงเทรา">72-9901 ฉะเชิงเทรา (วิเชียร สมบูรณ์)</option>
+                </optgroup>
+                <!-- EV Vehicles -->
+                <optgroup label="รถบรรทุกไฟฟ้า (100% EV 6 ล้อ)">
+                  <option value="73-1735 สระบุรี">73-1735 สระบุรี (พิศมัย พลเยี่ยม • BYD T8)</option>
+                  <option value="72-8297 สระบุรี">72-8297 สระบุรี (วิทวัส สอนพรม • BYD T8)</option>
+                  <option value="72-5079 สระบุรี">72-5079 สระบุรี (ทรงวุฒิ ฉวีรัมย์ • NEX Point)</option>
+                  <option value="61-5463 กทม.">61-5463 กทม. (วิวัฒน์ อุ่นสว่าง • NEX Point)</option>
+                </optgroup>
+                <option value="OTHER">-- ทะเบียนอื่น ๆ (ระบุเอง) --</option>
+              </select>
+              <input type="text" id="customPlateInput" placeholder="กรอกทะเบียนรถ เช่น 70-9999 กทม."
+                     class="w-full mt-1.5 px-3 py-2 rounded-xl border border-amber-300 bg-amber-50 text-xs font-bold text-slate-800 outline-none hidden">
+            </div>
+
+            <!-- ประเภทรถ (Vehicle Type) -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                ประเภทรถ / เชื้อเพลิง
+              </label>
+              <select id="vehicleType"
+                      class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs text-slate-800">
+                <option value="รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)" selected>รถบรรทุก 6 ล้อตู้ทึบ (ดีเซล)</option>
+                <option value="รถบรรทุก 6 ล้อคอกผ้าใบ (ดีเซล)">รถบรรทุก 6 ล้อคอกผ้าใบ (ดีเซล)</option>
+                <option value="รถบรรทุก 6 ล้อตู้แห้ง (ดีเซล)">รถบรรทุก 6 ล้อตู้แห้ง (ดีเซล)</option>
+                <option value="รถบรรทุก 6 ล้อ EV (ไฟฟ้า 100%)">รถบรรทุก 6 ล้อ EV (ไฟฟ้า 100%)</option>
+                <option value="รถกระบะ / รถส่วนกลาง">รถกระบะ / รถส่วนกลาง</option>
+              </select>
+            </div>
+
+            <!-- เลขไมล์ปัจจุบัน (Odometer) -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                เลขไมล์ปัจจุบัน (กม.) <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <input type="number" id="odometer" required min="0" max="9999999" placeholder="เช่น 168450"
+                       class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs font-mono font-bold text-slate-800 pr-10">
+                <span class="absolute right-3 top-2.5 text-[10px] text-slate-400 font-bold">KM</span>
+              </div>
+            </div>
+
+            <!-- วันที่บันทึก / วันที่ตรวจพบ -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                วันที่ตรวจพบ / วันที่ซ่อม <span class="text-red-500">*</span>
+              </label>
+              <input type="date" id="inspectionDate" required
+                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs text-slate-800 font-mono">
+            </div>
+
+            <!-- ชื่อผู้แจ้ง / พขร. -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                ชื่อผู้แจ้ง / พนักงานขับรถ <span class="text-red-500">*</span>
+              </label>
+              <input type="text" id="driverName" required placeholder="เช่น นายทวีศักดิ์ คำปก"
+                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs text-slate-800">
+            </div>
+
+            <!-- อีเมลผู้แจ้ง -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                อีเมลผู้แจ้ง (Driver Email) <span class="text-red-500">*</span>
+              </label>
+              <input type="email" id="driverEmail" required placeholder="เช่น driver@gmail.com"
+                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs font-mono text-slate-800">
+            </div>
+
+            <!-- เบอร์โทรติดต่อ -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                เบอร์โทรติดต่อผู้แจ้ง
+              </label>
+              <input type="tel" id="driverPhone" placeholder="เช่น 062-3285963"
+                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs font-mono text-slate-800">
+            </div>
+
+            <!-- สถานะงานซ่อมเริ่มต้น -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                สถานะงานซ่อม
+              </label>
+              <select id="ticketStatus"
+                      class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs font-bold text-slate-800">
+                <option value="ซ่อมเสร็จแล้ว" selected>✅ ซ่อมเสร็จแล้ว (พร้อมวางบิล/เบิกจ่าย)</option>
+                <option value="กำลังซ่อม">⏳ อยู่ระหว่างดำเนินการซ่อม (In-Progress)</option>
+                <option value="รอดำเนินการ">⚠️ แจ้งเรื่อง รออนุมัติซ่อม (Pending)</option>
+                <option value="ปิดงานสมบูรณ์">🔒 ปิดงานสมบูรณ์ (Closed)</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- CARD 2: ข้อมูลอาการเสีย และประเภทงานซ่อม -->
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-xs">2</span>
+              <span>อาการเสีย และรายละเอียดปัญหา (Symptom & Defect Description)</span>
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <!-- ประเภทการซ่อม -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                ประเภทการซ่อมบำรุง <span class="text-red-500">*</span>
+              </label>
+              <select id="maintenanceType" required
+                      class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs text-slate-800">
+                <option value="ซ่อมบำรุงตามระยะทาง (PM)" selected>ซ่อมบำรุงตามระยะทาง (PM Periodic Maintenance)</option>
+                <option value="ซ่อมฉุกเฉิน / รถเสียระหว่างทาง (Breakdown)">ซ่อมฉุกเฉิน / เสียระหว่างทาง (Breakdown)</option>
+                <option value="เปลี่ยนอะไหล่สึกหรอตามสภาพ (Wear & Tear)">เปลี่ยนอะไหล่สึกหรอตามสภาพ (Wear & Tear)</option>
+                <option value="แก้ไขจากผลตรวจประจำวัน (Daily Inspection Defect)">แก้ไขจากผลตรวจประจำวัน (Daily Check Defect)</option>
+                <option value="ปรับปรุงตัวถัง / อุปกรณ์เสริม (Bodywork)">ปรับปรุงตัวถัง / อุปกรณ์เสริม (Bodywork)</option>
+              </select>
+            </div>
+
+            <!-- ระบบที่ชำรุด -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                ระบบยานยนต์ที่เกี่ยวข้อง <span class="text-red-500">*</span>
+              </label>
+              <select id="systemAffected" required
+                      class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs text-slate-800">
+                <option value="ระบบเบรกและลมเบรก" selected>ระบบเบรกและลมเบรก (Brakes & Air)</option>
+                <option value="เครื่องยนต์และของเหลว">เครื่องยนต์และของเหลว (Engine & Lubricants)</option>
+                <option value="ยางและกระทะล้อ">ยางและกระทะล้อ (Tires & Wheels)</option>
+                <option value="ระบบไฟส่องสว่างและสัญญาณ">ระบบไฟส่องสว่างและสัญญาณ (Lights & Electrical)</option>
+                <option value="ช่วงล่างและแหนบ">ช่วงล่าง แหนบ เพลา (Suspension)</option>
+                <option value="แบตเตอรี่และระบบขับเคลื่อน EV">แบตเตอรี่และระบบมอเตอร์ EV (EV Powertrain)</option>
+                <option value="ระบบระบายความร้อนและหม้อน้ำ">ระบบระบายความร้อน (Cooling System)</option>
+                <option value="ระบบปรับอากาศ (แอร์รถ)">ระบบปรับอากาศ (Air Conditioning)</option>
+                <option value="ตัวถัง ตู้บรรทุก ประตูท้าย">ตัวถัง ตู้บรรทุก ประตูท้าย (Body & Container)</option>
+                <option value="กระจกและอุปกรณ์ความปลอดภัย">กระจกและอุปกรณ์ความปลอดภัย (Safety & Glass)</option>
+                <option value="ระบบอื่น ๆ">ระบบอื่น ๆ</option>
+              </select>
+            </div>
+
+            <!-- ความเร่งด่วน -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                ระดับความเร่งด่วน <span class="text-red-500">*</span>
+              </label>
+              <select id="urgency" required
+                      class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs font-bold text-slate-800">
+                <option value="ปกติ" selected>🟡 ปกติ (ตามรอบบำรุงรักษา)</option>
+                <option value="ด่วน">🟠 ด่วน (มีผลต่อความปลอดภัย / แอร์ / ยาง)</option>
+                <option value="ด่วนที่สุด">🔴 ด่วนที่สุด (รถวิ่งไม่ได้ / เบรกแตก / ลมรั่ว / ล้อติด)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- รายละเอียดอาการเสีย -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">
+              คำอธิบายอาการเสีย / รายละเอียดปัญหาที่ตรวจพบ <span class="text-red-500">*</span>
+            </label>
+            <textarea id="symptomDescription" rows="2" required placeholder="อธิบายอาการเสียอย่างละเอียด เช่น ผ้าเบรกหน้าซ้ายบาง มีเสียงเสียดสีเวลาเบรก, น้ำมันเครื่องครบกำหนดเปลี่ยนถ่าย 20,000 กม., ยางล้อหลังขวาด้านนอกมีรอยแตกลึก..."
+                      class="w-full p-3 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-xs text-slate-800 leading-relaxed"></textarea>
+          </div>
+        </div>
+
+        <!-- CARD 3: รายการอะไหล่ที่ซ่อมหรือเปลี่ยน (DYNAMIC LINE ITEMS REPEATER) -->
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">3</span>
+                <span>รายการอะไหล่และงานซ่อมที่เปลี่ยน (Spare Parts & Services)</span>
+              </h3>
+              <p class="text-[11px] text-slate-500 mt-0.5">
+                สามารถกด <strong class="text-blue-600">+ เพิ่มรายการ</strong> ได้ไม่จำกัด เพื่อบันทึกอะไหล่และค่าแรงทั้งหมดในบิลใบนี้
+              </p>
+            </div>
+            <button type="button" onclick="addPartRow()"
+                    class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1.5 self-start sm:self-auto cursor-pointer">
+              <i class="fa-solid fa-plus"></i>
+              <span>เพิ่มรายการอะไหล่ / ค่าบริการ</span>
+            </button>
+          </div>
+
+          <!-- Dynamic Table of Parts -->
+          <div class="overflow-x-auto border border-slate-200 rounded-xl">
+            <table class="w-full text-left text-xs" id="partsTable">
+              <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                <tr>
+                  <th class="py-2.5 px-3 w-10 text-center">#</th>
+                  <th class="py-2.5 px-3 min-w-[200px]">รายการอะไหล่ / งานบริการ</th>
+                  <th class="py-2.5 px-3 w-36">หมวดหมู่</th>
+                  <th class="py-2.5 px-3 w-20 text-center">จำนวน</th>
+                  <th class="py-2.5 px-3 w-24">หน่วย</th>
+                  <th class="py-2.5 px-3 w-28 text-right">ราคา/หน่วย (บ.)</th>
+                  <th class="py-2.5 px-3 w-32 text-right">รวมเงิน (บ.)</th>
+                  <th class="py-2.5 px-3 w-12 text-center">ลบ</th>
+                </tr>
+              </thead>
+              <tbody id="partsTableBody" class="divide-y divide-slate-100 text-slate-700 font-sans">
+                <!-- Rows injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Financial Breakdown Summary Box -->
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col md:flex-row items-end justify-between gap-4">
+            <div class="text-xs text-slate-500 space-y-1 w-full md:w-auto">
+              <p class="flex items-center gap-1">
+                <i class="fa-solid fa-calculator text-blue-600"></i>
+                <span>ระบบคำนวณราคารวมอัตโนมัติตามจำนวนและราคาต่อหน่วย</span>
+              </p>
+              <div class="flex items-center gap-3 pt-1">
+                <label class="inline-flex items-center gap-1.5 cursor-pointer text-slate-700 font-semibold">
+                  <input type="checkbox" id="checkIncludeVat" onchange="calculateFinancialTotals()" class="rounded text-blue-600 focus:ring-blue-500">
+                  <span>คิดภาษีมูลค่าเพิ่ม (VAT 7%)</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Financial Totals -->
+            <div class="w-full md:w-80 space-y-1.5 text-xs">
+              <div class="flex justify-between items-center text-slate-600">
+                <span>รวมค่าอะไหล่:</span>
+                <span id="sumPartsCost" class="font-mono font-semibold">0.00 บาท</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-600">
+                <span>รวมค่าแรงช่าง:</span>
+                <span id="sumLaborCost" class="font-mono font-semibold">0.00 บาท</span>
+              </div>
+              <div class="flex justify-between items-center text-slate-600">
+                <span>ภาษีมูลค่าเพิ่ม (7%):</span>
+                <span id="sumVatCost" class="font-mono font-semibold">0.00 บาท</span>
+              </div>
+              <div class="flex justify-between items-center pt-2 border-t border-slate-300 text-sm font-bold text-slate-900">
+                <span class="text-blue-900">ยอดรวมทั้งสิ้น (สุทธิ):</span>
+                <span id="sumTotalCost" class="text-base text-emerald-600 font-mono font-extrabold">0.00 บาท</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 4: ข้อมูลศูนย์บริการ / อู่ซ่อม -->
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs">4</span>
+              <span>ข้อมูลศูนย์บริการ / อู่ / ช่างผู้ดำเนินการซ่อม (Service Center / Garage)</span>
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                ชื่ออู่ / ศูนย์บริการ <span class="text-red-500">*</span>
+              </label>
+              <input type="text" id="garageName" required placeholder="เช่น อู่มงคลการช่าง หรือ ศูนย์อีซูซุ สระบุรี"
+                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs text-slate-800">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                ชื่อช่างผู้ตรวจซ่อม
+              </label>
+              <input type="text" id="mechanicName" placeholder="เช่น ช่างสมชาย หรือ วิศวกรประจำศูนย์"
+                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs text-slate-800">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                เบอร์โทรติดต่ออู่ / ศูนย์บริการ
+              </label>
+              <input type="tel" id="garagePhone" placeholder="เช่น 036-123456"
+                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs font-mono text-slate-800">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">
+                ระยะเวลารับประกันงานซ่อม
+              </label>
+              <input type="text" id="warrantyPeriod" placeholder="เช่น 3 เดือน หรือ 10,000 กม."
+                     class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs text-slate-800">
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 5: แนบรูปภาพประกอบ และบิลค่าซ่อม (4 PHOTOS) -->
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-1">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-xs">5</span>
+                <span>รูปภาพประกอบ & บิลค่าซ่อม (Receipts & Evidence Photos)</span>
+              </h3>
+              <p class="text-[11px] text-slate-500 mt-0.5">
+                รูปภาพทั้งหมดจะถูกบันทึกขึ้น Google Drive ID: <code class="font-mono text-blue-600">1YRkTR9dMz0PxKgF60edVF56Ckq909fMF</code> โดยอัตโนมัติ
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- PHOTO 1: บิลค่าซ่อม / ใบเสร็จรับเงิน (สำคัญมาก) -->
+            <div class="border-2 border-dashed border-amber-300 bg-amber-50/50 rounded-xl p-3 flex flex-col items-center justify-between text-center space-y-2 hover:border-amber-500 transition">
+              <span class="text-xs font-bold text-amber-900 flex items-center gap-1">
+                <i class="fa-solid fa-receipt text-amber-600"></i> บิลค่าซ่อม / ใบเสร็จรับเงิน <span class="text-red-500">*</span>
+              </span>
+              
+              <div class="w-full aspect-[4/3] bg-white rounded-lg border border-slate-200 overflow-hidden relative flex items-center justify-center">
+                <img id="previewBillPhoto" src="" alt="บิลค่าซ่อม" class="w-full h-full object-cover hidden">
+                <div id="placeholderBillPhoto" class="text-slate-400 text-center p-2">
+                  <i class="fa-solid fa-file-invoice-dollar text-3xl mb-1 text-slate-300"></i>
+                  <p class="text-[10px]">ยังไม่ได้แนบบิลค่าซ่อม</p>
+                </div>
+              </div>
+
+              <div class="w-full flex items-center gap-1.5 pt-1">
+                <button type="button" onclick="triggerCameraCapture('billPhoto')" class="flex-1 py-1.5 px-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[11px] font-bold shadow-xs transition flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-camera"></i> ถ่ายสด
+                </button>
+                <label class="flex-1 py-1.5 px-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-[11px] font-bold shadow-xs transition flex items-center justify-center gap-1 cursor-pointer">
+                  <i class="fa-solid fa-upload"></i> อัปโหลด
+                  <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event, 'billPhoto')">
+                </label>
+                <button type="button" onclick="clearPhoto('billPhoto')" class="p-1.5 bg-slate-200 hover:bg-red-100 text-slate-600 hover:text-red-600 rounded-lg text-[11px] transition" title="ลบภาพ">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- PHOTO 2: รูปอาการเสีย / จุดชำรุดก่อนซ่อม -->
+            <div class="border border-slate-200 bg-slate-50 rounded-xl p-3 flex flex-col items-center justify-between text-center space-y-2 hover:border-blue-400 transition">
+              <span class="text-xs font-semibold text-slate-800 flex items-center gap-1">
+                <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> จุดที่ชำรุด (ก่อนซ่อม)
+              </span>
+              
+              <div class="w-full aspect-[4/3] bg-white rounded-lg border border-slate-200 overflow-hidden relative flex items-center justify-center">
+                <img id="previewDefectPhoto" src="" alt="อาการเสีย" class="w-full h-full object-cover hidden">
+                <div id="placeholderDefectPhoto" class="text-slate-400 text-center p-2">
+                  <i class="fa-solid fa-image text-3xl mb-1 text-slate-300"></i>
+                  <p class="text-[10px]">ภาพจุดชำรุดก่อนซ่อม</p>
+                </div>
+              </div>
+
+              <div class="w-full flex items-center gap-1.5 pt-1">
+                <button type="button" onclick="triggerCameraCapture('defectPhoto')" class="flex-1 py-1.5 px-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-semibold shadow-xs transition flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-camera"></i> ถ่ายสด
+                </button>
+                <label class="flex-1 py-1.5 px-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-[11px] font-semibold shadow-xs transition flex items-center justify-center gap-1 cursor-pointer">
+                  <i class="fa-solid fa-upload"></i> อัปโหลด
+                  <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event, 'defectPhoto')">
+                </label>
+                <button type="button" onclick="clearPhoto('defectPhoto')" class="p-1.5 bg-slate-200 hover:bg-red-100 text-slate-600 hover:text-red-600 rounded-lg text-[11px] transition" title="ลบภาพ">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- PHOTO 3: รูปอะไหล่ใหม่ / ขณะกำลังซ่อม -->
+            <div class="border border-slate-200 bg-slate-50 rounded-xl p-3 flex flex-col items-center justify-between text-center space-y-2 hover:border-blue-400 transition">
+              <span class="text-xs font-semibold text-slate-800 flex items-center gap-1">
+                <i class="fa-solid fa-gears text-blue-500"></i> อะไหล่ใหม่ / ขณะซ่อม
+              </span>
+              
+              <div class="w-full aspect-[4/3] bg-white rounded-lg border border-slate-200 overflow-hidden relative flex items-center justify-center">
+                <img id="previewPartsPhoto" src="" alt="อะไหล่ใหม่" class="w-full h-full object-cover hidden">
+                <div id="placeholderPartsPhoto" class="text-slate-400 text-center p-2">
+                  <i class="fa-solid fa-box-open text-3xl mb-1 text-slate-300"></i>
+                  <p class="text-[10px]">ภาพอะไหล่ที่เปลี่ยน</p>
+                </div>
+              </div>
+
+              <div class="w-full flex items-center gap-1.5 pt-1">
+                <button type="button" onclick="triggerCameraCapture('partsPhoto')" class="flex-1 py-1.5 px-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-semibold shadow-xs transition flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-camera"></i> ถ่ายสด
+                </button>
+                <label class="flex-1 py-1.5 px-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-[11px] font-semibold shadow-xs transition flex items-center justify-center gap-1 cursor-pointer">
+                  <i class="fa-solid fa-upload"></i> อัปโหลด
+                  <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event, 'partsPhoto')">
+                </label>
+                <button type="button" onclick="clearPhoto('partsPhoto')" class="p-1.5 bg-slate-200 hover:bg-red-100 text-slate-600 hover:text-red-600 rounded-lg text-[11px] transition" title="ลบภาพ">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- PHOTO 4: รูปงานหลังซ่อมเสร็จ -->
+            <div class="border border-slate-200 bg-slate-50 rounded-xl p-3 flex flex-col items-center justify-between text-center space-y-2 hover:border-emerald-400 transition">
+              <span class="text-xs font-semibold text-slate-800 flex items-center gap-1">
+                <i class="fa-solid fa-circle-check text-emerald-500"></i> งานหลังซ่อมเสร็จ
+              </span>
+              
+              <div class="w-full aspect-[4/3] bg-white rounded-lg border border-slate-200 overflow-hidden relative flex items-center justify-center">
+                <img id="previewFinishedPhoto" src="" alt="หลังซ่อมเสร็จ" class="w-full h-full object-cover hidden">
+                <div id="placeholderFinishedPhoto" class="text-slate-400 text-center p-2">
+                  <i class="fa-solid fa-check-double text-3xl mb-1 text-slate-300"></i>
+                  <p class="text-[10px]">ภาพผลงานหลังซ่อมเสร็จ</p>
+                </div>
+              </div>
+
+              <div class="w-full flex items-center gap-1.5 pt-1">
+                <button type="button" onclick="triggerCameraCapture('finishedPhoto')" class="flex-1 py-1.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-semibold shadow-xs transition flex items-center justify-center gap-1">
+                  <i class="fa-solid fa-camera"></i> ถ่ายสด
+                </button>
+                <label class="flex-1 py-1.5 px-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-[11px] font-semibold shadow-xs transition flex items-center justify-center gap-1 cursor-pointer">
+                  <i class="fa-solid fa-upload"></i> อัปโหลด
+                  <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(event, 'finishedPhoto')">
+                </label>
+                <button type="button" onclick="clearPhoto('finishedPhoto')" class="p-1.5 bg-slate-200 hover:bg-red-100 text-slate-600 hover:text-red-600 rounded-lg text-[11px] transition" title="ลบภาพ">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- CARD 6: หมายเหตุเพิ่มเติม และปุ่มส่งข้อมูล -->
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">
+              หมายเหตุเพิ่มเติม (ถ้ามี)
+            </label>
+            <input type="text" id="ticketRemarks" placeholder="เช่น ช่างแจ้งว่าสายพานอาจต้องเปลี่ยนในรอบถัดไปอีก 10,000 กม."
+                   class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white outline-none text-xs text-slate-800">
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
+            <button type="button" onclick="prepareA4PreviewFromCurrentForm()"
+                    class="w-full sm:w-auto px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-print"></i>
+              <span>ดูตัวอย่างและพิมพ์ใบแจ้งซ่อม A4</span>
+            </button>
+
+            <button type="submit" id="btnSubmitForm"
+                    class="w-full sm:w-auto px-7 py-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-xl text-sm font-bold shadow-md transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+              <i class="fa-solid fa-cloud-arrow-up text-base"></i>
+              <span>บันทึกข้อมูลและส่งเข้าระบบ</span>
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- TAB 2: HISTORY - ประวัติและรายการแจ้งซ่อม                    -->
+    <!-- ============================================================ -->
+    <section id="sectionHistory" class="tab-section hidden space-y-5">
+      
+      <!-- KPI Stats Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between text-slate-400 mb-1">
+            <span class="text-xs font-semibold text-slate-500">งานซ่อมทั้งหมด</span>
+            <i class="fa-solid fa-clipboard-list text-blue-500"></i>
+          </div>
+          <p class="text-xl sm:text-2xl font-black text-slate-800 font-mono" id="statTotalTickets">0</p>
+          <span class="text-[10px] text-slate-400">รายการแจ้งซ่อมทั้งหมด</span>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between text-slate-400 mb-1">
+            <span class="text-xs font-semibold text-slate-500">รอซ่อม / กำลังซ่อม</span>
+            <i class="fa-solid fa-clock-rotate-left text-amber-500"></i>
+          </div>
+          <p class="text-xl sm:text-2xl font-black text-amber-600 font-mono" id="statPendingTickets">0</p>
+          <span class="text-[10px] text-slate-400">งานอยู่ระหว่างดำเนินการ</span>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between text-slate-400 mb-1">
+            <span class="text-xs font-semibold text-slate-500">ซ่อมเสร็จสมบูรณ์</span>
+            <i class="fa-solid fa-circle-check text-emerald-500"></i>
+          </div>
+          <p class="text-xl sm:text-2xl font-black text-emerald-600 font-mono" id="statCompletedTickets">0</p>
+          <span class="text-[10px] text-slate-400">พร้อมใช้งาน / ปิดงาน</span>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+          <div class="flex items-center justify-between text-slate-400 mb-1">
+            <span class="text-xs font-semibold text-slate-500">ยอดค่าใช้จ่ายรวม</span>
+            <i class="fa-solid fa-coins text-amber-500"></i>
+          </div>
+          <p class="text-lg sm:text-xl font-black text-slate-900 font-mono truncate" id="statTotalCost">0 บ.</p>
+          <span class="text-[10px] text-slate-400">รวมค่าอะไหล่และค่าแรงทั้งหมด</span>
+        </div>
+
+      </div>
+
+      <!-- Search & Filters Bar -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+          
+          <div class="relative sm:col-span-2">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+            <input type="text" id="searchInput" oninput="renderHistoryTable()" placeholder="ค้นหาด้วย ทะเบียนรถ, ช่าง, อาการเสีย, รหัส MNT..."
+                   class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+
+          <div>
+            <select id="filterStatus" onchange="renderHistoryTable()"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none bg-slate-50">
+              <option value="ALL">สถานะทั้งหมด</option>
+              <option value="ซ่อมเสร็จแล้ว">ซ่อมเสร็จแล้ว</option>
+              <option value="กำลังซ่อม">อยู่ระหว่างซ่อม</option>
+              <option value="รอดำเนินการ">รอดำเนินการ</option>
+            </select>
+          </div>
+
+          <div>
+            <select id="filterPlate" onchange="renderHistoryTable()"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none bg-slate-50">
+              <option value="ALL">ทะเบียนรถทั้งหมด</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- History Data Table -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">รหัส / วันที่</th>
+                <th class="py-3 px-3">ทะเบียนรถ</th>
+                <th class="py-3 px-3">ผู้แจ้งซ่อม</th>
+                <th class="py-3 px-3 min-w-[180px]">อาการเสีย & อะไหล่</th>
+                <th class="py-3 px-3 text-right">ยอดเงินรวม</th>
+                <th class="py-3 px-3 text-center">หลักฐาน</th>
+                <th class="py-3 px-3 text-center">สถานะ</th>
+                <th class="py-3 px-3 text-center w-28">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody" class="divide-y divide-slate-100 font-sans">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="historyEmptyState" class="hidden p-10 text-center text-slate-400 space-y-2">
+          <i class="fa-solid fa-folder-open text-4xl text-slate-300"></i>
+          <p class="text-xs">ไม่พบข้อมูลประวัติการซ่อมบำรุงตามเงื่อนไขที่เลือก</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- TAB 3: PRINT - ใบแจ้งซ่อมมาตรฐาน A4                         -->
+    <!-- ============================================================ -->
+    <section id="sectionPrint" class="tab-section hidden space-y-4">
+      
+      <div class="no-print bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between text-xs text-amber-900">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-circle-info text-amber-600 text-base"></i>
+          <span>หน้าตัวอย่างเอกสารใบแจ้งซ่อมบำรุงรักษาขนาด A4 ท่านสามารถกดสั่งพิมพ์หรือบันทึกเป็น PDF ได้ทันที</span>
+        </div>
+        <button type="button" onclick="window.print()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-print"></i> พิมพ์เอกสาร A4
+        </button>
+      </div>
+
+      <!-- Printable A4 Container Sheet -->
+      <div id="printableA4Area" class="a4-page bg-white max-w-4xl mx-auto p-8 sm:p-12 shadow-md rounded-lg border border-slate-200 text-slate-900 font-sarabun space-y-6">
+        
+        <!-- Document Header -->
+        <div class="flex items-start justify-between border-b-2 border-slate-900 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xl font-prompt">
+              TTMK
+            </div>
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900 font-prompt leading-tight">
+                ห้างหุ้นส่วนจำกัด ทั่วไทยขนส่งมงคล
+              </h2>
+              <p class="text-xs text-slate-600">
+                ระบบบริหารการซ่อมบำรุงยานพาหนะขนส่ง &bull; Fleet Maintenance Job Order
+              </p>
+              <p class="text-[11px] text-slate-500">
+                โทร. 062-3285963 (Mr.Taweesak.kom)
+              </p>
+            </div>
+          </div>
+
+          <div class="text-right">
+            <span class="inline-block px-3 py-1 bg-slate-900 text-white text-xs font-bold rounded">
+              ใบแจ้งซ่อมและเบิกจ่ายค่าซ่อม
+            </span>
+            <p class="text-xs font-mono font-bold mt-1.5 text-slate-800">
+              เลขที่: <span id="printTicketId">MNT-20261013-001</span>
+            </p>
+            <p class="text-xs text-slate-600 font-mono">
+              วันที่: <span id="printDate">13/10/2026</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Vehicle & Garage Meta Information Table -->
+        <div class="grid grid-cols-2 gap-4 text-xs border border-slate-300 rounded-lg p-3 bg-slate-50/50">
+          <div class="space-y-1">
+            <p><strong>ทะเบียนรถ:</strong> <span id="printPlate" class="font-bold text-sm text-blue-900">70-8899 กทม.</span></p>
+            <p><strong>ประเภทรถ:</strong> <span id="printVehicleType">รถบรรทุก 6 ล้อตู้ทึบ</span></p>
+            <p><strong>เลขไมล์ปัจจุบัน:</strong> <span id="printOdo" class="font-mono">168,450 กม.</span></p>
+            <p><strong>ผู้แจ้งซ่อม (พขร.):</strong> <span id="printDriverName">นายทวีศักดิ์ คำปก</span></p>
+          </div>
+          <div class="space-y-1">
+            <p><strong>ประเภทการซ่อม:</strong> <span id="printMntType">ซ่อมบำรุงตามระยะทาง (PM)</span></p>
+            <p><strong>ระบบที่เกี่ยวข้อง:</strong> <span id="printSystem">ระบบเบรกและลมเบรก</span></p>
+            <p><strong>ศูนย์บริการ / อู่:</strong> <span id="printGarage">อู่มงคลการช่าง</span></p>
+            <p><strong>ช่างผู้ซ่อม:</strong> <span id="printMechanic">ช่างสมชาย (โทร. 036-123456)</span></p>
+          </div>
+        </div>
+
+        <!-- Symptom Box -->
+        <div class="text-xs border border-slate-300 rounded-lg p-3">
+          <p class="font-bold text-slate-800 mb-1">รายละเอียดอาการเสีย / ปัญหาที่ตรวจพบ:</p>
+          <p id="printSymptom" class="text-slate-700 leading-relaxed font-sans">
+            ผ้าเบรกหน้าซ้ายบาง มีเสียงเสียดสีเวลาเบรก และเปลี่ยนถ่ายน้ำมันเครื่องตามระยะ 20,000 กม.
+          </p>
+        </div>
+
+        <!-- Parts & Labor Itemized Table -->
+        <div>
+          <h4 class="text-xs font-bold text-slate-800 mb-1.5">รายการอะไหล่และค่าแรงที่เปลี่ยน:</h4>
+          <table class="w-full text-xs border-collapse border border-slate-300">
+            <thead class="bg-slate-100 text-slate-800">
+              <tr>
+                <th class="border border-slate-300 py-1.5 px-2 w-8 text-center">ลำดับ</th>
+                <th class="border border-slate-300 py-1.5 px-2 text-left">รายการอะไหล่ / งานบริการ</th>
+                <th class="border border-slate-300 py-1.5 px-2 w-28 text-left">หมวดหมู่</th>
+                <th class="border border-slate-300 py-1.5 px-2 w-16 text-center">จำนวน</th>
+                <th class="border border-slate-300 py-1.5 px-2 w-24 text-right">ราคา/หน่วย</th>
+                <th class="border border-slate-300 py-1.5 px-2 w-28 text-right">รวมเป็นเงิน</th>
+              </tr>
+            </thead>
+            <tbody id="printPartsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+            <tfoot class="bg-slate-50 font-bold">
+              <tr>
+                <td colspan="5" class="border border-slate-300 py-1 px-2 text-right">รวมค่าอะไหล่:</td>
+                <td class="border border-slate-300 py-1 px-2 text-right font-mono" id="printSumParts">0.00</td>
+              </tr>
+              <tr>
+                <td colspan="5" class="border border-slate-300 py-1 px-2 text-right">รวมค่าแรงช่าง:</td>
+                <td class="border border-slate-300 py-1 px-2 text-right font-mono" id="printSumLabor">0.00</td>
+              </tr>
+              <tr>
+                <td colspan="5" class="border border-slate-300 py-1 px-2 text-right">ภาษีมูลค่าเพิ่ม (VAT 7%):</td>
+                <td class="border border-slate-300 py-1 px-2 text-right font-mono" id="printSumVat">0.00</td>
+              </tr>
+              <tr class="text-sm bg-slate-200">
+                <td colspan="5" class="border border-slate-300 py-1.5 px-2 text-right text-slate-900 font-extrabold">ยอดสุทธิทั้งสิ้น:</td>
+                <td class="border border-slate-300 py-1.5 px-2 text-right text-emerald-800 font-mono font-extrabold" id="printSumTotal">0.00 บาท</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Remarks & Warranty -->
+        <div class="text-xs text-slate-600 grid grid-cols-2 gap-4">
+          <p><strong>การรับประกันงานซ่อม:</strong> <span id="printWarranty">-</span></p>
+          <p><strong>หมายเหตุ:</strong> <span id="printRemarks">-</span></p>
+        </div>
+
+        <!-- Attached Images Strip on Print -->
+        <div id="printPhotoStrip" class="border border-slate-200 rounded-lg p-2 grid grid-cols-4 gap-2">
+          <!-- Injected thumbnails -->
+        </div>
+
+        <!-- Signatures Box -->
+        <div class="pt-6 grid grid-cols-3 gap-6 text-center text-xs">
+          <div class="space-y-8">
+            <p>ลงชื่อ .....................................................</p>
+            <p>( <span id="printSignDriver">นายทวีศักดิ์ คำปก</span> )<br><span class="text-slate-500">พนักงานขับรถ / ผู้แจ้งซ่อม</span></p>
+          </div>
+
+          <div class="space-y-8">
+            <p>ลงชื่อ .....................................................</p>
+            <p>( <span id="printSignMechanic">ช่างผู้ซ่อม</span> )<br><span class="text-slate-500">ช่างผู้ดำเนินการ / อู่ซ่อม</span></p>
+          </div>
+
+          <div class="space-y-8">
+            <p>ลงชื่อ .....................................................</p>
+            <p>( ..................................................... )<br><span class="text-slate-500">เจ้าหน้าที่ควบคุม / TSM อนุมัติ</span></p>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: CAMERA CAPTURE (NO-PRINT)                               -->
+  <!-- ============================================================== -->
+  <div id="cameraModal" class="no-print hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 text-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl space-y-3 p-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h3 class="text-xs sm:text-sm font-bold flex items-center gap-2">
+          <i class="fa-solid fa-camera text-amber-400"></i>
+          <span id="cameraModalTitle">ถ่ายภาพสด</span>
+        </h3>
+        <button type="button" onclick="closeCameraModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <div class="relative w-full aspect-[4/3] bg-black rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+        <video id="liveCameraVideo" autoplay playsinline muted class="w-full h-full object-cover"></video>
+      </div>
+
+      <div class="flex items-center justify-between gap-2 pt-1">
+        <button type="button" onclick="switchCameraFacing()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-semibold text-slate-300">
+          <i class="fa-solid fa-arrows-rotate"></i> สลับกล้อง
+        </button>
+        <button type="button" onclick="snapCameraPhoto()" class="flex-1 py-2.5 px-4 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-camera"></i> กดถ่ายภาพ
+        </button>
+        <button type="button" onclick="closeCameraModal()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs text-slate-400">
+          ยกเลิก
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Canvas for snapshot compression -->
+  <canvas id="hiddenCompressCanvas" class="hidden"></canvas>
+
+  <!-- ============================================================== -->
+  <!-- FOOTER (NO-PRINT)                                              -->
+  <!-- ============================================================== -->
+  <footer class="no-print bg-white border-t border-slate-200 py-4 px-4 text-center text-xs text-slate-500 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p class="font-medium text-slate-600">
+        &copy; 2026 หจก. ทั่วไทยขนส่งมงคล &bull; Mr.Taweesak.kom (062-3285963)
+      </p>
+      <div class="flex items-center space-x-3 text-[11px]">
+        <a href="../index.html" class="hover:text-blue-600">ระบบหลัก</a>
+        <a href="../CheckTruck/index.html" class="hover:text-amber-600">ตรวจรถ 6 ล้อ</a>
+        <a href="../Alcohol/index.html" class="hover:text-blue-600">ตรวจแอลกอฮอล์</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Script Logic -->
+  <script src="app.js?v=20261013_01"></script>
+</body>
+</html>
