@@ -113,11 +113,11 @@
     <!-- Right Controls: Driver Badge, Mode, Sound & Reset -->
     <div class="flex items-center gap-1 sm:gap-1.5">
       <!-- Minimalist Driver Tag -->
-      <button onclick="promptChangeDriver()" class="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900/90 border border-cyan-800/60 hover:border-cyan-400 transition text-[10px] font-mono shadow" title="คลิกเพื่อเปลี่ยนพนักงานขับรถ">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span id="driverNameTxt" class="text-white font-bold truncate max-w-[90px] sm:max-w-none">นายทวีศักดิ์</span>
-        <span id="driverIdTxt" class="text-cyan-300 font-bold bg-slate-800 px-1 rounded text-[9px]">DRV-999</span>
-        <span id="driverPlateTxt" class="text-amber-400 font-bold hidden md:inline">70-8899</span>
+      <button onclick="promptChangeDriver()" class="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900/90 border border-cyan-800/60 hover:border-cyan-400 transition text-[10px] font-mono shadow" title="คลิกเพื่อระบุหรือเปลี่ยนพนักงานขับรถ">
+        <span class="w-1.5 h-1.5 rounded-full bg-slate-400" id="driverStatusDot"></span>
+        <span id="driverNameTxt" class="text-white font-bold truncate max-w-[90px] sm:max-w-none">ระบุตัวตน</span>
+        <span id="driverIdTxt" class="text-cyan-300 font-bold bg-slate-800 px-1 rounded text-[9px]">-</span>
+        <span id="driverPlateTxt" class="text-amber-400 font-bold hidden md:inline">-</span>
       </button>
 
       <!-- Compact Mode Toggle -->
@@ -1485,12 +1485,13 @@
     const STORAGE_KEY_DRIVER = "TTMK_SAVED_DRIVER_EMAIL";
 
     function checkSavedDriver() {
-      const savedEmail = localStorage.getItem(STORAGE_KEY_DRIVER);
-      if (savedEmail) {
+      // ตรวจสอบอีเมลที่เคยล็อกอินไว้ในอุปกรณ์นี้ (จำอีเมลจริงที่เคยกรอก)
+      const savedEmail = localStorage.getItem(STORAGE_KEY_DRIVER) || localStorage.getItem("TTMK_LAST_EMAIL");
+      if (savedEmail && savedEmail.trim().length > 3) {
         // มีประวัติเคยยืนยันแล้ว -> ดึงมาทำงานอัตโนมัติ ไม่เด้งขวางจอ
-        verifyDriverEmailSilent(savedEmail);
+        verifyDriverEmailSilent(savedEmail.trim().toLowerCase());
       } else {
-        // เข้าครั้งแรก -> เด้งหน้าต่าง SweetAlert ให้กรอกอีเมลเพื่อยืนยันตัวตน
+        // เข้าครั้งแรก หรือยังไม่เคยระบุตัวตน -> เด้งหน้าต่างให้กรอกอีเมลเพื่อยืนยันตัวตน (ช่องว่างเปล่า ไม่ค้างอีเมลทดสอบ)
         promptDriverLoginModal();
       }
     }
@@ -1501,7 +1502,7 @@
         html: `
           <div class="text-left text-xs font-mono text-slate-300 space-y-2">
             <p>กรุณาระบุอีเมลที่ลงทะเบียนไว้ในระบบ <b>Registered_Drivers</b></p>
-            <input type="email" id="swalDriverEmail" value="closec16522@gmail.com" placeholder="เช่น closec16522@gmail.com"
+            <input type="email" id="swalDriverEmail" value="" placeholder="เช่น somchai@gmail.com"
               class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-xs focus:outline-none focus:border-cyan-400 font-mono">
             <p class="text-[10px] text-slate-400">* ระบบจะจำชื่อและสิทธิ์ของท่านไว้ในอุปกรณ์นี้โดยอัตโนมัติ ไม่ต้องกรอกซ้ำในครั้งต่อไป</p>
           </div>
@@ -1513,11 +1514,11 @@
         allowOutsideClick: false,
         preConfirm: () => {
           const email = document.getElementById('swalDriverEmail').value.trim();
-          if (!email) {
-            Swal.showValidationMessage('กรุณากรอกอีเมล');
+          if (!email || !email.includes('@')) {
+            Swal.showValidationMessage('กรุณากรอกอีเมลให้ถูกต้อง');
             return false;
           }
-          return email;
+          return email.toLowerCase();
         }
       }).then(async (res) => {
         if (res.isConfirmed && res.value) {
@@ -1527,7 +1528,11 @@
     }
 
     function promptChangeDriver() {
+      // ล้างข้อมูลเพื่อเปลี่ยนคนขับ
       localStorage.removeItem(STORAGE_KEY_DRIVER);
+      localStorage.removeItem("TTMK_LAST_EMAIL");
+      registeredDriver = null;
+      updateDriverHeaderUI();
       promptDriverLoginModal();
     }
 
@@ -1544,16 +1549,21 @@
           registeredDriver = {
             id: dData.driverId || 'EMP-OK',
             name: json.driverName || dData.name,
-            phone: dData.phone || '062-3285963',
-            plate: dData.plate || '70-8899 กทม.',
+            phone: dData.phone || '',
+            plate: dData.plate || (typeof selectedPlate !== 'undefined' ? selectedPlate : ''),
             email: email
           };
+          localStorage.setItem(STORAGE_KEY_DRIVER, email);
+          localStorage.setItem("TTMK_LAST_EMAIL", email);
           updateDriverHeaderUI();
         } else {
-          // Fallback to local default if offline
-          setMockDriver(email);
+          // หากเชื่อมต่อสำเร็จแต่ไม่พบอีเมลในระบบ ให้แจ้งให้กรอกใหม่
+          registeredDriver = null;
+          updateDriverHeaderUI();
+          promptDriverLoginModal();
         }
       } catch (e) {
+        // ออฟไลน์หรือสัญญาณติดขัด และมีอีเมลที่บันทึกไว้ในเครื่อง
         setMockDriver(email);
       }
     }
@@ -1581,11 +1591,12 @@
           registeredDriver = {
             id: dData.driverId || 'EMP-OK',
             name: json.driverName || dData.name,
-            phone: dData.phone || '062-3285963',
-            plate: dData.plate || '70-8899 กทม.',
+            phone: dData.phone || '',
+            plate: dData.plate || (typeof selectedPlate !== 'undefined' ? selectedPlate : ''),
             email: email
           };
           localStorage.setItem(STORAGE_KEY_DRIVER, email);
+          localStorage.setItem("TTMK_LAST_EMAIL", email);
           updateDriverHeaderUI();
 
           Swal.fire({
@@ -1597,6 +1608,8 @@
             color: '#fff'
           });
         } else {
+          registeredDriver = null;
+          updateDriverHeaderUI();
           Swal.fire({
             icon: 'error',
             title: 'ไม่พบข้อมูลในระบบ',
@@ -1610,6 +1623,7 @@
       } catch (err) {
         setMockDriver(email);
         localStorage.setItem(STORAGE_KEY_DRIVER, email);
+        localStorage.setItem("TTMK_LAST_EMAIL", email);
         Swal.fire({
           icon: 'success',
           title: `เข้าใช้งาน: ${registeredDriver.name}`,
@@ -1639,11 +1653,12 @@
           email: email
         };
       } else {
+        const username = email.split('@')[0];
         registeredDriver = {
           id: 'DRV-001',
-          name: 'พนักงานขับรถ ' + email.split('@')[0],
-          phone: '062-3285963',
-          plate: '70-8899 กทม.',
+          name: 'พนักงานขับรถ ' + username,
+          phone: '-',
+          plate: typeof selectedPlate !== 'undefined' ? selectedPlate : '-',
           email: email
         };
       }
@@ -1651,14 +1666,27 @@
     }
 
     function updateDriverHeaderUI() {
-      if (!registeredDriver) return;
       const nameEl = document.getElementById('driverNameTxt');
       const idEl = document.getElementById('driverIdTxt');
       const plateEl = document.getElementById('driverPlateTxt');
+      const dotEl = document.getElementById('driverStatusDot');
+
+      if (!registeredDriver) {
+        if (nameEl) nameEl.innerText = 'ระบุตัวตน';
+        if (idEl) idEl.innerText = '-';
+        if (plateEl) plateEl.innerText = '-';
+        if (dotEl) {
+          dotEl.className = 'w-1.5 h-1.5 rounded-full bg-slate-400';
+        }
+        return;
+      }
 
       if (nameEl) nameEl.innerText = registeredDriver.name;
-      if (idEl) idEl.innerText = registeredDriver.id;
-      if (plateEl) plateEl.innerText = registeredDriver.plate;
+      if (idEl) idEl.innerText = registeredDriver.id || 'EMP-OK';
+      if (plateEl) plateEl.innerText = registeredDriver.plate || (typeof selectedPlate !== 'undefined' ? selectedPlate : '-');
+      if (dotEl) {
+        dotEl.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse';
+      }
     }
 
     // --- Inspection Mode Management (Day of Week & Detailed Toggle) ---
@@ -2099,6 +2127,21 @@
     }
 
     async function submitToGoogleAppsScript() {
+      if (!registeredDriver || !registeredDriver.email) {
+        playBeep(400, 'sawtooth', 0.15);
+        Swal.fire({
+          icon: 'warning',
+          title: 'ยังไม่ได้ระบุตัวตนพนักงานขับรถ',
+          text: 'กรุณากรอกอีเมลและยืนยันตัวตนพนักงานขับรถก่อนส่งข้อมูลเข้าระบบ',
+          confirmButtonColor: '#f59e0b',
+          background: '#0a1120',
+          color: '#fff'
+        }).then(() => {
+          promptDriverLoginModal();
+        });
+        return;
+      }
+
       const odometer = document.getElementById('finalOdometer').value;
       if (!odometer) {
         playBeep(400, 'sawtooth', 0.15);
@@ -2197,9 +2240,9 @@
 
       const payload = {
         standardDoc: 'DAILY_INSPECTION',
-        email: registeredDriver ? registeredDriver.email : 'closec16522@gmail.com',
-        driverName: registeredDriver ? registeredDriver.name : 'นายทวีศักดิ์ คำปก',
-        vehiclePlate: registeredDriver ? registeredDriver.plate : '70-8899 กทม.',
+        email: registeredDriver.email,
+        driverName: registeredDriver.name,
+        vehiclePlate: registeredDriver.plate || (typeof selectedPlate !== 'undefined' ? selectedPlate : ''),
         vehicleType: vehicleMode === 'ICE' ? 'ICE (ดีเซล/น้ำมัน)' : 'EV (ไฟฟ้า)',
         odometer: odometer,
         overallStatus: overallStatus,

@@ -30,10 +30,10 @@ function renderQuickRecentEmail() {
   const quickBox = document.getElementById("quickLoginBox");
   const quickDivider = document.getElementById("quickLoginDivider");
   const emailText = document.getElementById("quickRecentEmailText");
-  const lastEmail = localStorage.getItem("TTMK_LAST_EMAIL") || (appState.driver ? appState.driver.email : null);
+  const lastEmail = localStorage.getItem("TTMK_LAST_EMAIL") || localStorage.getItem("TTMK_SAVED_DRIVER_EMAIL") || (appState.driver ? appState.driver.email : null);
 
-  if (lastEmail && quickBox && emailText) {
-    emailText.textContent = lastEmail;
+  if (lastEmail && lastEmail.trim() && quickBox && emailText) {
+    emailText.textContent = lastEmail.trim();
     quickBox.classList.remove("hidden");
     if (quickDivider) quickDivider.classList.remove("hidden");
   } else if (quickBox) {
@@ -45,11 +45,11 @@ window.renderQuickRecentEmail = renderQuickRecentEmail;
 
 // ฟังก์ชันเลือกล็อกอินด่วน 1-คลิก (เฉพาะ Email ล่าสุด)
 window.quickSelectLastDriver = function() {
-  const lastEmail = localStorage.getItem("TTMK_LAST_EMAIL") || (appState.driver ? appState.driver.email : null);
-  if (lastEmail) {
+  const lastEmail = localStorage.getItem("TTMK_LAST_EMAIL") || localStorage.getItem("TTMK_SAVED_DRIVER_EMAIL") || (appState.driver ? appState.driver.email : null);
+  if (lastEmail && lastEmail.trim()) {
     const emailInput = document.getElementById("driverEmailInput");
-    if (emailInput) emailInput.value = lastEmail;
-    handleEmailLookup(lastEmail);
+    if (emailInput) emailInput.value = lastEmail.trim();
+    handleEmailLookup(lastEmail.trim());
   }
 };
 window.quickSelectDriver = window.quickSelectLastDriver;
@@ -511,18 +511,43 @@ async function loadFaceModels() {
  */
 async function checkAutoLogin() {
   const savedData = localStorage.getItem("TTMK_DRIVER_PROFILE");
-  if (!savedData) return;
+  let email = "";
+  let cachedDriver = null;
+
+  if (savedData) {
+    try {
+      cachedDriver = JSON.parse(savedData);
+      if (cachedDriver && cachedDriver.email) {
+        email = cachedDriver.email.toLowerCase().trim();
+      }
+    } catch (e) {
+      console.warn("Auto-login parse error:", e);
+    }
+  }
+
+  if (!email) {
+    const rawEmail = localStorage.getItem("TTMK_LAST_EMAIL") || localStorage.getItem("TTMK_SAVED_DRIVER_EMAIL");
+    if (rawEmail && rawEmail.trim().length > 3) {
+      email = rawEmail.trim().toLowerCase();
+    }
+  }
+
+  // หากไม่มีข้อมูลที่เคยบันทึกไว้ในอุปกรณ์นี้ ให้ช่องกรอกว่างไว้เสมอ ไม่สวมสิทธิ์ผู้ใช้ทดสอบ
+  if (!email) {
+    const emailInput = document.getElementById("driverEmailInput");
+    if (emailInput) emailInput.value = "";
+    return;
+  }
 
   try {
-    const driver = JSON.parse(savedData);
-    if (!driver || !driver.email) return;
-
-    const email = driver.email.toLowerCase().trim();
     localStorage.setItem("TTMK_LAST_EMAIL", email);
+    localStorage.setItem("TTMK_SAVED_DRIVER_EMAIL", email);
     renderQuickRecentEmail();
 
-    // แสดงผลข้อมูลที่จำไว้ก่อนเบื้องต้น
-    applyDriverData(driver, true);
+    // แสดงผลข้อมูลที่จำไว้ก่อนเบื้องต้น (ถ้ามีแคช)
+    if (cachedDriver) {
+      applyDriverData(cachedDriver, true);
+    }
 
     // ตรวจสอบความถูกต้องและอัปเดตข้อมูลล่าสุดจากชีต Registered_Drivers เสมอ
     const currentGasUrl = getGasWebAppUrl();
@@ -542,11 +567,15 @@ async function checkAutoLogin() {
           // หากไม่มีในชีต Registered_Drivers แล้ว ให้ยกเลิกการจำข้อมูลอัตโนมัติ
           console.warn("Driver email not found in Registered_Drivers sheet, resetting auto-login.");
           localStorage.removeItem("TTMK_DRIVER_PROFILE");
+          localStorage.removeItem("TTMK_LAST_EMAIL");
+          localStorage.removeItem("TTMK_SAVED_DRIVER_EMAIL");
           appState.driver = null;
           const banner = document.getElementById("autoLoginBanner");
           if (banner) banner.classList.add("hidden");
           const card = document.getElementById("driverProfileCard");
           if (card) card.classList.add("hidden");
+          const emailInput = document.getElementById("driverEmailInput");
+          if (emailInput) emailInput.value = "";
           const btnNext = document.getElementById("btnNextToStep2");
           if (btnNext) {
             btnNext.setAttribute("disabled", "true");
@@ -558,7 +587,7 @@ async function checkAutoLogin() {
       }
     }
   } catch (e) {
-    console.warn("Auto-login parse error:", e);
+    console.warn("Auto-login error:", e);
   }
 }
 
@@ -696,20 +725,27 @@ function initEventListeners() {
  */
 function switchUser() {
   localStorage.removeItem("TTMK_DRIVER_PROFILE");
+  localStorage.removeItem("TTMK_LAST_EMAIL");
+  localStorage.removeItem("TTMK_SAVED_DRIVER_EMAIL");
   appState.driver = null;
-  document.getElementById("autoLoginBanner").classList.add("hidden");
-  document.getElementById("driverProfileCard").classList.add("hidden");
-  document.getElementById("driverEmailInput").value = "";
+  const banner = document.getElementById("autoLoginBanner");
+  if (banner) banner.classList.add("hidden");
+  const card = document.getElementById("driverProfileCard");
+  if (card) card.classList.add("hidden");
+  const emailInput = document.getElementById("driverEmailInput");
+  if (emailInput) emailInput.value = "";
   renderQuickRecentEmail();
 
   const btnNextToStep2 = document.getElementById("btnNextToStep2");
-  btnNextToStep2.setAttribute("disabled", "true");
-  btnNextToStep2.className = "w-full py-3 px-4 bg-slate-300 text-slate-500 font-semibold rounded-xl text-sm transition shadow flex items-center justify-center space-x-2 cursor-not-allowed";
+  if (btnNextToStep2) {
+    btnNextToStep2.setAttribute("disabled", "true");
+    btnNextToStep2.className = "w-full py-3 px-4 bg-slate-300 text-slate-500 font-semibold rounded-xl text-sm transition shadow flex items-center justify-center space-x-2 cursor-not-allowed";
+  }
 
   Swal.fire({
     icon: "info",
     title: "ออกจากข้อมูลผู้ใช้เดิมแล้ว",
-    text: "ท่านสามารถคลิกเข้าสู่ระบบด่วนด้วยอีเมลเดิม หรือกรอกอีเมลใหม่เพื่อเข้าสู่ระบบ",
+    text: "กรุณาระบุอีเมลพนักงานเพื่อเข้าสู่ระบบใหม่",
     timer: 1500,
     showConfirmButton: false
   });
@@ -788,13 +824,14 @@ async function handleEmailLookup(providedEmail, providedName) {
     Swal.fire({
       icon: "warning",
       title: "กรุณาระบุอีเมลให้ถูกต้อง",
-      text: "โปรดป้อนรูปแบบอีเมลพนักงาน เช่น taweesak.kom@gmail.com",
+      text: "โปรดป้อนรูปแบบอีเมลพนักงาน เช่น driver@gmail.com",
       confirmButtonColor: "#2563eb"
     });
     return;
   }
 
   localStorage.setItem("TTMK_LAST_EMAIL", email);
+  localStorage.setItem("TTMK_SAVED_DRIVER_EMAIL", email);
   renderQuickRecentEmail();
 
   Swal.fire({
@@ -879,7 +916,9 @@ function applyDriverData(driver, isAutoLogin) {
   // บันทึกความจำลง LocalStorage (Remember Me)
   localStorage.setItem("TTMK_DRIVER_PROFILE", JSON.stringify(driver));
   if (driver && driver.email) {
-    localStorage.setItem("TTMK_LAST_EMAIL", driver.email.toLowerCase().trim());
+    const cleanEmail = driver.email.toLowerCase().trim();
+    localStorage.setItem("TTMK_LAST_EMAIL", cleanEmail);
+    localStorage.setItem("TTMK_SAVED_DRIVER_EMAIL", cleanEmail);
     renderQuickRecentEmail();
   }
 
