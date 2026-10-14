@@ -870,7 +870,7 @@
               <i class="fa-solid fa-rotate text-xs"></i>
               <span>ซิงค์ข้อมูล Google Sheet</span>
             </button>
-            <a href="https://drive.google.com/drive/folders/1tfKH6EOBFdG0c4Wm2MPO-R61NP5mAc0c" target="_blank"
+            <a href="https://drive.google.com/drive/folders/1bCPdf6So1ZRz60L_zPFNQo_nEKLleqbS" target="_blank"
                class="px-2.5 py-1.5 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 rounded-lg text-xs font-semibold border border-blue-200 dark:border-blue-800 flex items-center gap-1.5 transition">
               <i class="fa-brands fa-google-drive text-amber-500"></i>
               <span>Drive แอลกอฮอล์</span>
@@ -2312,6 +2312,30 @@
               <i class="fa-solid fa-print text-slate-600 dark:text-slate-300"></i>
               <span>พิมพ์ใบแผนการเดินรถ (A4)</span>
             </button>
+
+            <!-- Sync with Google Sheet Button -->
+            <button type="button" onclick="syncRoutesFromGoogleSheet()"
+                    id="btnSyncRouteSheet"
+                    class="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 font-bold transition border border-emerald-300 dark:border-emerald-700 flex items-center gap-1.5"
+                    title="ดึงข้อมูลเส้นทางล่าสุดจาก Google Sheet: Route_Plans">
+              <i class="fa-solid fa-arrows-rotate text-emerald-600"></i>
+              <span>ซิงค์ Google Sheet</span>
+            </button>
+
+            <!-- Google Drive Quick Folder Links -->
+            <a href="https://drive.google.com/drive/folders/1oaFFK-Xt35bnKUiLBJ3eJXeG12Npvnui" target="_blank"
+               class="px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 text-amber-800 dark:text-amber-300 font-bold transition border border-amber-300 dark:border-amber-800 flex items-center gap-1.5 text-xs"
+               title="เปิดโฟลเดอร์ Google Drive: 01_Route_Plans_PDF">
+              <i class="fa-brands fa-google-drive text-amber-600"></i>
+              <span>Drive: ใบแผนงาน PDF</span>
+            </a>
+
+            <a href="https://drive.google.com/drive/folders/1V54IZ4H7w_rx0la5jFnfCxaoJICBmNfx" target="_blank"
+               class="px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 text-purple-800 dark:text-purple-300 font-bold transition border border-purple-300 dark:border-purple-800 flex items-center gap-1.5 text-xs"
+               title="เปิดโฟลเดอร์ Google Drive: 02_Rest_Stop_Evidence">
+              <i class="fa-solid fa-images text-purple-600"></i>
+              <span>Drive: รูปจุดพัก</span>
+            </a>
           </div>
         </div>
 
@@ -4323,7 +4347,10 @@
       GAS_URL: "https://script.google.com/macros/s/AKfycbxbyJ1yWNodowMh-OLxqBuFvH-Pk-TLwg7dRv_lwT7bbTJBu5MH_lhqxE3KwJ7lDH407g/exec",
       GAS_TRUCK_URL: "https://script.google.com/macros/s/AKfycbwvZxSw_p62y6ZwegF8iUiEdxyEJrF01yB37AumDHwgLcSFBoRSZUmwgvdtLJ-6hCFE/exec",
       GAS_MAINTENANCE_URL: "https://script.google.com/macros/s/AKfycbxkyA3Ion2-rStHiNbiRhDGF105yy71O41LKdSH79CXyLw94ukyOoKBRUPj6dYZAmWn/exec",
-      DRIVE_FOLDER_ALCOHOL: "1tfKH6EOBFdG0c4Wm2MPO-R61NP5mAc0c",
+      DRIVE_ROOT: "1lM3KyJTSNvQlHWzbCVLS8QLlfQTfgpi0",
+      DRIVE_FOLDER_ROUTE_PLANS: "1oaFFK-Xt35bnKUiLBJ3eJXeG12Npvnui",
+      DRIVE_FOLDER_REST_STOPS: "1V54IZ4H7w_rx0la5jFnfCxaoJICBmNfx",
+      DRIVE_FOLDER_ALCOHOL: "1bCPdf6So1ZRz60L_zPFNQo_nEKLleqbS",
       DRIVE_FOLDER_TRUCK: "1ryLhwkO1lnv-2qgLbDDl0XyVaq8S2Szs",
       DRIVE_FOLDER_MAINTENANCE: "1YRkTR9dMz0PxKgF60edVF56Ckq909fMF"
     };
