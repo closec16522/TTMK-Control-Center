@@ -392,22 +392,29 @@
         <span class="flex-1 text-left">5. พลังงาน & ESG</span>
       </button>
 
-      <!-- 6. ปฏิทินจัดคิวรถ -->
+      <!-- 6. วางแผนการเดินรถ & จุดพักตามกฎหมาย (Route & Trip Planning) -->
+      <button onclick="switchTab('route-planning')" id="nav-route-planning" class="sidebar-item">
+        <i class="fa-solid fa-route w-5 text-center mr-2 text-blue-500"></i>
+        <span class="flex-1 text-left">6. วางแผนการเดินรถ & จุดพัก</span>
+        <span class="bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-blue-500/20">My Maps</span>
+      </button>
+
+      <!-- 7. ปฏิทินจัดคิวรถ -->
       <button onclick="switchTab('dispatch')" id="nav-dispatch" class="sidebar-item">
         <i class="fa-solid fa-calendar-days w-5 text-center mr-2 text-amber-500"></i>
-        <span class="flex-1 text-left">6. ปฏิทินจัดคิวรถ</span>
+        <span class="flex-1 text-left">7. ปฏิทินจัดคิวรถ</span>
       </button>
 
-      <!-- 7. Driver POD App -->
+      <!-- 8. Driver POD App -->
       <button onclick="switchTab('driver')" id="nav-driver" class="sidebar-item">
         <i class="fa-solid fa-mobile-screen-button w-5 text-center mr-2 text-indigo-500"></i>
-        <span class="flex-1 text-left">7. Driver POD App</span>
+        <span class="flex-1 text-left">8. Driver POD App</span>
       </button>
 
-      <!-- 8. ตั้งค่า & ผู้ใช้งาน -->
+      <!-- 9. ตั้งค่า & ผู้ใช้งาน -->
       <button onclick="switchTab('settings')" id="nav-settings" class="sidebar-item">
         <i class="fa-solid fa-sliders w-5 text-center mr-2 text-slate-500"></i>
-        <span class="flex-1 text-left">8. ตั้งค่า & ผู้ใช้งาน</span>
+        <span class="flex-1 text-left">9. ตั้งค่า & ผู้ใช้งาน</span>
       </button>
 
       <!-- Connected Ecosystem Sub-apps Section -->
@@ -560,7 +567,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
           
           <!-- KPI 1: งานรอจัดส่ง / รอตรวจความพร้อม -->
-          <div class="glass-panel p-3.5 flex flex-col justify-between">
+          <div class="glass-panel p-3.5 flex flex-col justify-between group relative cursor-help hover:border-amber-400/80 transition-all">
             <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
               <span class="text-xs font-semibold">งานรอจัดส่ง</span>
               <div class="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-500 flex items-center justify-center text-xs">
@@ -571,10 +578,24 @@
               <span id="kpiPendingShipmentCount" class="text-2xl font-extrabold text-slate-800 dark:text-white font-digital">0</span>
               <span id="kpiPendingShipmentSub" class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block mt-0.5">พิจารณายืนยัน</span>
             </div>
+
+            <!-- Hover Tooltip -->
+            <div class="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 bottom-[105%] mb-2 w-64 p-3 rounded-xl bg-slate-900/95 text-white text-[11px] leading-relaxed shadow-2xl border border-slate-700/80 pointer-events-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div class="flex items-center gap-1.5 font-bold text-amber-400 mb-1">
+                <i class="fa-solid fa-clock"></i>
+                <span>งานรอจัดส่ง / รอตรวจความพร้อม</span>
+              </div>
+              <p class="text-slate-300">จำนวนรถบรรทุก 6 ล้อ ที่ผ่านการตรวจสภาพและแอลกอฮอล์ มีสถานะ <b>"พร้อมใช้งาน"</b> หรือออเดอร์งานที่รอยืนยันคิวปล่อยรถ เพื่อเตรียมพร้อมรับงานรอบถัดไป</p>
+              <div class="mt-2 pt-1.5 border-t border-slate-800 flex justify-between text-[9.5px] text-slate-400 font-mono">
+                <span>ที่มา: Fleet_Vehicles Sheet</span>
+                <span class="text-amber-400 font-bold">เกณฑ์ SCG</span>
+              </div>
+              <div class="hidden sm:block absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900/95"></div>
+            </div>
           </div>
 
           <!-- KPI 2: กำลังขนส่ง / กำลังวิ่งงานจริง -->
-          <div class="glass-panel p-3.5 flex flex-col justify-between">
+          <div class="glass-panel p-3.5 flex flex-col justify-between group relative cursor-help hover:border-blue-400/80 transition-all">
             <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
               <span class="text-xs font-semibold">กำลังขนส่ง</span>
               <div class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-500 flex items-center justify-center text-xs">
@@ -585,10 +606,24 @@
               <span id="kpiInTransitCount" class="text-2xl font-extrabold text-blue-700 dark:text-blue-400 font-digital">0</span>
               <span id="kpiInTransitSub" class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold block mt-0.5">SCGJWD วิ่งงานจริง</span>
             </div>
+
+            <!-- Hover Tooltip -->
+            <div class="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 bottom-[105%] mb-2 w-64 p-3 rounded-xl bg-slate-900/95 text-white text-[11px] leading-relaxed shadow-2xl border border-slate-700/80 pointer-events-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div class="flex items-center gap-1.5 font-bold text-blue-400 mb-1">
+                <i class="fa-solid fa-truck-moving"></i>
+                <span>กำลังขนส่ง (In Transit)</span>
+              </div>
+              <p class="text-slate-300">จำนวนรถบรรทุก 6 ล้อ และรถบรรทุกไฟฟ้า EV 100% ที่กำลังวิ่งปฏิบัติหน้าที่บนเส้นทางส่งสินค้าจริงของ SCGJWD แบบ Real-time ณ ปัจจุบัน</p>
+              <div class="mt-2 pt-1.5 border-t border-slate-800 flex justify-between text-[9.5px] text-slate-400 font-mono">
+                <span>ที่มา: สถานะ "กำลังวิ่งงาน" & GPS</span>
+                <span class="text-blue-400 font-bold">วิ่งงานจริง</span>
+              </div>
+              <div class="hidden sm:block absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900/95"></div>
+            </div>
           </div>
 
           <!-- KPI 3: ส่งสำเร็จเดือนนี้ / เที่ยววิ่งเสร็จสิ้น -->
-          <div class="glass-panel p-3.5 flex flex-col justify-between">
+          <div class="glass-panel p-3.5 flex flex-col justify-between group relative cursor-help hover:border-emerald-400/80 transition-all">
             <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
               <span class="text-xs font-semibold">ส่งสำเร็จเดือนนี้</span>
               <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-500 flex items-center justify-center text-xs">
@@ -599,10 +634,24 @@
               <span id="kpiDeliveredMonthCount" class="text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 font-digital">0</span>
               <span id="kpiDeliveredMonthSub" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold block mt-0.5">เที่ยววิ่งสำเร็จ</span>
             </div>
+
+            <!-- Hover Tooltip -->
+            <div class="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 bottom-[105%] mb-2 w-64 p-3 rounded-xl bg-slate-900/95 text-white text-[11px] leading-relaxed shadow-2xl border border-slate-700/80 pointer-events-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div class="flex items-center gap-1.5 font-bold text-emerald-400 mb-1">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>ส่งสำเร็จเดือนนี้ (Delivered Trips)</span>
+              </div>
+              <p class="text-slate-300">จำนวนเที่ยววิ่งขนส่งสินค้าที่ส่งมอบปลายทางเสร็จสมบูรณ์แล้วในรอบเดือนปัจจุบัน (ตุลาคม 2569) ตามรอบบันทึกการส่งมอบงาน</p>
+              <div class="mt-2 pt-1.5 border-t border-slate-800 flex justify-between text-[9.5px] text-slate-400 font-mono">
+                <span>ที่มา: Master Billing Sheets & Logs</span>
+                <span class="text-emerald-400 font-bold">ต.ค. 2569</span>
+              </div>
+              <div class="hidden sm:block absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900/95"></div>
+            </div>
           </div>
 
           <!-- KPI 4: รายได้รวมเดือนนี้ / ยอดตั้งเบิกสะสม -->
-          <div class="glass-panel p-3.5 flex flex-col justify-between">
+          <div class="glass-panel p-3.5 flex flex-col justify-between group relative cursor-help hover:border-purple-400/80 transition-all">
             <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
               <span class="text-xs font-semibold">รายได้รวมเดือนนี้</span>
               <div class="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-950/50 text-purple-500 flex items-center justify-center text-xs">
@@ -613,10 +662,24 @@
               <span id="kpiRevenueMonthCount" class="text-2xl font-extrabold text-purple-700 dark:text-purple-400 font-digital">฿0</span>
               <span id="kpiRevenueMonthSub" class="text-[10px] text-purple-600 dark:text-purple-400 font-semibold block mt-0.5">ยอดตั้งเบิกรวม</span>
             </div>
+
+            <!-- Hover Tooltip -->
+            <div class="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 bottom-[105%] mb-2 w-64 p-3 rounded-xl bg-slate-900/95 text-white text-[11px] leading-relaxed shadow-2xl border border-slate-700/80 pointer-events-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div class="flex items-center gap-1.5 font-bold text-purple-400 mb-1">
+                <i class="fa-solid fa-wallet"></i>
+                <span>รายได้รวมเดือนนี้ (Total Revenue)</span>
+              </div>
+              <p class="text-slate-300">ยอดเงินตั้งเบิกค่าขนส่งสะสมของกองรถ TTMK ในเดือนปัจจุบัน คำนวณจากไฟล์ตั้งเบิก Master Billing Sheets และเที่ยววิ่งจริง</p>
+              <div class="mt-2 pt-1.5 border-t border-slate-800 flex justify-between text-[9.5px] text-slate-400 font-mono">
+                <span>ที่มา: รวมยอด Amount ใน 15 Feeds</span>
+                <span class="text-purple-400 font-bold">SCGJWD Feed</span>
+              </div>
+              <div class="hidden sm:block absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900/95"></div>
+            </div>
           </div>
 
           <!-- KPI 5: On-Time Rate / ความพร้อมกองรถ -->
-          <div class="glass-panel p-3.5 flex flex-col justify-between">
+          <div class="glass-panel p-3.5 flex flex-col justify-between group relative cursor-help hover:border-blue-400/80 transition-all">
             <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
               <span class="text-xs font-semibold">On-Time Rate</span>
               <div class="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/50 text-blue-500 flex items-center justify-center text-xs">
@@ -627,10 +690,24 @@
               <span id="kpiOnTimeRateValue" class="text-2xl font-extrabold text-blue-800 dark:text-blue-300 font-digital">0.0%</span>
               <span id="kpiOnTimeRateSub" class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold block mt-0.5">มาตรฐาน SCG > 98%</span>
             </div>
+
+            <!-- Hover Tooltip -->
+            <div class="absolute right-0 sm:left-1/2 sm:-translate-x-1/2 bottom-[105%] mb-2 w-64 p-3 rounded-xl bg-slate-900/95 text-white text-[11px] leading-relaxed shadow-2xl border border-slate-700/80 pointer-events-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div class="flex items-center gap-1.5 font-bold text-blue-400 mb-1">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span>On-Time & Safety Compliance Rate</span>
+              </div>
+              <p class="text-slate-300">อัตราความปลอดภัยและความตรงต่อเวลาตามเกณฑ์ SCGJWD (>98%) คำนวณจากเปอร์เซ็นต์ผ่านการตรวจแอลกอฮอล์และความพร้อมของตัวรถ 100%</p>
+              <div class="mt-2 pt-1.5 border-t border-slate-800 flex justify-between text-[9.5px] text-slate-400 font-mono">
+                <span>สูตร: (ตรวจผ่าน ÷ ตรวจทั้งหมด) × 100</span>
+                <span class="text-blue-400 font-bold">SCG > 98%</span>
+              </div>
+              <div class="hidden sm:block absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900/95"></div>
+            </div>
           </div>
 
           <!-- KPI 6: อัตรากินน้ำมัน / ประสิทธิภาพพลังงาน -->
-          <div class="glass-panel p-3.5 flex flex-col justify-between">
+          <div class="glass-panel p-3.5 flex flex-col justify-between group relative cursor-help hover:border-orange-400/80 transition-all">
             <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
               <span class="text-xs font-semibold">อัตรากินน้ำมัน</span>
               <div class="w-7 h-7 rounded-lg bg-orange-50 dark:bg-orange-950/50 text-orange-500 flex items-center justify-center text-xs">
@@ -640,6 +717,20 @@
             <div class="mt-2">
               <span id="kpiFuelRateValue" class="text-2xl font-extrabold text-orange-600 dark:text-orange-400 font-digital">0.0</span>
               <span id="kpiFuelRateSub" class="text-[10px] text-orange-600 dark:text-orange-400 font-semibold block mt-0.5">กม./ลิตร (เกณฑ์ปกติ)</span>
+            </div>
+
+            <!-- Hover Tooltip -->
+            <div class="absolute right-0 sm:left-1/2 sm:-translate-x-1/2 bottom-[105%] mb-2 w-64 p-3 rounded-xl bg-slate-900/95 text-white text-[11px] leading-relaxed shadow-2xl border border-slate-700/80 pointer-events-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div class="flex items-center gap-1.5 font-bold text-orange-400 mb-1">
+                <i class="fa-solid fa-gas-pump"></i>
+                <span>อัตรากินน้ำมันเฉลี่ย (Fuel Rate)</span>
+              </div>
+              <p class="text-slate-300">อัตราสิ้นเปลืองเฉลี่ยของกองรถ 6 ล้อ โดยเกณฑ์มาตรฐาน SCG คือ 5.60 กม./ลิตร ผสานประสิทธิภาพรถบรรทุกไฟฟ้า EV 100% (Zero Emission)</p>
+              <div class="mt-2 pt-1.5 border-t border-slate-800 flex justify-between text-[9.5px] text-slate-400 font-mono">
+                <span>หน่วย: กิโลเมตร / ลิตร (กม./ลิตร)</span>
+                <span class="text-orange-400 font-bold">เกณฑ์ 5.60</span>
+              </div>
+              <div class="hidden sm:block absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900/95"></div>
             </div>
           </div>
 
@@ -703,22 +794,44 @@
                 <i class="fa-solid fa-location-dot"></i>
               </div>
               <div>
-                <h3 class="font-bold text-sm text-slate-800 dark:text-white">Live Vehicle Telemetry & GPS Tracking (Google Maps Thailand)</h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400">ติดตามพิกัดรถ 6 ล้อ ดีเซล และ รถบรรทุกไฟฟ้า EV 100% สดผ่านแผนที่ Google Maps</p>
+                <h3 class="font-bold text-sm text-slate-800 dark:text-white">Live Vehicle Telemetry & Daily Check-in GPS (Google Maps Thailand)</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">อัปเดตวันต่อวัน: แสดงเฉพาะรถที่ Check-in ปฏิบัติงานในวันปัจจุบัน</p>
               </div>
             </div>
 
-            <!-- Map Layer Switcher -->
-            <div class="flex items-center gap-1.5 text-xs">
-              <button type="button" onclick="setMapLayer('roadmap')" class="px-2.5 py-1 rounded-lg font-semibold bg-blue-600 text-white shadow-sm">
-                แผนที่ถนน
-              </button>
-              <button type="button" onclick="setMapLayer('satellite')" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                ดาวเทียม
-              </button>
-              <button type="button" onclick="setMapLayer('terrain')" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                ภูมิประเทศ
-              </button>
+            <!-- Map Controls & Checkin Badge -->
+            <div class="flex items-center flex-wrap gap-2 text-xs">
+              
+              <!-- Daily Checkin Badge -->
+              <span id="liveMapCheckinBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="liveMapCheckinText">กำลังตรวจสอบข้อมูล Check-in วันนี้...</span>
+              </span>
+
+              <!-- Filter: Today only vs All -->
+              <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-800">
+                <button type="button" onclick="setLiveMapFilter('today')" id="btnMapFilterToday"
+                        class="px-2.5 py-1 rounded-md font-bold text-xs bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm transition">
+                  <i class="fa-solid fa-calendar-day mr-1"></i> เฉพาะ Check-in วันนี้
+                </button>
+                <button type="button" onclick="setLiveMapFilter('all')" id="btnMapFilterAll"
+                        class="px-2.5 py-1 rounded-md font-semibold text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
+                  <i class="fa-solid fa-layer-group mr-1"></i> รถทั้งหมดในกอง
+                </button>
+              </div>
+
+              <!-- Map Layer Switcher -->
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="setMapLayer('roadmap')" id="btnLayerRoadmap" class="px-2.5 py-1 rounded-lg font-semibold bg-blue-600 text-white shadow-sm">
+                  แผนที่ถนน
+                </button>
+                <button type="button" onclick="setMapLayer('satellite')" id="btnLayerSatellite" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  ดาวเทียม
+                </button>
+                <button type="button" onclick="setMapLayer('terrain')" id="btnLayerTerrain" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  ภูมิประเทศ
+                </button>
+              </div>
             </div>
           </div>
 
@@ -2149,6 +2262,253 @@
             </div>
           </div>
         </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 6: ระบบวางแผนการเดินรถ & จุดพักตามกฎหมาย (Route & Trip Planning) -->
+      <!-- ============================================================== -->
+      <section id="tab-route-planning" class="tab-content space-y-5">
+        
+        <!-- Header Toolbar -->
+        <div class="glass-panel p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md">
+              <i class="fa-solid fa-route text-lg"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm md:text-base font-bold text-slate-800 dark:text-white">
+                  ระบบวางแผนการเดินรถ & จุดพักรถบรรทุกตามกฎหมาย
+                </h2>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800">
+                  SCGJWD Standards
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                ควบคุมเวลาขับขี่ไม่เกิน 4 ชั่วโมง พักไม่น้อยกว่า 30 นาที • ปั๊มขนาดใหญ่ & จุดพักกรมทางหลวง
+              </p>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center flex-wrap gap-2 text-xs">
+            <a href="https://www.google.com/maps/d/u/0/edit?hl=en&mid=1wYQoJE0xGGZWxAbxNMdtOs9j75t7jUk&ll=11.212460249374791%2C101.21538909999998&z=6"
+               target="_blank"
+               class="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 transition border border-blue-200 dark:border-blue-800 font-bold flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-map-location-dot text-blue-600"></i>
+              <span>เส้นทาง By.TTMK.Saraburi บน Google My Maps</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-0.5"></i>
+            </a>
+
+            <button type="button" onclick="openAddRouteModal()"
+                    class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow flex items-center gap-1.5">
+              <i class="fa-solid fa-plus"></i>
+              <span>เพิ่มเส้นทาง / ลูกค้าใหม่</span>
+            </button>
+
+            <button type="button" onclick="printRoutePlanSheet()"
+                    class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold transition border border-slate-300 dark:border-slate-700 flex items-center gap-1.5">
+              <i class="fa-solid fa-print text-slate-600 dark:text-slate-300"></i>
+              <span>พิมพ์ใบแผนการเดินรถ (A4)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Route Selection Bar -->
+        <div class="glass-panel p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center flex-wrap gap-2.5 flex-1">
+            <label class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-map-pin text-blue-600"></i> เลือกเส้นทางเดินรถ:
+            </label>
+            <select id="routeSelectDropdown" onchange="onSelectRoutePlan(this.value)"
+                    class="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-bold outline-none focus:ring-2 focus:ring-blue-500 max-w-xl flex-1">
+              <!-- Populated dynamically -->
+            </select>
+
+            <select id="routeFeedFilter" onchange="filterRoutePlansByFeed(this.value)"
+                    class="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold outline-none">
+              <option value="ALL">ทุกลุ่มงาน / Feed ทั้งหมด</option>
+              <option value="FEED_01">FEED_01 (ราชบุรี - ชลบุรี)</option>
+              <option value="FEED_02">FEED_02 (สระบุรี - บีฟู้ดส์ ลพบุรี)</option>
+              <option value="FEED_03">FEED_03 (สระบุรี - คาร์กิลล์ โคราช)</option>
+              <option value="FEED_04">FEED_04 (สระบุรี - ไทยคอนเทนเนอร์ ระยอง)</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span id="routeCustomerBadge" class="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-bold border border-indigo-200 dark:border-indigo-800">
+              ลูกค้า: บจก. กลุ่มสยามบรรจุภัณฑ์ โรงงานชลบุรี
+            </span>
+            <span id="routeDateBadge" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono">
+              ทบทวน: 17.09.2567
+            </span>
+          </div>
+        </div>
+
+        <!-- Route KPI Metric Highlights (4 Cards) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+          <div class="glass-panel p-3.5 flex flex-col justify-between">
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold flex items-center justify-between">
+              ระยะทางรวม
+              <i class="fa-solid fa-road text-blue-500"></i>
+            </span>
+            <div class="mt-2">
+              <span id="routeKpiDistance" class="text-2xl font-extrabold text-blue-700 dark:text-blue-400 font-digital">458</span>
+              <span class="text-[10px] text-blue-600 font-semibold block mt-0.5">กิโลเมตร (จุดเริ่มต้นถึงปลายทาง)</span>
+            </div>
+          </div>
+
+          <div class="glass-panel p-3.5 flex flex-col justify-between">
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold flex items-center justify-between">
+              เวลาเดินทางประมาณการ
+              <i class="fa-regular fa-clock text-amber-500"></i>
+            </span>
+            <div class="mt-2">
+              <span id="routeKpiTime" class="text-xl font-extrabold text-slate-800 dark:text-white font-digital">6 - 8 ชม.</span>
+              <span class="text-[10px] text-amber-600 font-semibold block mt-0.5">ไม่รวมเวลาหยุดพักตามกฎหมาย</span>
+            </div>
+          </div>
+
+          <div class="glass-panel p-3.5 flex flex-col justify-between">
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold flex items-center justify-between">
+              ความเร็วควบคุม (SCG Speed)
+              <i class="fa-solid fa-gauge-high text-emerald-500"></i>
+            </span>
+            <div class="mt-2">
+              <span id="routeKpiSpeed" class="text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 font-digital">≤ 80</span>
+              <span class="text-[10px] text-emerald-600 font-semibold block mt-0.5">กม./ชม. (จำกัดความเร็ว GPS)</span>
+            </div>
+          </div>
+
+          <div class="glass-panel p-3.5 flex flex-col justify-between">
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold flex items-center justify-between">
+              เกณฑ์พักรถตามกฎหมาย
+              <i class="fa-solid fa-shield-halved text-purple-500"></i>
+            </span>
+            <div class="mt-2">
+              <span id="routeKpiRestStops" class="text-2xl font-extrabold text-purple-700 dark:text-purple-400 font-digital">4 จุด</span>
+              <span class="text-[10px] text-purple-600 font-semibold block mt-0.5">ขับ ≤ 4 ชม. พัก ≥ 30 นาที</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Google Map for Selected Route -->
+        <div class="glass-panel p-4 md:p-5 space-y-3">
+          <div class="flex flex-wrap items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 gap-2">
+            <div>
+              <h3 id="routeMapTitle" class="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-map-location-dot text-blue-600"></i>
+                <span>แผนที่เส้นทางจริง & จุดพักรถบรรทุก (Google Maps Thailand)</span>
+              </h3>
+              <p id="routeMapRoadsText" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                ถนนเพชรเกษม (ทางหลวงหมายเลข 4), ถนนบรมราชชนนี, ถนนบางนา-ตราด, ถนนสุขุมวิท
+              </p>
+            </div>
+
+            <!-- Route Map Layer Switcher -->
+            <div class="flex items-center gap-1.5 text-xs">
+              <button type="button" onclick="setRouteMapLayer('roadmap')" id="btnRouteLayerRoadmap" class="px-2.5 py-1 rounded-lg font-semibold bg-blue-600 text-white shadow-sm">
+                แผนที่ถนน
+              </button>
+              <button type="button" onclick="setRouteMapLayer('satellite')" id="btnRouteLayerSatellite" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                ดาวเทียม
+              </button>
+              <button type="button" onclick="setRouteMapLayer('terrain')" id="btnRouteLayerTerrain" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                ภูมิประเทศ
+              </button>
+            </div>
+          </div>
+
+          <div id="routePlanningMap" class="w-full h-80 md:h-96 rounded-xl border border-slate-200 dark:border-slate-700 z-10"></div>
+        </div>
+
+        <!-- SCGJWD Official Route & Rest Stops Table (ตามรูปภาพ 4 & 5) -->
+        <div class="glass-panel p-4 sm:p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-900 text-white font-mono">SCGJWD LOGISTICS</span>
+                <h3 id="routeTableTitle" class="font-extrabold text-sm md:text-base text-slate-800 dark:text-white">
+                  แผนจุดพักรถสำหรับเส้นทาง: โรงงานสยามบรรจุภัณฑ์ (TCRB) ราชบุรี – บริษัท กลุ่มสยามบรรจุภัณฑ์ จำกัด โรงงานชลบุรี
+                </h3>
+              </div>
+              <p id="routeTableMeta" class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                ถนนเพชรเกษม (ทล.4) • วันที่ทบทวน: 17.09.2567 • ผู้จัดทำ: Nichanan Aj.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2 text-xs">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-800">
+                <i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> ผ่านเกณฑ์ความปลอดภัย TSM
+              </span>
+            </div>
+          </div>
+
+          <!-- The Table -->
+          <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead class="bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th class="py-3 px-3 text-center w-12">จุดที่</th>
+                  <th class="py-3 px-3">ชื่อจุด / สถานที่</th>
+                  <th class="py-3 px-3 w-32">ตำแหน่ง (พิกัด GPS)</th>
+                  <th class="py-3 px-3 w-40">หมายเลขถนน</th>
+                  <th class="py-3 px-3 text-center w-28">ระยะทางช่วง (กม.)</th>
+                  <th class="py-3 px-3">ข้อแนะนำ</th>
+                  <th class="py-3 px-3">จุดที่ต้องระวัง</th>
+                  <th class="py-3 px-3 text-center w-28">ภาพถ่ายสถานที่</th>
+                </tr>
+              </thead>
+              <tbody id="routePlanTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900/60">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Safety Protocols & Emergency Shoulder Parking Box (ตรงตามรูปภาพ 4) -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-2">
+            
+            <!-- Left: Legal Compliance & Route Note -->
+            <div class="lg:col-span-2 p-4 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 text-xs space-y-2">
+              <div class="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-bold">
+                <i class="fa-solid fa-scale-balanced text-sm"></i>
+                <span>ข้อกำหนดตามกฎหมาย & มาตรฐานความปลอดภัย SCGJWD Logistics</span>
+              </div>
+              <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300 leading-relaxed">
+                <li><strong>พ.ร.บ.การขนส่งทางบก พ.ศ. 2522:</strong> ผู้ขับขี่รถบรรทุกต้องหยุดพักไม่น้อยกว่า <strong>30 นาที</strong> หลังจากขับรถติดต่อกันครบ <strong>4 ชั่วโมง</strong> และในรอบ 24 ชั่วโมง ขับขี่รวมต้องไม่เกินเวลาที่กฎหมายกำหนด</li>
+                <li><strong>ข้อแนะนำความปลอดภัย SCGJWD:</strong> แนะนำให้หยุดพักรถทุกๆ <strong>2 ชั่วโมง</strong> หรือที่จุดพักรถที่ระบุไว้ในตารางเพื่อตรวจเช็คความพร้อมของรถ (ยาง, ระบบเบรก, สายรัดสินค้า)</li>
+                <li><strong>การควบคุมความเร็ว:</strong> ขับขี่ด้วยความเร็วไม่เกิน <strong>80 กม./ชม.</strong> และตรวจสอบระบบ GPS Tracking ตลอดเส้นทาง</li>
+              </ul>
+            </div>
+
+            <!-- Right: Emergency Shoulder Parking Protocol -->
+            <div class="p-4 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 text-xs space-y-2">
+              <div class="flex items-center gap-2 text-amber-900 dark:text-amber-300 font-bold">
+                <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+                <span>ภาพประกอบการจอดรถไหล่ทาง เมื่อเกิดภาวะฉุกเฉิน</span>
+              </div>
+              <div class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-amber-200 dark:border-amber-800 text-[11px] text-slate-700 dark:text-slate-300 space-y-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-[10px]">1</span>
+                  <span>เปิดไฟฉุกเฉิน (Hazard Lights) ทันทีที่จอดชิดไหล่ทาง</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-[10px]">2</span>
+                  <span>วางกรวยยาง/ป้ายเตือนสะท้อนแสง <strong>จุดที่ 1 ห่าง 5 เมตร</strong> ท้ายรถ</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-[10px]">3</span>
+                  <span>วางกรวยยาง/ป้ายเตือนสะท้อนแสง <strong>จุดที่ 2 ห่าง 50 เมตร</strong> ท้ายรถ</span>
+                </div>
+                <p class="text-[10px] text-amber-700 dark:text-amber-400 font-semibold pt-1 border-t border-amber-100 dark:border-amber-800">
+                  ⚠️ ติดตั้งอุปกรณ์เตือนภัยเพื่อให้รถคันอื่นเห็นในระยะปลอดภัยก่อนถึงตัวรถ
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </section>
 
       <!-- ============================================================== -->
@@ -3654,6 +4014,191 @@
     </div>
   </div>
 
+  <!-- ============================================================== -->
+  <!-- MODAL 7: Route Plan Add / Edit Manager Modal                     -->
+  <!-- ============================================================== -->
+  <div id="routePlanModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="glass-panel max-w-4xl w-full p-4 sm:p-6 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl max-h-[94vh] flex flex-col my-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 gap-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg shadow-sm">
+            <i class="fa-solid fa-route"></i>
+          </div>
+          <div>
+            <h3 id="routeModalTitle" class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+              เพิ่ม / แก้ไขข้อมูลเส้นทางเดินรถ & จุดพัก (Route Plan Manager)
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              กำหนดจุดพักรถปั๊มมาตรฐาน & ทางหลวง ตามเกณฑ์ขับขี่ไม่เกิน 4 ชม. พัก ≥ 30 นาที
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAddRouteModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Form Body (Scrollable) -->
+      <form id="routePlanForm" onsubmit="event.preventDefault(); saveRouteFromModal();" class="flex-1 overflow-y-auto p-1 pr-2 space-y-4 text-xs my-3">
+        <input type="hidden" id="routeModalEditId" value="">
+
+        <!-- Basic Info Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">ชื่อเส้นทางเดินรถ *</label>
+            <input type="text" id="routeFormName" required placeholder="เช่น ต้นทาง TCSB สระบุรี ปลายทาง บริษัท บีฟู้ดส์..."
+                   class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-bold outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">กลุ่มงาน / Feed *</label>
+            <input type="text" id="routeFormFeed" required placeholder="เช่น FEED_02"
+                   class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-mono outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">ชื่อลูกค้า (Customer) *</label>
+            <input type="text" id="routeFormCustomer" required placeholder="เช่น บจก.กลุ่มสยามบรรจุภัณฑ์"
+                   class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">เส้นทาง ถนนสายหลัก *</label>
+            <input type="text" id="routeFormRoads" required placeholder="เช่น ถนนเพชรเกษม (ทล.4), ทล.บางนา-ตราด"
+                   class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">จำกัดความเร็ว (กม./ชม.)</label>
+            <input type="number" id="routeFormSpeed" value="80" max="90" min="40"
+                   class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-bold outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">ผู้จัดทำ / ทบทวน</label>
+            <input type="text" id="routeFormReviewer" value="Nichanan Aj. (SCGJWD)"
+                   class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+
+        <!-- Waypoints & Rest Stops Builder -->
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-map-pin text-rose-500"></i>
+                <span>กำหนดจุดแวะ & จุดพักรถบรรทุกตามลำดับ</span>
+              </h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                แต่ละช่วงระยะทางต้องไม่เกินเกณฑ์ขับขี่ต่อเนื่องตามกฎหมาย (ไม่เกิน 180-200 กม. หรือ 4 ชั่วโมง)
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="addRoutePointRow()"
+                      class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center gap-1 shadow-sm">
+                <i class="fa-solid fa-plus text-xs"></i> เพิ่มจุด
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Points Table inside Modal -->
+          <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-700">
+                <tr>
+                  <th class="py-2.5 px-2 text-center w-10">ลำดับ</th>
+                  <th class="py-2.5 px-2 w-48">ชื่อจุด / ปั๊ม / สถานที่ *</th>
+                  <th class="py-2.5 px-2 w-28">ประเภท</th>
+                  <th class="py-2.5 px-2 w-36">พิกัด GPS (Lat, Lng)</th>
+                  <th class="py-2.5 px-2 w-32">ถนน / ทล.</th>
+                  <th class="py-2.5 px-2 text-center w-24">ระยะช่วง (กม.)</th>
+                  <th class="py-2.5 px-2">ข้อแนะนำ & จุดระวัง</th>
+                  <th class="py-2.5 px-2 text-center w-12">ลบ</th>
+                </tr>
+              </thead>
+              <tbody id="modalRoutePointsTbody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Realtime Compliance Warning Notice -->
+          <div id="routeComplianceAlert" class="hidden p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-base"></i>
+            <span id="routeComplianceAlertText">ตรวจพบช่วงระยะทางเกิน 180 กม. หรือขับเกิน 4 ชม. กรุณาเพิ่มจุดพักรถตามกฎหมาย!</span>
+          </div>
+        </div>
+
+        <!-- Modal Submit Actions -->
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2.5">
+          <button type="button" onclick="closeAddRouteModal()"
+                  class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-semibold transition">
+            ยกเลิก
+          </button>
+          <button type="submit"
+                  class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-md flex items-center gap-1.5">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>บันทึกเส้นทางเดินรถ</span>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL 8: Printable Route Plan Sheet Modal (A4 Standard)          -->
+  <!-- ============================================================== -->
+  <div id="routePlanPrintModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto print-modal-container">
+    <div class="glass-panel max-w-5xl w-full p-4 sm:p-6 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl max-h-[96vh] flex flex-col my-auto print-modal-box">
+      
+      <!-- Modal Header (Hidden on print) -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 no-print gap-3">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fa-solid fa-print"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+              พิมพ์แผนการเดินรถ & จุดพักมาตรฐาน A4 (Route Plan Sheet)
+            </h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+              จัดรูปแบบเอกสาร SCGJWD Logistics พร้อมตารางจุดพักรถ และคู่มือจอดฉุกเฉิน
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="window.print()"
+                  class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow transition flex items-center gap-1.5">
+            <i class="fa-solid fa-print"></i>
+            <span>สั่งพิมพ์เอกสาร (Ctrl+P)</span>
+          </button>
+          <button type="button" onclick="closeRoutePlanPrintModal()"
+                  class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Document Canvas -->
+      <div id="routePlanPrintableArea" class="flex-1 overflow-y-auto p-4 sm:p-6 my-2 bg-white text-black font-sans text-xs">
+        <!-- Rendered dynamically by printRoutePlanSheet() -->
+      </div>
+
+      <!-- Modal Footer (Hidden on print) -->
+      <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between no-print text-xs">
+        <span class="text-slate-500 dark:text-slate-400 text-[11px]">
+          💡 แนะนำให้ตั้งค่าหน้าพิมพ์: Orientation: Landscape หรือ Portrait, Scale: Fit to page width
+        </span>
+        <button type="button" onclick="closeRoutePlanPrintModal()"
+                class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold transition">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- App Script Logic -->
   <script>
     const CONFIG = {
@@ -3676,7 +4221,13 @@
       currentTab: 'overview',
       leafletMap: null,
       mapTileLayer: null,
-      fleetMarkersLayer: null
+      fleetMarkersLayer: null,
+      routes: [],
+      currentRouteId: 'ROUTE-001',
+      routePlanningMap: null,
+      routeMapTileLayer: null,
+      routeMarkersLayer: null,
+      routePolylineLayer: null
     };
 
     const TAB_TITLES = {
@@ -3689,6 +4240,7 @@
       'import-billing': 'ศูนย์นำเข้าไฟล์ตั้งเบิก แยก Feed & พิมพ์สรุปยอดวิ่ง/วางบิล (Billing Import Portal)',
       fleet: 'ข้อมูลกองรถ 6 ล้อ (ดีเซล/EV) & ทะเบียนคนขับรถจริง (Enterprise ERP)',
       esg: 'การจัดการพลังงานและลดคาร์บอน (ESG & Green Logistics)',
+      'route-planning': 'ระบบวางแผนการเดินรถ & จุดพักรถบรรทุกตามกฎหมาย (Route & Trip Planning)',
       dispatch: 'ปฏิทินจัดคิวและกระจายเที่ยววิ่ง (Visual Dispatch Calendar)',
       driver: 'Mobile Driver App Simulator (POD สำหรับคนขับ)',
       settings: 'การตั้งค่าระบบและคีย์ความปลอดภัย (System_Config)'
@@ -3731,6 +4283,17 @@
             }
             if (typeof updateOverviewKpisAndCharts === 'function') {
               updateOverviewKpisAndCharts();
+            }
+          });
+        }
+
+        if (tabName === 'route-planning') {
+          requestAnimationFrame(() => {
+            if (typeof initRoutePlanning === 'function') {
+              initRoutePlanning();
+            }
+            if (appState.routePlanningMap) {
+              appState.routePlanningMap.invalidateSize();
             }
           });
         }
@@ -7475,8 +8038,24 @@
 
     // =========================================================================
     // LIVE VEHICLE TELEMETRY & GPS TRACKING (Google Maps Thailand)
-    // Synchronized with latest Alcohol_Logs GPS per vehicle plate
+    // Day-by-Day Daily Filter: Displays ONLY vehicles checked in TODAY
     // =========================================================================
+    function setLiveMapFilter(mode) {
+      appState.mapFilterMode = mode;
+      const btnToday = document.getElementById('btnMapFilterToday');
+      const btnAll = document.getElementById('btnMapFilterAll');
+      if (btnToday && btnAll) {
+        if (mode === 'today') {
+          btnToday.className = 'px-2.5 py-1 rounded-md font-bold text-xs bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm transition';
+          btnAll.className = 'px-2.5 py-1 rounded-md font-semibold text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
+        } else {
+          btnAll.className = 'px-2.5 py-1 rounded-md font-bold text-xs bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm transition';
+          btnToday.className = 'px-2.5 py-1 rounded-md font-semibold text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition';
+        }
+      }
+      renderLiveFleetMap();
+    }
+
     function renderLiveFleetMap() {
       if (!appState.leafletMap) return;
 
@@ -7486,30 +8065,94 @@
         appState.fleetMarkersLayer.clearLayers();
       }
 
-      // 1. Group Alcohol_Logs by vehicle plate to find the LATEST record per plate
-      const latestLogsByPlate = {};
       const allLogs = appState.alcoholLogs || [];
+      const trkLogs = appState.truckLogs || [];
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const todayISO = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`; // 2026-10-14
+      const todaySlash = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`; // 14/10/2026
+      const todayThaiSlash = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear() + 543}`; // 14/10/2569
 
-      // Alcohol logs are sorted newest-first in appState
+      function isLogDateToday(l) {
+        if (!l) return false;
+        const d = String(l.date || '').trim();
+        const ts = String(l.timestamp || '').trim();
+        return d.startsWith(todayISO) || d.startsWith(todaySlash) || d.startsWith(todayThaiSlash) ||
+               ts.startsWith(todayISO) || ts.startsWith(todaySlash) || ts.startsWith(todayThaiSlash);
+      }
+
+      // Group latest logs by plate
+      const latestLogsByPlate = {};
+      const todayLogsByPlate = {};
+      let mostRecentDateStr = '';
+
       allLogs.forEach((log, index) => {
         const rawPlate = (log.vehiclePlate || '').trim();
         if (!rawPlate || rawPlate === '-') return;
         const basePlate = rawPlate.split(' ')[0];
+
         if (!latestLogsByPlate[basePlate]) {
           latestLogsByPlate[basePlate] = { log, index };
+          if (!mostRecentDateStr && log.date) mostRecentDateStr = log.date;
         }
         if (!latestLogsByPlate[rawPlate]) {
           latestLogsByPlate[rawPlate] = { log, index };
         }
+
+        if (isLogDateToday(log)) {
+          if (!todayLogsByPlate[basePlate]) todayLogsByPlate[basePlate] = { log, index };
+          if (!todayLogsByPlate[rawPlate]) todayLogsByPlate[rawPlate] = { log, index };
+        }
       });
 
-      // 2. Fetch fleet vehicles
-      const mappedVehicles = (appState.vehicles && appState.vehicles.length > 0) ? appState.vehicles : DEFAULT_FLEET_VEHICLES;
+      // Also check truck inspection logs for today checkins
+      trkLogs.forEach((trkLog, index) => {
+        const rawPlate = (trkLog.vehiclePlate || trkLog.plate || '').trim();
+        if (!rawPlate || rawPlate === '-') return;
+        const basePlate = rawPlate.split(' ')[0];
+        if (isLogDateToday(trkLog) && !todayLogsByPlate[basePlate]) {
+          todayLogsByPlate[basePlate] = { log: trkLog, index, isTruckLog: true };
+        }
+      });
+
+      const filterMode = appState.mapFilterMode || 'today';
+      const allVehicles = (appState.vehicles && appState.vehicles.length > 0) ? appState.vehicles : DEFAULT_FLEET_VEHICLES;
+      
+      let vehiclesToDisplay = [];
+      const todayPlatesCount = Object.keys(todayLogsByPlate).length;
+
+      const badgeTextEl = document.getElementById('liveMapCheckinText');
+      const badgeContainer = document.getElementById('liveMapCheckinBadge');
+
+      if (filterMode === 'all') {
+        vehiclesToDisplay = allVehicles;
+        if (badgeTextEl) badgeTextEl.textContent = `📋 แสดงรถทั้งหมดในกอง: ${allVehicles.length} คัน`;
+        if (badgeContainer) badgeContainer.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800';
+      } else {
+        // Today mode: Filter to ONLY vehicles that checked in today
+        if (todayPlatesCount > 0) {
+          vehiclesToDisplay = allVehicles.filter(veh => {
+            const basePlate = veh.plate.split(' ')[0];
+            return !!(todayLogsByPlate[basePlate] || todayLogsByPlate[veh.plate]);
+          });
+          if (badgeTextEl) badgeTextEl.textContent = `🟢 Check-in วันนี้ (${todaySlash}): ${vehiclesToDisplay.length} คัน`;
+          if (badgeContainer) badgeContainer.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800';
+        } else {
+          // If no checkin yet today, fallback to latest check-in day with clear notice
+          vehiclesToDisplay = allVehicles.filter(veh => {
+            const basePlate = veh.plate.split(' ')[0];
+            return !!(latestLogsByPlate[basePlate] || latestLogsByPlate[veh.plate]);
+          });
+          if (badgeTextEl) badgeTextEl.textContent = `⚠️ วันนี้ (${todaySlash}) ยังไม่มีรถ Check-in | แสดงรอบตรวจล่าสุด (${mostRecentDateStr || '13 ต.ค.'}: ${vehiclesToDisplay.length} คัน)`;
+          if (badgeContainer) badgeContainer.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800';
+        }
+      }
+
       const bounds = [];
 
-      mappedVehicles.forEach(veh => {
+      vehiclesToDisplay.forEach(veh => {
         const basePlate = veh.plate.split(' ')[0];
-        const logEntry = latestLogsByPlate[basePlate] || latestLogsByPlate[veh.plate];
+        const logEntry = (todayLogsByPlate[basePlate] || todayLogsByPlate[veh.plate]) || (latestLogsByPlate[basePlate] || latestLogsByPlate[veh.plate]);
 
         let lat = null, lng = null;
         let isRealGps = false;
@@ -7520,12 +8163,15 @@
         let driverName = veh.driver || 'พนักงานขับรถประจำ';
         let inspectionTime = 'ล่าสุด วันนี้';
         let googleMapsLink = '';
+        let isCheckedInToday = false;
 
         if (logEntry && logEntry.log) {
           const l = logEntry.log;
           logIndex = logEntry.index;
           if (l.driverName) driverName = l.driverName;
           inspectionTime = l.timestamp || `${l.date || ''} ${l.time || ''}`.trim() || inspectionTime;
+          isCheckedInToday = isLogDateToday(l);
+
           alcoholVal = typeof l.alcoholValue === 'number' ? l.alcoholValue : parseFloat(l.alcoholValue) || 0.0;
           if (l.bpSys && l.bpDia) {
             bpText = `${l.bpSys}/${l.bpDia} mmHg (ชีพจร ${l.bpPulse || 75} bpm)`;
@@ -7575,7 +8221,7 @@
         const isAlcoholAlert = alcoholVal > 0;
         const isBpAlert = bpText.includes('เสี่ยง') || bpText.includes('สูง');
 
-        let pinBg = 'linear-gradient(135deg, #1e40af, #3b82f6)';
+        let pinBg = isCheckedInToday ? 'linear-gradient(135deg, #059669, #10b981)' : 'linear-gradient(135deg, #1e40af, #3b82f6)';
         let pinIcon = 'fa-truck';
         let pinBorder = '#ffffff';
         let typeBadge = isEv ? '⚡ 100% EV' : '⛽ ดีเซล B7 Euro 5';
@@ -7616,7 +8262,7 @@
         ` : '';
 
         marker.bindPopup(`
-          <div style="font-family:'Sarabun',sans-serif; min-width:230px; max-width:290px; padding:2px;">
+          <div style="font-family:'Sarabun',sans-serif; min-width:240px; max-width:300px; padding:2px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; border-bottom:1px solid #e2e8f0; padding-bottom:5px;">
               <strong style="color:#0f172a; font-size:13px; display:flex; align-items:center; gap:5px;">
                 🚚 ${escapeHtml(veh.plate)} ${escapeHtml(veh.province || '')}
@@ -7628,7 +8274,7 @@
 
             <div style="font-size:11px; color:#334155; line-height:1.55;">
               <div>👤 <b>ผู้ขับประจำ:</b> ${escapeHtml(driverName)}</div>
-              <div>🕒 <b>เวลาตรวจล่าสุด:</b> ${escapeHtml(inspectionTime)}</div>
+              <div>🕒 <b>เวลาตรวจ Check-in:</b> ${isCheckedInToday ? '<span style="color:#059669; font-weight:bold;">🟢 วันนี้ (' + escapeHtml(inspectionTime) + ')</span>' : escapeHtml(inspectionTime)}</div>
               <div style="margin-top:4px; padding:5px 7px; background:#f0fdf4; border-radius:7px; border:1px solid #bbf7d0; color:#166534; font-size:11px;">
                 <b>🍺 ผลแอลกอฮอล์:</b> ${alcoholVal.toFixed(2)} mg% (ผ่านเกณฑ์ 100%)<br>
                 <b>💓 ความดัน & ชีพจร:</b> ${escapeHtml(bpText)}
@@ -7679,6 +8325,15 @@
         maxZoom: 20,
         attribution: '&copy; Google Maps'
       }).addTo(appState.leafletMap);
+
+      const bRoad = document.getElementById('btnLayerRoadmap');
+      const bSat = document.getElementById('btnLayerSatellite');
+      const bTer = document.getElementById('btnLayerTerrain');
+      if (bRoad && bSat && bTer) {
+        bRoad.className = type === 'roadmap' ? 'px-2.5 py-1 rounded-lg font-semibold bg-blue-600 text-white shadow-sm' : 'px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+        bSat.className = type === 'satellite' ? 'px-2.5 py-1 rounded-lg font-semibold bg-blue-600 text-white shadow-sm' : 'px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+        bTer.className = type === 'terrain' ? 'px-2.5 py-1 rounded-lg font-semibold bg-blue-600 text-white shadow-sm' : 'px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+      }
     }
 
     // Charts
@@ -8822,6 +9477,953 @@
       if (modal) modal.classList.add('hidden');
     }
 
+// =========================================================================
+// ROUTE & TRIP PLANNING WITH SCGJWD REST STOPS & HIGHWAY COMPLIANCE
+// =========================================================================
+
+const DEFAULT_ROUTE_PLANS = [
+  {
+    id: 'ROUTE-001',
+    name: 'เส้นทางเดินรถราชบุรี TCRB – บจก.กลุ่มสยามบรรจุภัณฑ์ โรงงานชลบุรี',
+    feed: 'FEED_01',
+    customer: 'บจก. กลุ่มสยามบรรจุภัณฑ์ จำกัด (โรงงานชลบุรี)',
+    roads: 'ถนนเพชรเกษม (ทล.4), ถ.บรมราชชนนี, ถ.บางนา-ตราด, ถ.สุขุมวิท',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '17.09.2567',
+    estimatedTime: '6 - 8 ชม.',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCRB) ราชบุรี',
+        lat: 13.5282,
+        lng: 99.8166,
+        road: 'ทล.4 (เพชรเกษม)',
+        distanceKm: 0,
+        recommendation: 'จุดปล่อยรถ/ขึ้นสินค้า ตรวจเช็คเอกสารใบกำกับสินค้า ตรวจความพร้อมพนักงานขับรถ (วัดแอลกอฮอล์/ความดัน) และตรวจสภาพรถ F-CAM-032 ก่อนออกเดินทาง',
+        hazard: 'ระวังรถเข้า-ออกบริเวณปากทางเข้าโรงงาน ใช้ความเร็วไม่เกิน 20 กม./ชม. ในพื้นที่โรงงาน',
+        photoUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 1,
+        type: 'rest',
+        name: 'ปั๊มเอสโซ่ อาร์.เอส.ออยล์นครปฐม',
+        lat: 13.8213,
+        lng: 100.0433,
+        road: 'ทล.4 (เพชรเกษม กม.56)',
+        distanceKm: 56,
+        recommendation: 'จุดพักรถที่ 1: ตรวจเช็คความตึงของสายรัดสินค้า (Lashing), ตรวจเช็คลมยางและอุณหภูมิยาง, ล้างหน้าพักผ่อน 15-30 นาที',
+        hazard: 'จุดกลับรถและทางแยกสัญญาณไฟจราจรช่วงนครปฐม ระวังรถจักรยานยนต์ตัดหน้า',
+        photoUrl: 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 2,
+        type: 'rest',
+        name: 'ปั๊มน้ำมันบางจาก - บจก. สินปิ่นเกล้า',
+        lat: 13.7861,
+        lng: 100.3500,
+        road: 'ถ.บรมราชชนนี (มุ่งหน้าสะพานพระปิ่นเกล้า/กาญจนาภิเษก)',
+        distanceKm: 92,
+        recommendation: 'จุดพักรถที่ 2: หยุดพักผ่อน รับประทานอาหาร ดื่มน้ำ ตรวจเช็คระบบไฟส่องสว่างและสัญญาณเตือนท้ายรถ',
+        hazard: 'ปริมาณการจราจรหนาแน่นช่วงเข้าเขตปริมณฑล/พุทธมณฑล ห้ามใช้ความเร็วเกิน 60 กม./ชม. ในช่องทางคู่ขนาน',
+        photoUrl: 'https://images.unsplash.com/photo-1527018607616-0526648e861c?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 3,
+        type: 'rest',
+        name: 'Shell ออยล์นวงค์ A',
+        lat: 13.5988,
+        lng: 100.6503,
+        road: 'ถ.บางนา-ตราด (ทล.34 กม.22)',
+        distanceKm: 82,
+        recommendation: 'จุดพักรถที่ 3: ตรวจสอบความร้อนของดุมล้อและระบบเบรก, ตรวจเช็ค GPS Tracking, พักสายตาไม่น้อยกว่า 20 นาที',
+        hazard: 'ทางเบี่ยงสะพานกลับรถและจุดขึ้นลงทางด่วนบูรพาวิถี ระวังรถเปลี่ยนเลนกะทันหัน',
+        photoUrl: 'https://images.unsplash.com/photo-1590496793929-36417d3117de?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 4,
+        type: 'rest',
+        name: 'PTT Station ปตท.จิฟฟี่ สาขาฉะเชิงเทรา-บางนา ตราด กม.49',
+        lat: 13.5186,
+        lng: 101.0058,
+        road: 'ถ.บางนา-ตราด (กม.49 ขาออก มุ่งหน้าชลบุรี)',
+        distanceKm: 48,
+        recommendation: 'จุดพักรถที่ 4 (จุดพักสุดท้ายก่อนส่งมอบ): ปั๊มขนาดใหญ่ มีลานจอดรถบรรทุกกว้างขวาง ตรวจเช็คความเรียบร้อยของสินค้าก่อนเข้าโรงงานลูกค้า',
+        hazard: 'จุดชะลอตัวก่อนข้ามแม่น้ำบางปะกง ลมพัดขวางบนสะพาน ให้จับพวงมาลัยสองมือมั่นคง',
+        photoUrl: 'https://images.unsplash.com/photo-1617886903355-9354bb57751f?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 5,
+        type: 'destination',
+        name: 'บจก. กลุ่มสยามบรรจุภัณฑ์ จำกัด โรงงานชลบุรี',
+        lat: 13.3648,
+        lng: 100.9866,
+        road: 'ถ.สุขุมวิท (นิคมอุตสาหกรรมทองโกรว์ / นิคมอมตะซิตี้ ชลบุรี)',
+        distanceKm: 80,
+        recommendation: 'จุดส่งมอบสินค้าปลายทาง: ดับเครื่องยนต์ ดึงเบรกมือ สวมใส่อุปกรณ์ PPE (หมวก, เสื้อสะท้อนแสง, รองเท้าเซฟตี้) ครบชุดก่อนลงจากรถ และส่งมอบเอกสารใบส่งของ (POD)',
+        hazard: 'ทางแยกและทางเข้า-ออกนิคมอุตสาหกรรม มีรถบรรทุกขนาดใหญ่และตู้คอนเทนเนอร์เข้าออกหนาแน่น',
+        photoUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80'
+      }
+    ]
+  },
+  {
+    id: 'ROUTE-002',
+    name: 'เส้นทางสระบุรี TCSB – บริษัท บีฟู้ดส์ โปรดักส์อินเตอร์เนชั่นแนล (ลพบุรี)',
+    feed: 'FEED_02',
+    customer: 'บจก. บีฟู้ดส์ โปรดักส์ อินเตอร์เนชั่นแนล (พัฒนานิคม)',
+    roads: 'ทล.1 (พหลโยธิน) – ทล.21 (สระบุรี - หล่มสัก)',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '15.09.2567',
+    estimatedTime: '2 - 3 ชม.',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
+        lat: 14.5303,
+        lng: 100.9150,
+        road: 'ทล.1 พหลโยธิน กม.105',
+        distanceKm: 0,
+        recommendation: 'จุดขึ้นสินค้า ตรวจสอบสภาพซีลล็อกตู้คอนเทนเนอร์/ผ้าใบคลุม และชั่งน้ำหนักรถก่อนเดินทาง',
+        hazard: 'จุดกลับรถหน้าโรงงานปูนซีเมนต์ ระวังรถบรรทุกหนักชะลอตัว',
+        photoUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 1,
+        type: 'rest',
+        name: 'จุดพักรถ ปตท. แยกบายพาสสระบุรี (PTT Station Bypass)',
+        lat: 14.5680,
+        lng: 100.9250,
+        road: 'ทล.1 เลี่ยงเมืองสระบุรี',
+        distanceKm: 18,
+        recommendation: 'ตรวจสอบลมยางและเช็คระบบไฟเบรกก่อนเข้าสู่ทางหลวงสาย 21',
+        hazard: 'ทางแยกร่วมเลี่ยงเมือง มีรถบรรทุกหักเลี้ยวเลนซ้ายบ่อยครั้ง',
+        photoUrl: 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 2,
+        type: 'rest',
+        name: 'PTT Station ปตท. จิฟฟี่ พัฒนานิคม กม.25',
+        lat: 14.8820,
+        lng: 100.8650,
+        road: 'ทล.21 (สระบุรี-หล่มสัก กม.25)',
+        distanceKm: 46,
+        recommendation: 'จุดพักรถตามเกณฑ์กฎหมาย: พักสายตา 30 นาที ดื่มน้ำ ล้างหน้า ตรวจสอบความปลอดภัยสินค้า',
+        hazard: 'ทางตรงยาว เสี่ยงต่ออาการหลับใน ให้รักษาความเร็วไม่เกิน 80 กม./ชม.',
+        photoUrl: 'https://images.unsplash.com/photo-1617886903355-9354bb57751f?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 3,
+        type: 'destination',
+        name: 'บจก. บีฟู้ดส์ โปรดักส์อินเตอร์เนชั่นแนล (ลพบุรี)',
+        lat: 14.9250,
+        lng: 100.8420,
+        road: 'ซอยเทศบาลตำบลพัฒนานิคม ลพบุรี',
+        distanceKm: 24,
+        recommendation: 'จุดส่งมอบสินค้า: ติดต่อป้อม รปภ. แลกบัตร และเทียบท่าโหลดสินค้าตามช่องที่กำหนด',
+        hazard: 'ทางเข้าแคบ มีรถรับส่งพนักงานและรถเกษตรกรวิ่งสวนทางบ่อย',
+        photoUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80'
+      }
+    ]
+  },
+  {
+    id: 'ROUTE-003',
+    name: 'เส้นทางสระบุรี TCSB – บ.คาร์กิลล์มีทส์ (ไทยแลนด์) โชคชัย โคราช',
+    feed: 'FEED_03',
+    customer: 'บจก. คาร์กิลล์มีทส์ (ไทยแลนด์) โชคชัย',
+    roads: 'ทล.2 (มิตรภาพ) – ทล.24 (โชคชัย - เดชอุดม)',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '16.09.2567',
+    estimatedTime: '3.5 - 5 ชม.',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
+        lat: 14.5303,
+        lng: 100.9150,
+        road: 'ทล.1 / ทล.2 มิตรภาพ',
+        distanceKm: 0,
+        recommendation: 'ขึ้นสินค้า ตรวจเช็คระบบเบรกและเกียร์ก่อนขึ้นเขาดงพญาเย็น',
+        hazard: 'ระวังรถหนาแน่นช่วงทางแยกต่างระดับสระบุรี',
+        photoUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 1,
+        type: 'rest',
+        name: 'จุดพักรถ ปตท. มวกเหล็ก (PTT Station Muak Lek)',
+        lat: 14.6530,
+        lng: 101.1850,
+        road: 'ทล.2 มิตรภาพ กม.35',
+        distanceKm: 42,
+        recommendation: 'จุดพักรถที่ 1: ตรวจเช็คระดับน้ำมันเบรกและลมยาง พักคลายความร้อนของเครื่องยนต์',
+        hazard: 'ทางขึ้นเนินชันและโค้งต่อเนื่อง ระวังรถบรรทุกหนักชะลอความเร็ว',
+        photoUrl: 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 2,
+        type: 'rest',
+        name: 'ปั๊มบางจาก ลำตะคอง คลองไผ่',
+        lat: 14.8620,
+        lng: 101.5580,
+        road: 'ทล.2 มิตรภาพ กม.86 ริมอ่างเก็บน้ำลำตะคอง',
+        distanceKm: 58,
+        recommendation: 'จุดพักรถที่ 2 (จุดพักหลัก): พักผ่อน 30 นาที ดื่มน้ำ ตรวจเช็คสายรัดกล่องสินค้า',
+        hazard: 'ทางลงเขาชันยาวช่วงคลองไผ่ ห้ามใช้เกียร์ว่างเด็ดขาด ใช้ Engine Brake สม่ำเสมอ',
+        photoUrl: 'https://images.unsplash.com/photo-1527018607616-0526648e861c?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 3,
+        type: 'rest',
+        name: 'จุดพักรถ ปตท. บายพาส ปักธงชัย-โชคชัย',
+        lat: 14.8890,
+        lng: 102.0450,
+        road: 'ทล.24 สายโชคชัย-เดชอุดม',
+        distanceKm: 65,
+        recommendation: 'จุดพักรถที่ 3: ตรวจสอบความพร้อมรอบคันก่อนเข้าโรงงานลูกค้าปลายทาง',
+        hazard: 'ทางแยกสัญญาณไฟขนาดใหญ่ มีรถเลี้ยวขวาข้ามเลน',
+        photoUrl: 'https://images.unsplash.com/photo-1617886903355-9354bb57751f?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 4,
+        type: 'destination',
+        name: 'บ.คาร์กิลล์มีทส์ (ไทยแลนด์) อ.โชคชัย',
+        lat: 14.7320,
+        lng: 102.1640,
+        road: 'ถนนโชคชัย-ครบุรี นครราชสีมา',
+        distanceKm: 25,
+        recommendation: 'จุดส่งมอบสินค้า: ผ่านจุดฆ่าเชื้อล้อรถและปฏิบัติตามมาตรฐาน Bio-Security ของโรงงาน',
+        hazard: 'ถนนสายรอง 2 เลนสวน ระวังรถจักรยานยนต์และรถเกษตรกรรม',
+        photoUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80'
+      }
+    ]
+  },
+  {
+    id: 'ROUTE-004',
+    name: 'เส้นทางสระบุรี TCSB – บจก.ไทยคอนเทนเนอร์ ระยอง (มาบตาพุด)',
+    feed: 'FEED_04',
+    customer: 'บจก. ไทยคอนเทนเนอร์ ระยอง (Thai Containers Rayong)',
+    roads: 'ทล.1 – ถนนกาญจนาภิเษก (ทล.9) – มอเตอร์เวย์ (ทล.7) – ทล.36',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '14.09.2567',
+    estimatedTime: '4 - 5.5 ชม.',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
+        lat: 14.5303,
+        lng: 100.9150,
+        road: 'ทล.1 พหลโยธิน',
+        distanceKm: 0,
+        recommendation: 'ขึ้นสินค้า ตรวจเช็คซีลและอุปกรณ์ความปลอดภัยประจำรถ',
+        hazard: 'ปริมาณรถหนาแน่นช่วงเช้า',
+        photoUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 1,
+        type: 'rest',
+        name: 'ปั๊ม ปตท. วังน้อย อยุธยา (PTT Wang Noi)',
+        lat: 14.2320,
+        lng: 100.7150,
+        road: 'ทล.1 กม.65 ขาเข้ากรุงเทพฯ',
+        distanceKm: 45,
+        recommendation: 'จุดพักรถที่ 1: ตรวจเช็คสายรัดและดุมล้อ พักผ่อน 15 นาที',
+        hazard: 'รถบรรทุกเข้า-ออกปั๊มหนาแน่น ให้ระวังทางแยก',
+        photoUrl: 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 2,
+        type: 'rest',
+        name: 'จุดพักรถ มอเตอร์เวย์ M7 บางปะกง (Service Area)',
+        lat: 13.5680,
+        lng: 100.9850,
+        road: 'ทางหลวงพิเศษหมายเลข 7 (Motorway M7 กม.49)',
+        distanceKm: 85,
+        recommendation: 'จุดพักรถทางการกรมทางหลวง: พักผ่อน 30 นาที ตรวจเช็คสภาพร่างกายและยานพาหนะ',
+        hazard: 'รถวิ่งด้วยความเร็วสูงในช่องทางหลัก ชิดซ้ายอย่างปลอดภัยก่อนเลี้ยวเข้าจุดพักรถ',
+        photoUrl: 'https://images.unsplash.com/photo-1590496793929-36417d3117de?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 3,
+        type: 'rest',
+        name: 'ปั๊ม ปตท. มาบข่า-นิคมพัฒนา ระยอง',
+        lat: 12.8250,
+        lng: 101.1850,
+        road: 'ทล.36 (พัทยา-ระยอง)',
+        distanceKm: 68,
+        recommendation: 'จุดพักรถที่ 3: ตรวจเช็คใบส่งของและความพร้อมก่อนเข้านิคมอุตสาหกรรม',
+        hazard: 'ทางแยกร่วมทล.36 มีรถบรรทุกสารเคมีและตู้คอนเทนเนอร์จำนวนมาก',
+        photoUrl: 'https://images.unsplash.com/photo-1617886903355-9354bb57751f?auto=format&fit=crop&w=400&q=80'
+      },
+      {
+        order: 4,
+        type: 'destination',
+        name: 'บจก.ไทยคอนเทนเนอร์ ระยอง (นิคมมาบตาพุด)',
+        lat: 12.7210,
+        lng: 101.1450,
+        road: 'นิคมอุตสาหกรรมมาบตาพุด ระยอง',
+        distanceKm: 22,
+        recommendation: 'จุดส่งมอบสินค้า: ปฏิบัติตามกฎความปลอดภัยเข้มงวดของนิคมอุตสาหกรรม ดับเครื่องทันทีที่เทียบท่า',
+        hazard: 'พื้นที่ควบคุมสารเคมีและความปลอดภัยสูง ขับขี่ความเร็วไม่เกิน 30 กม./ชม. ภายในนิคม',
+        photoUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80'
+      }
+    ]
+  }
+];
+
+function initRoutePlanning() {
+  const saved = localStorage.getItem('TTMK_ROUTE_PLANS');
+  if (saved) {
+    try {
+      appState.routes = JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to parse saved route plans, reverting to defaults:', e);
+      appState.routes = JSON.parse(JSON.stringify(DEFAULT_ROUTE_PLANS));
+    }
+  } else {
+    appState.routes = JSON.parse(JSON.stringify(DEFAULT_ROUTE_PLANS));
+    localStorage.setItem('TTMK_ROUTE_PLANS', JSON.stringify(appState.routes));
+  }
+
+  if (!appState.routes || appState.routes.length === 0) {
+    appState.routes = JSON.parse(JSON.stringify(DEFAULT_ROUTE_PLANS));
+  }
+
+  if (!appState.currentRouteId || !appState.routes.some(r => r.id === appState.currentRouteId)) {
+    appState.currentRouteId = appState.routes[0].id;
+  }
+
+  // Populate Dropdown
+  const select = document.getElementById('routeSelectDropdown');
+  if (select) {
+    select.innerHTML = appState.routes.map(r => {
+      return `<option value="${escapeHtml(r.id)}" ${r.id === appState.currentRouteId ? 'selected' : ''}>[${escapeHtml(r.feed)}] ${escapeHtml(r.name)}</option>`;
+    }).join('');
+  }
+
+  // Initialize Map if needed
+  if (!appState.routePlanningMap && typeof L !== 'undefined') {
+    const mapEl = document.getElementById('routePlanningMap');
+    if (mapEl) {
+      appState.routePlanningMap = L.map('routePlanningMap', {
+        zoomControl: true,
+        attributionControl: false
+      }).setView([13.6, 100.5], 8);
+
+      setRouteMapLayer('roadmap');
+      appState.routeMarkersLayer = L.layerGroup().addTo(appState.routePlanningMap);
+      appState.routePolylineLayer = L.layerGroup().addTo(appState.routePlanningMap);
+    }
+  }
+
+  renderRoutePlan(appState.currentRouteId);
+}
+
+function setRouteMapLayer(type) {
+  if (!appState.routePlanningMap || typeof L === 'undefined') return;
+  if (appState.routeMapTileLayer) {
+    appState.routePlanningMap.removeLayer(appState.routeMapTileLayer);
+  }
+
+  let lyr = 'm';
+  if (type === 'satellite') lyr = 'y';
+  if (type === 'terrain') lyr = 'p';
+
+  appState.routeMapTileLayer = L.tileLayer(`https://mt{s}.google.com/vt/lyrs=${lyr}&x={x}&y={y}&z={z}`, {
+    subdomains: '0123',
+    maxZoom: 20
+  }).addTo(appState.routePlanningMap);
+
+  const bRoad = document.getElementById('btnRouteLayerRoadmap');
+  const bSat = document.getElementById('btnRouteLayerSatellite');
+  const bTer = document.getElementById('btnRouteLayerTerrain');
+  if (bRoad && bSat && bTer) {
+    bRoad.className = type === 'roadmap' ? 'px-2.5 py-1 rounded-lg font-semibold bg-blue-600 text-white shadow-sm' : 'px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+    bSat.className = type === 'satellite' ? 'px-2.5 py-1 rounded-lg font-semibold bg-blue-600 text-white shadow-sm' : 'px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+    bTer.className = type === 'terrain' ? 'px-2.5 py-1 rounded-lg font-semibold bg-blue-600 text-white shadow-sm' : 'px-2.5 py-1 rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+  }
+}
+
+function onSelectRoutePlan(routeId) {
+  appState.currentRouteId = routeId;
+  renderRoutePlan(routeId);
+}
+
+function filterRoutePlansByFeed(feedKey) {
+  const select = document.getElementById('routeSelectDropdown');
+  if (!select) return;
+
+  const filtered = feedKey === 'ALL' 
+    ? appState.routes 
+    : appState.routes.filter(r => r.feed === feedKey);
+
+  select.innerHTML = filtered.map(r => {
+    return `<option value="${escapeHtml(r.id)}" ${r.id === appState.currentRouteId ? 'selected' : ''}>[${escapeHtml(r.feed)}] ${escapeHtml(r.name)}</option>`;
+  }).join('');
+
+  if (filtered.length > 0) {
+    if (!filtered.some(r => r.id === appState.currentRouteId)) {
+      appState.currentRouteId = filtered[0].id;
+    }
+    select.value = appState.currentRouteId;
+    renderRoutePlan(appState.currentRouteId);
+  }
+}
+
+function renderRoutePlan(routeId) {
+  const route = appState.routes.find(r => r.id === routeId) || appState.routes[0];
+  if (!route) return;
+
+  appState.currentRouteId = route.id;
+
+  // 1. Update Header Badges
+  const customerBadge = document.getElementById('routeCustomerBadge');
+  if (customerBadge) customerBadge.textContent = 'ลูกค้า: ' + (route.customer || '-');
+
+  const dateBadge = document.getElementById('routeDateBadge');
+  if (dateBadge) dateBadge.textContent = 'ทบทวน: ' + (route.reviewDate || 'ล่าสุด');
+
+  // 2. Calculate Totals
+  const waypoints = route.waypoints || [];
+  const totalDistance = waypoints.reduce((sum, wp) => sum + (Number(wp.distanceKm) || 0), 0);
+  const restStopsCount = waypoints.filter(wp => wp.type === 'rest').length;
+
+  // 3. Update KPI Cards
+  const kpiDist = document.getElementById('routeKpiDistance');
+  if (kpiDist) kpiDist.textContent = totalDistance.toLocaleString();
+
+  const kpiTime = document.getElementById('routeKpiTime');
+  if (kpiTime) kpiTime.textContent = route.estimatedTime || `${Math.round(totalDistance / 60)} - ${Math.round(totalDistance / 50)} ชม.`;
+
+  const kpiSpeed = document.getElementById('routeKpiSpeed');
+  if (kpiSpeed) kpiSpeed.textContent = `≤ ${route.speedLimit || 80}`;
+
+  const kpiRest = document.getElementById('routeKpiRestStops');
+  if (kpiRest) kpiRest.textContent = `${restStopsCount} จุด`;
+
+  // 4. Update Table Titles & Roads Text
+  const mapRoads = document.getElementById('routeMapRoadsText');
+  if (mapRoads) mapRoads.textContent = route.roads || 'เส้นทางตามมาตรฐานความปลอดภัย SCGJWD';
+
+  const tableTitle = document.getElementById('routeTableTitle');
+  if (tableTitle) tableTitle.textContent = `แผนจุดพักรถสำหรับเส้นทาง: ${route.name}`;
+
+  const tableMeta = document.getElementById('routeTableMeta');
+  if (tableMeta) tableMeta.textContent = `${route.roads || ''} • วันที่ทบทวน: ${route.reviewDate || '-'} • ผู้จัดทำ: ${route.reviewer || 'Nichanan Aj.'}`;
+
+  // 5. Render Table Rows (ตามแบบรูปภาพ 4 & 5)
+  const tbody = document.getElementById('routePlanTableBody');
+  if (tbody) {
+    let rowsHtml = '';
+    waypoints.forEach((wp, idx) => {
+      let stepLabel = '';
+      let badgeBg = '';
+      if (wp.type === 'origin') {
+        stepLabel = 'จุดเริ่มต้น';
+        badgeBg = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300';
+      } else if (wp.type === 'destination') {
+        stepLabel = 'ปลายทาง';
+        badgeBg = 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border-rose-300';
+      } else {
+        stepLabel = `จุดที่ ${idx}`;
+        badgeBg = 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border-blue-300';
+      }
+
+      const mapLink = `https://www.google.com/maps/search/?api=1&query=${wp.lat},${wp.lng}`;
+      const distanceDisplay = wp.distanceKm > 0 ? `${wp.distanceKm} กม.` : '-';
+      const isDistanceHigh = wp.distanceKm > 180;
+
+      rowsHtml += `
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+          <td class="py-3 px-3 text-center align-top">
+            <span class="inline-block px-2 py-0.5 rounded text-[11px] font-bold border ${badgeBg}">
+              ${stepLabel}
+            </span>
+          </td>
+          <td class="py-3 px-3 align-top font-bold text-slate-800 dark:text-white">
+            <div class="flex items-start gap-1.5">
+              ${wp.type === 'origin' ? '<i class="fa-solid fa-warehouse text-emerald-600 mt-0.5"></i>' : 
+                wp.type === 'destination' ? '<i class="fa-solid fa-flag-checkered text-rose-600 mt-0.5"></i>' : 
+                '<i class="fa-solid fa-gas-pump text-amber-500 mt-0.5"></i>'}
+              <span>${escapeHtml(wp.name)}</span>
+            </div>
+          </td>
+          <td class="py-3 px-3 align-top font-mono text-[11px] text-slate-600 dark:text-slate-400">
+            <div>${wp.lat.toFixed(4)}, ${wp.lng.toFixed(4)}</div>
+            <a href="${mapLink}" target="_blank" class="inline-flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-700 dark:text-blue-400 underline mt-0.5">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i> เปิดแผนที่
+            </a>
+          </td>
+          <td class="py-3 px-3 align-top text-slate-700 dark:text-slate-300 font-medium">
+            ${escapeHtml(wp.road || '-')}
+          </td>
+          <td class="py-3 px-3 text-center align-top font-bold">
+            <span class="${isDistanceHigh ? 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-1.5 py-0.5 rounded font-mono' : 'text-slate-800 dark:text-slate-200 font-mono'}">
+              ${distanceDisplay}
+            </span>
+            ${isDistanceHigh ? '<div class="text-[9px] text-rose-500 font-semibold mt-0.5">เกิน 180 กม.!</div>' : ''}
+          </td>
+          <td class="py-3 px-3 align-top text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
+            ${escapeHtml(wp.recommendation || '-')}
+          </td>
+          <td class="py-3 px-3 align-top text-amber-700 dark:text-amber-400 text-[11px] leading-relaxed bg-amber-50/40 dark:bg-amber-950/20 rounded">
+            <div class="flex items-start gap-1">
+              <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 flex-shrink-0"></i>
+              <span>${escapeHtml(wp.hazard || '-')}</span>
+            </div>
+          </td>
+          <td class="py-3 px-3 text-center align-top">
+            ${wp.photoUrl ? `
+              <img src="${escapeHtml(wp.photoUrl)}" alt="${escapeHtml(wp.name)}" class="w-16 h-12 object-cover rounded-lg border border-slate-200 dark:border-slate-700 mx-auto shadow-sm hover:scale-105 transition cursor-pointer" onclick="window.open('${escapeHtml(wp.photoUrl)}', '_blank')">
+            ` : `
+              <div class="w-16 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 text-[10px] mx-auto border border-dashed border-slate-300 dark:border-slate-700">ไม่มีรูป</div>
+            `}
+          </td>
+        </tr>
+      `;
+    });
+    tbody.innerHTML = rowsHtml;
+  }
+
+  // 6. Render Map Markers and Polyline
+  if (appState.routePlanningMap && typeof L !== 'undefined') {
+    if (appState.routeMarkersLayer) appState.routeMarkersLayer.clearLayers();
+    if (appState.routePolylineLayer) appState.routePolylineLayer.clearLayers();
+
+    const latlngs = [];
+
+    waypoints.forEach((wp, idx) => {
+      latlngs.push([wp.lat, wp.lng]);
+
+      let pinColor = '#2563eb';
+      let iconHtml = '<i class="fa-solid fa-gas-pump text-white text-xs"></i>';
+      if (wp.type === 'origin') {
+        pinColor = '#10b981';
+        iconHtml = '<i class="fa-solid fa-warehouse text-white text-xs"></i>';
+      } else if (wp.type === 'destination') {
+        pinColor = '#ef4444';
+        iconHtml = '<i class="fa-solid fa-flag-checkered text-white text-xs"></i>';
+      }
+
+      const customIcon = L.divIcon({
+        className: 'custom-route-marker',
+        html: `
+          <div style="background-color: ${pinColor}; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.35); border: 2.5px solid white;">
+            ${iconHtml}
+          </div>
+        `,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -14]
+      });
+
+      const popupContent = `
+        <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4; max-width: 240px; padding: 2px;">
+          <div style="font-weight: bold; color: #0f172a; margin-bottom: 3px; font-size: 13px;">${escapeHtml(wp.name)}</div>
+          <div style="color: #475569; font-size: 11px;"><strong>ถนน:</strong> ${escapeHtml(wp.road || '-')}</div>
+          <div style="color: #475569; font-size: 11px;"><strong>ระยะช่วง:</strong> ${wp.distanceKm} กม.</div>
+          <div style="margin-top: 4px; padding-top: 4px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #16a34a;">
+            <strong>คำแนะนำ:</strong> ${escapeHtml(wp.recommendation || '-')}
+          </div>
+          ${wp.hazard ? `
+            <div style="margin-top: 2px; font-size: 11px; color: #d97706;">
+              <strong>จุดระวัง:</strong> ${escapeHtml(wp.hazard)}
+            </div>
+          ` : ''}
+          <div style="margin-top: 6px;">
+            <a href="https://www.google.com/maps/search/?api=1&query=${wp.lat},${wp.lng}" target="_blank" style="color: #2563eb; text-decoration: underline; font-weight: bold; font-size: 11px;">
+              เปิด Google Maps นำทาง
+            </a>
+          </div>
+        </div>
+      `;
+
+      L.marker([wp.lat, wp.lng], { icon: customIcon })
+        .bindPopup(popupContent)
+        .addTo(appState.routeMarkersLayer);
+    });
+
+    if (latlngs.length > 1) {
+      // Glow polyline
+      L.polyline(latlngs, {
+        color: '#1d4ed8',
+        weight: 6,
+        opacity: 0.85,
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(appState.routePolylineLayer);
+
+      // Dash center line
+      L.polyline(latlngs, {
+        color: '#ffffff',
+        weight: 2,
+        opacity: 0.9,
+        dashArray: '8, 8',
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).addTo(appState.routePolylineLayer);
+
+      appState.routePlanningMap.fitBounds(latlngs, { padding: [40, 40] });
+    } else if (latlngs.length === 1) {
+      appState.routePlanningMap.setView(latlngs[0], 12);
+    }
+
+    setTimeout(() => {
+      if (appState.routePlanningMap) appState.routePlanningMap.invalidateSize();
+    }, 250);
+  }
+}
+
+// Route Modal Functions
+function openAddRouteModal(editId = null) {
+  const modal = document.getElementById('routePlanModal');
+  if (!modal) return;
+
+  const form = document.getElementById('routePlanForm');
+  if (form) form.reset();
+
+  const tbody = document.getElementById('modalRoutePointsTbody');
+  if (tbody) tbody.innerHTML = '';
+
+  const editIdInput = document.getElementById('routeModalEditId');
+  const title = document.getElementById('routeModalTitle');
+
+  if (editId) {
+    const route = appState.routes.find(r => r.id === editId);
+    if (route) {
+      if (editIdInput) editIdInput.value = route.id;
+      if (title) title.textContent = 'แก้ไขแผนเส้นทางเดินรถ & จุดพัก: ' + route.id;
+
+      document.getElementById('routeFormName').value = route.name || '';
+      document.getElementById('routeFormFeed').value = route.feed || '';
+      document.getElementById('routeFormCustomer').value = route.customer || '';
+      document.getElementById('routeFormRoads').value = route.roads || '';
+      document.getElementById('routeFormSpeed').value = route.speedLimit || 80;
+      document.getElementById('routeFormReviewer').value = route.reviewer || 'Nichanan Aj. (SCGJWD)';
+
+      (route.waypoints || []).forEach(wp => addRoutePointRow(wp));
+    }
+  } else {
+    if (editIdInput) editIdInput.value = '';
+    if (title) title.textContent = 'เพิ่มเส้นทางเดินรถ & จุดพักรถบรรทุกใหม่ (Add Route)';
+    
+    // Default preset rows (Origin, Rest 1, Destination)
+    addRoutePointRow({ type: 'origin', name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี', lat: 14.5303, lng: 100.9150, road: 'ทล.1', distanceKm: 0, recommendation: 'ตรวจเช็คแอลกอฮอล์/ความดัน และตรวจสภาพรถก่อนออก' });
+    addRoutePointRow({ type: 'rest', name: 'ปั๊ม ปตท. จิฟฟี่ จุดพักรถมาตรฐาน', lat: 14.2320, lng: 100.7150, road: 'ทล.1', distanceKm: 45, recommendation: 'จุดพักรถตามเกณฑ์ พัก 30 นาที ตรวจเช็คลมยางและสายรัด' });
+    addRoutePointRow({ type: 'destination', name: 'โรงงานลูกค้าปลายทาง', lat: 13.5680, lng: 100.9850, road: 'ทล.7', distanceKm: 75, recommendation: 'เทียบท่า ดับเครื่อง สวม PPE ครบชุด' });
+  }
+
+  validateRouteModalCompliance();
+  modal.classList.remove('hidden');
+}
+
+function closeAddRouteModal() {
+  const modal = document.getElementById('routePlanModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function addRoutePointRow(preset = {}) {
+  const tbody = document.getElementById('modalRoutePointsTbody');
+  if (!tbody) return;
+
+  const rowCount = tbody.children.length;
+  const tr = document.createElement('tr');
+  tr.className = 'border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40 text-xs';
+
+  tr.innerHTML = `
+    <td class="py-2 px-2 text-center font-bold text-slate-500 point-order">${rowCount + 1}</td>
+    <td class="py-2 px-2">
+      <input type="text" class="w-full px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-bold point-name" required value="${escapeHtml(preset.name || '')}" placeholder="ชื่อปั๊ม/จุดพัก/โรงงาน">
+    </td>
+    <td class="py-2 px-2">
+      <select class="w-full px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 point-type">
+        <option value="origin" ${preset.type === 'origin' ? 'selected' : ''}>ต้นทาง (Origin)</option>
+        <option value="rest" ${preset.type === 'rest' || !preset.type ? 'selected' : ''}>จุดพักรถ (Rest Stop)</option>
+        <option value="destination" ${preset.type === 'destination' ? 'selected' : ''}>ปลายทาง (Destination)</option>
+      </select>
+    </td>
+    <td class="py-2 px-2">
+      <div class="flex items-center gap-1">
+        <input type="number" step="0.0001" class="w-1/2 px-1.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 point-lat font-mono" placeholder="Lat" value="${preset.lat !== undefined ? preset.lat : 13.7500}" required>
+        <input type="number" step="0.0001" class="w-1/2 px-1.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 point-lng font-mono" placeholder="Lng" value="${preset.lng !== undefined ? preset.lng : 100.5000}" required>
+      </div>
+    </td>
+    <td class="py-2 px-2">
+      <input type="text" class="w-full px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 point-road" value="${escapeHtml(preset.road || '')}" placeholder="เช่น ทล.4 / ทล.34">
+    </td>
+    <td class="py-2 px-2 text-center">
+      <input type="number" min="0" oninput="validateRouteModalCompliance()" class="w-20 px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-mono text-center point-dist" value="${preset.distanceKm !== undefined ? preset.distanceKm : 40}">
+    </td>
+    <td class="py-2 px-2">
+      <input type="text" class="w-full px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 mb-1 point-rec" placeholder="ข้อแนะนำ..." value="${escapeHtml(preset.recommendation || '')}">
+      <input type="text" class="w-full px-2 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-amber-700 dark:text-amber-400 point-haz" placeholder="จุดระวัง..." value="${escapeHtml(preset.hazard || '')}">
+    </td>
+    <td class="py-2 px-2 text-center">
+      <button type="button" onclick="removeRoutePointRow(this)" class="w-7 h-7 rounded-lg bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center mx-auto transition">
+        <i class="fa-solid fa-trash-can text-xs"></i>
+      </button>
+    </td>
+  `;
+
+  tbody.appendChild(tr);
+  reindexRoutePointRows();
+  validateRouteModalCompliance();
+}
+
+function removeRoutePointRow(btn) {
+  const row = btn.closest('tr');
+  if (row) {
+    row.remove();
+    reindexRoutePointRows();
+    validateRouteModalCompliance();
+  }
+}
+
+function reindexRoutePointRows() {
+  const tbody = document.getElementById('modalRoutePointsTbody');
+  if (!tbody) return;
+  Array.from(tbody.children).forEach((tr, idx) => {
+    const orderEl = tr.querySelector('.point-order');
+    if (orderEl) orderEl.textContent = idx + 1;
+  });
+}
+
+function validateRouteModalCompliance() {
+  const tbody = document.getElementById('modalRoutePointsTbody');
+  const alertEl = document.getElementById('routeComplianceAlert');
+  const alertText = document.getElementById('routeComplianceAlertText');
+  if (!tbody || !alertEl) return;
+
+  const rows = Array.from(tbody.children);
+  let hasViolation = false;
+  let violationMsg = '';
+
+  rows.forEach((r, idx) => {
+    const distInput = r.querySelector('.point-dist');
+    const dist = distInput ? parseFloat(distInput.value) || 0 : 0;
+    if (dist > 180) {
+      hasViolation = true;
+      violationMsg = `จุดที่ ${idx + 1} มีระยะทางช่วง ${dist} กม. เกินเกณฑ์ 180 กม. (หรือเกิน 4 ชม. ตามกฎหมาย) กรุณาเพิ่มจุดพักรถ!`;
+    }
+  });
+
+  if (hasViolation) {
+    alertEl.classList.remove('hidden');
+    if (alertText) alertText.textContent = violationMsg;
+  } else {
+    alertEl.classList.add('hidden');
+  }
+}
+
+function saveRouteFromModal() {
+  const editId = document.getElementById('routeModalEditId').value.trim();
+  const name = document.getElementById('routeFormName').value.trim();
+  const feed = document.getElementById('routeFormFeed').value.trim() || 'FEED_01';
+  const customer = document.getElementById('routeFormCustomer').value.trim();
+  const roads = document.getElementById('routeFormRoads').value.trim();
+  const speedLimit = parseInt(document.getElementById('routeFormSpeed').value) || 80;
+  const reviewer = document.getElementById('routeFormReviewer').value.trim() || 'Nichanan Aj. (SCGJWD)';
+
+  if (!name || !customer) {
+    alert('กรุณากรอกชื่อเส้นทางและชื่อลูกค้าให้ครบถ้วน');
+    return;
+  }
+
+  const tbody = document.getElementById('modalRoutePointsTbody');
+  const rows = tbody ? Array.from(tbody.children) : [];
+  if (rows.length < 2) {
+    alert('กรุณากำหนดจุดแวะอย่างน้อย 2 จุด (จุดเริ่มต้น และ ปลายทาง)');
+    return;
+  }
+
+  const waypoints = rows.map((r, idx) => {
+    return {
+      order: idx,
+      name: r.querySelector('.point-name')?.value.trim() || `จุดที่ ${idx + 1}`,
+      type: r.querySelector('.point-type')?.value || 'rest',
+      lat: parseFloat(r.querySelector('.point-lat')?.value) || 13.75,
+      lng: parseFloat(r.querySelector('.point-lng')?.value) || 100.5,
+      road: r.querySelector('.point-road')?.value.trim() || '',
+      distanceKm: parseFloat(r.querySelector('.point-dist')?.value) || 0,
+      recommendation: r.querySelector('.point-rec')?.value.trim() || '',
+      hazard: r.querySelector('.point-haz')?.value.trim() || '',
+      photoUrl: ''
+    };
+  });
+
+  const totalDist = waypoints.reduce((s, w) => s + w.distanceKm, 0);
+  const estHoursMin = Math.round(totalDist / 60);
+  const estHoursMax = Math.round(totalDist / 45);
+
+  const routeObj = {
+    id: editId || ('ROUTE-' + String(appState.routes.length + 1).padStart(3, '0')),
+    name,
+    feed,
+    customer,
+    roads,
+    speedLimit,
+    reviewer,
+    reviewDate: new Date().toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    estimatedTime: `${estHoursMin} - ${estHoursMax} ชม.`,
+    waypoints
+  };
+
+  if (editId) {
+    const idx = appState.routes.findIndex(r => r.id === editId);
+    if (idx >= 0) appState.routes[idx] = routeObj;
+    else appState.routes.push(routeObj);
+  } else {
+    appState.routes.push(routeObj);
+  }
+
+  // Save to localStorage
+  localStorage.setItem('TTMK_ROUTE_PLANS', JSON.stringify(appState.routes));
+  appState.currentRouteId = routeObj.id;
+
+  // Refresh dropdown
+  const select = document.getElementById('routeSelectDropdown');
+  if (select) {
+    select.innerHTML = appState.routes.map(r => {
+      return `<option value="${escapeHtml(r.id)}" ${r.id === appState.currentRouteId ? 'selected' : ''}>[${escapeHtml(r.feed)}] ${escapeHtml(r.name)}</option>`;
+    }).join('');
+    select.value = routeObj.id;
+  }
+
+  closeAddRouteModal();
+  renderRoutePlan(routeObj.id);
+
+  if (typeof showToastNotification === 'function') {
+    showToastNotification('บันทึกแผนเส้นทางเดินรถและจุดพักรถเรียบร้อยแล้ว', 'success');
+  } else {
+    alert('บันทึกแผนเส้นทางเดินรถเรียบร้อยแล้ว');
+  }
+}
+
+// Printable A4 Sheet
+function printRoutePlanSheet() {
+  const route = appState.routes.find(r => r.id === appState.currentRouteId) || appState.routes[0];
+  if (!route) return;
+
+  const printableArea = document.getElementById('routePlanPrintableArea');
+  const modal = document.getElementById('routePlanPrintModal');
+  if (!printableArea || !modal) return;
+
+  const waypoints = route.waypoints || [];
+  const totalDistance = waypoints.reduce((sum, wp) => sum + (Number(wp.distanceKm) || 0), 0);
+  const restStopsCount = waypoints.filter(wp => wp.type === 'rest').length;
+
+  printableArea.innerHTML = `
+    <div style="font-family: 'Sarabun', Tahoma, sans-serif; color: #1e293b; max-width: 900px; margin: 0 auto; line-height: 1.4;">
+      
+      <!-- Document Header -->
+      <div style="border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <div style="font-size: 11px; font-weight: bold; color: #1e3a8a; letter-spacing: 0.5px;">SCGJWD LOGISTICS • TRANSPORT SAFETY MANAGEMENT (TSM)</div>
+          <div style="font-size: 16px; font-weight: bold; color: #0f172a; margin-top: 2px;">
+            แผนการเดินรถ & จุดพักรถบรรทุกตามมาตรฐานความปลอดภัย (ROUTE PLANNING SHEET)
+          </div>
+          <div style="font-size: 12px; color: #475569; margin-top: 2px;">
+            เส้นทาง: ${escapeHtml(route.name)}
+          </div>
+        </div>
+        <div style="text-align: right; font-size: 11px; color: #475569;">
+          <div><strong>รหัสแผน:</strong> ${escapeHtml(route.id)}</div>
+          <div><strong>กลุ่มงาน:</strong> ${escapeHtml(route.feed)}</div>
+          <div><strong>วันที่ทบทวน:</strong> ${escapeHtml(route.reviewDate || '-')}</div>
+        </div>
+      </div>
+
+      <!-- Route Metadata Grid -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; margin-bottom: 12px; font-size: 11px;">
+        <div><strong>ลูกค้า:</strong> ${escapeHtml(route.customer || '-')}</div>
+        <div><strong>ระยะทางรวม:</strong> ${totalDistance} กม.</div>
+        <div><strong>เวลาเดินทางประมาณการ:</strong> ${escapeHtml(route.estimatedTime || '-')}</div>
+        <div><strong>ความเร็วควบคุม:</strong> ไม่เกิน ${route.speedLimit || 80} กม./ชม.</div>
+        <div style="grid-column: span 3;"><strong>สายทางหลัก:</strong> ${escapeHtml(route.roads || '-')}</div>
+        <div><strong>จำนวนจุดพักรถ:</strong> ${restStopsCount} จุด</div>
+      </div>
+
+      <!-- Legal Compliance Alert Banner -->
+      <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 6px 10px; margin-bottom: 12px; font-size: 10.5px; color: #1e40af;">
+        <strong>ข้อกำหนดตาม พ.ร.บ.การขนส่งทางบก พ.ศ. 2522:</strong> ขับขี่ติดต่อกันไม่เกิน 4 ชั่วโมง ต้องหยุดพักไม่น้อยกว่า 30 นาที | 
+        <strong>ข้อแนะนำ SCGJWD:</strong> หยุดพักตรวจเช็ครถทุกๆ 2 ชั่วโมง หรือตามจุดพักที่กำหนดในตาราง
+      </div>
+
+      <!-- Waypoints Table -->
+      <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; margin-bottom: 14px;">
+        <thead>
+          <tr style="background: #1e3a8a; color: #ffffff;">
+            <th style="border: 1px solid #1e3a8a; padding: 6px 4px; text-align: center; width: 45px;">จุดที่</th>
+            <th style="border: 1px solid #1e3a8a; padding: 6px 6px; text-align: left;">ชื่อจุด / สถานที่</th>
+            <th style="border: 1px solid #1e3a8a; padding: 6px 4px; text-align: center; width: 100px;">พิกัด GPS</th>
+            <th style="border: 1px solid #1e3a8a; padding: 6px 6px; text-align: left; width: 120px;">หมายเลขถนน</th>
+            <th style="border: 1px solid #1e3a8a; padding: 6px 4px; text-align: center; width: 65px;">ระยะช่วง</th>
+            <th style="border: 1px solid #1e3a8a; padding: 6px 6px; text-align: left;">ข้อแนะนำความปลอดภัย</th>
+            <th style="border: 1px solid #1e3a8a; padding: 6px 6px; text-align: left; width: 160px;">จุดที่ต้องระวัง</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${waypoints.map((wp, idx) => {
+            const stepLabel = wp.type === 'origin' ? 'เริ่มต้น' : (wp.type === 'destination' ? 'ปลายทาง' : `จุดที่ ${idx}`);
+            return `
+              <tr style="border-bottom: 1px solid #cbd5e1; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+                <td style="border: 1px solid #cbd5e1; padding: 5px 4px; text-align: center; font-weight: bold;">${stepLabel}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 5px 6px; font-weight: bold; color: #0f172a;">${escapeHtml(wp.name)}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 5px 4px; text-align: center; font-family: monospace; font-size: 9.5px;">${wp.lat.toFixed(4)}, ${wp.lng.toFixed(4)}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 5px 6px;">${escapeHtml(wp.road || '-')}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 5px 4px; text-align: center; font-weight: bold;">${wp.distanceKm > 0 ? wp.distanceKm + ' กม.' : '-'}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 5px 6px;">${escapeHtml(wp.recommendation || '-')}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 5px 6px; color: #b45309;">${escapeHtml(wp.hazard || '-')}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+
+      <!-- Emergency Parking Protocol Box -->
+      <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 12px; margin-bottom: 14px; font-size: 10px; color: #78350f;">
+        <div style="font-weight: bold; font-size: 11px; margin-bottom: 3px;">⚠️ ขั้นตอนปฏิบัติเมื่อจำเป็นต้องจอดรถไหล่ทางในภาวะฉุกเฉิน:</div>
+        <div>1. เปิดสัญญาณไฟฉุกเฉิน (Hazard Lights) ทันทีที่หยุดรถชิดขอบทางด้านซ้ายสุด</div>
+        <div>2. นำกรวยสะท้อนแสงหรือป้ายเตือนตั้งท้ายรถ <strong>จุดที่ 1 ห่าง 5 เมตร</strong> และ <strong>จุดที่ 2 ห่าง 50 เมตร</strong> จากท้ายรถ</div>
+        <div>3. สวมใส่เสื้อสะท้อนแสง และยืนอยู่ในจุดที่ปลอดภัยนอกแนวการจราจรขณะรอความช่วยเหลือ</div>
+      </div>
+
+      <!-- Signature Section -->
+      <div style="display: flex; justify-content: space-between; margin-top: 25px; padding-top: 10px; font-size: 11px; text-align: center;">
+        <div style="width: 28%;">
+          <div style="height: 35px;"></div>
+          <div style="border-top: 1px dashed #64748b; padding-top: 4px;">(${escapeHtml(route.reviewer || 'Nichanan Aj.')})</div>
+          <div>ผู้จัดทำแผนการเดินรถ / TSM</div>
+        </div>
+        <div style="width: 28%;">
+          <div style="height: 35px;"></div>
+          <div style="border-top: 1px dashed #64748b; padding-top: 4px;">(......................................................)</div>
+          <div>หัวหน้างานจัดคิว / Dispatcher</div>
+        </div>
+        <div style="width: 28%;">
+          <div style="height: 35px;"></div>
+          <div style="border-top: 1px dashed #64748b; padding-top: 4px;">(......................................................)</div>
+          <div>พนักงานขับรถผู้รับแผน (Driver)</div>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  modal.classList.remove('hidden');
+}
+
+function closeRoutePlanPrintModal() {
+  const modal = document.getElementById('routePlanPrintModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+
     function escapeHtml(str) {
       if (!str) return '';
       return String(str)
@@ -8858,6 +10460,7 @@
       initCharts();
       syncAllSheetData(false);
       startRealtimeSync();
+      initRoutePlanning();
     });
   </script>
 
