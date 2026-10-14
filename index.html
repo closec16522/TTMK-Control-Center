@@ -2328,11 +2328,11 @@
 
             <select id="routeFeedFilter" onchange="filterRoutePlansByFeed(this.value)"
                     class="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold outline-none">
-              <option value="ALL">ทุกลุ่มงาน / Feed ทั้งหมด</option>
-              <option value="FEED_01">FEED_01 (ราชบุรี - ชลบุรี)</option>
-              <option value="FEED_02">FEED_02 (สระบุรี - บีฟู้ดส์ ลพบุรี)</option>
-              <option value="FEED_03">FEED_03 (สระบุรี - คาร์กิลล์ โคราช)</option>
-              <option value="FEED_04">FEED_04 (สระบุรี - ไทยคอนเทนเนอร์ ระยอง)</option>
+              <option value="ALL">ทุกลุ่มงาน / Feed ทั้งหมด (9 เส้นทาง)</option>
+              <option value="FEED_01">FEED_01 (ราชบุรี - ชลบุรี 358 กม.)</option>
+              <option value="FEED_SOUTH">FEED_SOUTH (สระบุรี - สตูล 1,100 กม.)</option>
+              <option value="FEED_WEST">FEED_WEST (ราชบุรี - โดล ประจวบฯ 355 กม.)</option>
+              <option value="FEED_SHORT">FEED_SHORT (ระยะสั้น &lt; 150 กม. 5 เส้นทาง)</option>
             </select>
           </div>
 
@@ -4020,20 +4020,25 @@
   <!-- MODAL: Route Location & Google Maps Photo Detail Modal           -->
   <!-- ============================================================== -->
   <div id="routePhotoModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-    <div class="glass-panel max-w-2xl w-full p-4 sm:p-5 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl max-h-[94vh] flex flex-col my-auto">
+    <div class="glass-panel max-w-3xl w-full p-4 sm:p-5 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl max-h-[94vh] flex flex-col my-auto">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 gap-2">
         <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm shadow-sm">
+          <div class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-base shadow-sm">
             <i class="fa-solid fa-map-location-dot"></i>
           </div>
           <div>
-            <h3 id="photoModalTitle" class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
-              ภาพถ่ายสถานที่ & Google Maps Street View
-            </h3>
-            <p id="photoModalSubtitle" class="text-xs text-slate-500 dark:text-slate-400">
-              พิกัด GPS และข้อแนะนำความปลอดภัยประจำจุดพักรถ
+            <div class="flex items-center gap-2">
+              <h3 id="photoModalTitle" class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+                ภาพถ่ายสถานที่ & Google Maps Place Preview
+              </h3>
+              <span id="photoModalBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
+                จุดพักรถมาตรฐาน
+              </span>
+            </div>
+            <p id="photoModalSubtitle" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              แสดงภาพสถานที่ระดับ HD และแผนที่สำรวจ 3D จาก Google Maps
             </p>
           </div>
         </div>
@@ -4044,12 +4049,38 @@
 
       <!-- Modal Content -->
       <div class="flex-1 overflow-y-auto p-1 space-y-3.5 my-2 text-xs">
-        <!-- Photo Container -->
-        <div class="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-950 shadow-inner group">
-          <img id="photoModalImg" src="" alt="Location Photo" class="w-full h-56 sm:h-72 object-cover object-center transition duration-300">
-          <div class="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-sm text-white text-[11px] font-semibold flex items-center gap-1.5 border border-white/20">
+        
+        <!-- Tab Views inside Modal: Photo vs Live Map -->
+        <div class="flex items-center justify-between bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+          <div class="flex items-center gap-1">
+            <button type="button" id="btnModalViewPhoto" onclick="switchModalPreviewTab('photo')"
+                    class="px-3 py-1 rounded-lg font-bold text-xs bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm flex items-center gap-1.5">
+              <i class="fa-solid fa-image"></i>
+              <span>ภาพสถานที่จริง (HD Photo)</span>
+            </button>
+            <button type="button" id="btnModalViewMap" onclick="switchModalPreviewTab('map')"
+                    class="px-3 py-1 rounded-lg font-bold text-xs text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1.5">
+              <i class="fa-brands fa-google text-blue-500"></i>
+              <span>Google Maps Live Preview (3D)</span>
+            </button>
+          </div>
+          <span class="text-[10px] text-slate-400 font-mono hidden sm:inline px-2">พิกัดชัดเจนระดับมิเตอร์</span>
+        </div>
+
+        <!-- 1. Photo Container -->
+        <div id="modalPhotoContainer" class="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-950 shadow-inner group">
+          <img id="photoModalImg" src="" alt="Location Photo" class="w-full h-60 sm:h-72 object-cover object-center transition duration-300">
+          <div class="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur-sm text-white text-[11px] font-semibold flex items-center gap-1.5 border border-white/20">
             <i class="fa-brands fa-google text-blue-400"></i>
-            <span>ภาพถ่ายสถานที่จริง / Google Maps</span>
+            <span>Google Maps Place Preview</span>
+          </div>
+        </div>
+
+        <!-- 2. Live Map Embed Iframe Container -->
+        <div id="modalMapIframeContainer" class="hidden relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shadow-inner">
+          <iframe id="photoModalMapIframe" src="" class="w-full h-60 sm:h-72 border-0" loading="lazy" allowfullscreen></iframe>
+          <div class="absolute top-2 right-2 px-2.5 py-1 rounded-lg bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm text-slate-800 dark:text-white text-[10px] font-bold shadow border border-slate-200 dark:border-slate-700">
+            <i class="fa-solid fa-satellite text-blue-600 mr-1"></i> Interactive Map
           </div>
         </div>
 
@@ -4074,24 +4105,29 @@
         </div>
 
         <!-- Actions Bar -->
-        <div class="flex items-center justify-between pt-1 gap-2">
+        <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
           <a id="photoModalMapsLink" href="#" target="_blank"
-             class="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5">
+             class="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5 min-w-[140px]">
             <i class="fa-solid fa-diamond-turn-right"></i>
-            <span>เปิด Google Maps นำทาง</span>
+            <span>Google Maps นำทาง</span>
           </a>
           <a id="photoModalStreetViewLink" href="#" target="_blank"
-             class="flex-1 py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5">
+             class="flex-1 py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5 min-w-[140px]">
             <i class="fa-solid fa-street-view"></i>
-            <span>Google Street View 360°</span>
+            <span>Street View 360°</span>
           </a>
+          <button type="button" id="photoModalLineBtn" onclick="shareCurrentPlaceToLine()"
+                  class="py-2 px-3.5 rounded-xl bg-[#06c755] hover:bg-[#05b34c] text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5">
+            <i class="fa-brands fa-line text-sm"></i>
+            <span>ส่งจุดนี้เข้า LINE</span>
+          </button>
         </div>
       </div>
 
     </div>
   </div>
 
-    <!-- MODAL 7: Route Plan Add / Edit Manager Modal                     -->
+  <!-- MODAL 7: Route Plan Add / Edit Manager Modal                     -->
   <!-- ============================================================== -->
   <div id="routePlanModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
     <div class="glass-panel max-w-4xl w-full p-4 sm:p-6 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl max-h-[94vh] flex flex-col my-auto">
@@ -9555,15 +9591,17 @@
 
 // =========================================================================
 // ROUTE & TRIP PLANNING WITH SCGJWD REST STOPS & HIGHWAY COMPLIANCE
+// TTMK COMPLETE 9 ROUTES (GOOGLE MY MAPS GROUNDED)
 // =========================================================================
 
 const DEFAULT_ROUTE_PLANS = [
+  // 1.3 เส้นทาง: ราชบุรี (TCRB/TCSB) -> บจก.กลุ่มสยามบรรจุภัณฑ์ โรงงานชลบุรี
   {
     id: 'ROUTE-001',
-    name: 'เส้นทางเดินรถราชบุรี TCRB – บจก.กลุ่มสยามบรรจุภัณฑ์ โรงงานชลบุรี',
+    name: 'ราชบุรี (TCSB/TCRB) – บจก.กลุ่มสยามบรรจุภัณฑ์ โรงงานชลบุรี',
     feed: 'FEED_01',
     customer: 'บจก. กลุ่มสยามบรรจุภัณฑ์ จำกัด (โรงงานชลบุรี)',
-    roads: 'ถนนเพชรเกษม (ทล.4), ถ.บรมราชชนนี, ถ.บางนา-ตราด, ถ.สุขุมวิท',
+    roads: 'ถนนเพชรเกษม (ทล.4) ➔ ถนนบรมราชชนนี ➔ ถนนบางนา-ตราด ➔ ถนนสุขุมวิท',
     speedLimit: 80,
     reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
     reviewDate: '17.09.2567',
@@ -9579,274 +9617,523 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 0,
         recommendation: 'จุดเริ่มต้น: ตรวจเช็คเอกสารใบกำกับสินค้า ตรวจความพร้อมพนักงานขับรถ (วัดแอลกอฮอล์/ความดัน) และตรวจสภาพรถ F-CAM-032 ก่อนออกเดินทาง',
         hazard: 'ระวังรถเข้า-ออกบริเวณปากทางเข้าโรงงาน ใช้ความเร็วไม่เกิน 20 กม./ชม. ในพื้นที่โรงงาน',
-        photoUrl: 'assets/route_photos/point1_tcsb_ratchaburi.jpg'
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
       },
       {
         order: 1,
         type: 'rest',
-        name: 'ปั๊มเอสโซ่ อาร์.เอส.ออยล์นครปฐม',
+        name: 'ปั๊มเอสโซ่ อาร์.เอส.ออยล์ นครปฐม',
         lat: 13.8213,
         lng: 100.0433,
-        road: 'ถนนเพชรเกษม (ถนนหมายเลข 4)',
+        road: 'ถนนเพชรเกษม (ถนนหมายเลข 4 กม.56)',
         distanceKm: 56,
         recommendation: 'เติมน้ำมันและพักผ่อน 15-30 นาที ตรวจเช็คความตึงสายรัดสินค้า และตรวจเช็คลมยาง',
         hazard: 'อาจมีรถหนาแน่นช่วงเวลาสูงสุด ระวังรถจักรยานยนต์และจุดกลับรถ',
-        photoUrl: 'assets/route_photos/point2_esso_nakhonpathom.jpg'
+        photoUrl: 'assets/route_photos/esso_station_hd.jpg'
       },
       {
         order: 2,
         type: 'rest',
-        name: 'ปั๊มน้ำมันบางจาก - บริษัท สินปิ่นเกล้า จำกัด',
+        name: 'ปั๊มน้ำมันบางจาก - บจก. สินปิ่นเกล้า',
         lat: 13.7861,
         lng: 100.3500,
-        road: 'ถนนบรมราชชนนี',
+        road: 'ถนนบรมราชชนนี กม.92',
         distanceKm: 92,
         recommendation: 'เติมน้ำมันและพักผ่อน ดื่มน้ำ พักสายตา ตรวจเช็คระบบไฟส่องสว่างท้ายรถ',
         hazard: 'ถนนบรมราชชนนีอาจมีการจราจรหนาแน่น ห้ามใช้ความเร็วเกิน 60 กม./ชม. ในช่องทางคู่ขนาน',
-        photoUrl: 'assets/route_photos/point3_bangchak_pinklao.jpg'
+        photoUrl: 'assets/route_photos/bangchak_station_hd.jpg'
       },
       {
         order: 3,
         type: 'rest',
-        name: 'Shell ออยล์นวงค์ A',
+        name: 'Shell ออยล์นววงศ์ A บางนา',
         lat: 13.5988,
         lng: 100.6503,
-        road: 'ถนนบางนา-ตราด (ทล.34 กม.22)',
+        road: 'ถนนบางนา-ตราด กม.82 (ทล.34 กม.22)',
         distanceKm: 82,
         recommendation: 'เติมน้ำมันและพักผ่อน ตรวจสอบความร้อนของดุมล้อและระบบเบรก พักสายตาไม่น้อยกว่า 20 นาที',
         hazard: 'อาจมีการจราจรหนาแน่นช่วงเวลาเร่งด่วน ระวังจุดกลับรถและทางขึ้นสะพานยกระดับ',
-        photoUrl: 'assets/route_photos/point4_shell_bangna.jpg'
+        photoUrl: 'assets/route_photos/shell_station_hd.jpg'
       },
       {
         order: 4,
         type: 'rest',
-        name: 'PTT Station ปตท.จิฟฟี่ สาขาฉะเชิงเทรา-บางนา ตราด (กม.49)',
+        name: 'PTT Station ปตท.จิฟฟี่ ฉะเชิงเทรา-บางนา ตราด (กม.49)',
         lat: 13.7452,
         lng: 101.0058,
         road: 'ถนนบางนา-ตราด (กม.49 ขาออก)',
         distanceKm: 48,
         recommendation: 'เติมน้ำมันและพักผ่อน (จุดพักสุดท้ายก่อนถึงปลายทาง) ปั๊มขนาดใหญ่ มีลานจอดรถบรรทุกกว้างขวาง ตรวจเช็คความเรียบร้อยสินค้า',
         hazard: 'อาจมีการจราจรหนาแน่นช่วงเวลาเร่งด่วน ระวังลมพัดขวางบนสะพานข้ามแม่น้ำบางปะกง',
-        photoUrl: 'assets/route_photos/point5_ptt_chachoengsao.jpg'
+        photoUrl: 'assets/route_photos/ptt_station_hd.jpg'
       },
       {
         order: 5,
         type: 'destination',
-        name: 'บริษัท กลุ่มสยามบรรจุภัณฑ์ จำกัด โรงงานชลบุรี',
+        name: 'บจก.กลุ่มสยามบรรจุภัณฑ์ โรงงานชลบุรี',
         lat: 13.3648,
         lng: 100.9866,
         road: 'ถนนสุขุมวิท',
         distanceKm: 80,
         recommendation: 'ถึงจุดหมายปลายทาง: ดับเครื่องยนต์ ดึงเบรกมือ สวมใส่อุปกรณ์ PPE (หมวก, เสื้อสะท้อนแสง, รองเท้าเซฟตี้) ครบชุดก่อนลงจากรถ และส่งมอบเอกสารใบส่งของ (POD)',
         hazard: 'ตรวจสอบสภาพถนนและสภาพการจราจร ระวังรถบรรทุกตู้คอนเทนเนอร์เข้า-ออกนิคมอุตสาหกรรม',
-        photoUrl: 'assets/route_photos/point6_scg_chonburi.jpg'
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
       }
     ]
   },
+
+  // 1.1 ขาล่อง: TCSB สระบุรี -> โรงงานปลากระป๋องสยาม จ.สตูล (1,100 กม.)
   {
-    id: 'ROUTE-002',
-    name: 'เส้นทางสระบุรี TCSB – บริษัท บีฟู้ดส์ โปรดักส์อินเตอร์เนชั่นแนล (ลพบุรี)',
-    feed: 'FEED_02',
-    customer: 'บจก. บีฟู้ดส์ โปรดักส์ อินเตอร์เนชั่นแนล (พัฒนานิคม)',
-    roads: 'ทล.1 (พหลโยธิน) – ทล.21 (สระบุรี - หล่มสัก)',
+    id: 'ROUTE-SOUTH-DOWN',
+    name: 'สระบุรี (TCSB) – โรงงานผลิตภัณฑ์ปลากระป๋องสยาม จ.สตูล (ขาล่อง)',
+    feed: 'FEED_SOUTH',
+    customer: 'โรงงานผลิตภัณฑ์ปลากระป๋องสยาม จ.สตูล',
+    roads: 'ทล.1 ➔ ถ.พระราม 2 ➔ ทล.4 (เพชรเกษม) ➔ ทล.41 ➔ ทล.406',
     speedLimit: 80,
     reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
-    reviewDate: '15.09.2567',
-    estimatedTime: '2 - 3 ชม.',
+    reviewDate: '17.09.2567',
+    estimatedTime: '15 - 18 ชม.',
     waypoints: [
       {
         order: 0,
         type: 'origin',
         name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
-        lat: 14.5303,
-        lng: 100.9150,
-        road: 'ทล.1 พหลโยธิน กม.105',
-        distanceKm: 0,
-        recommendation: 'จุดขึ้นสินค้า ตรวจสอบสภาพซีลล็อกตู้คอนเทนเนอร์/ผ้าใบคลุม และชั่งน้ำหนักรถก่อนเดินทาง',
-        hazard: 'จุดกลับรถหน้าโรงงานปูนซีเมนต์ ระวังรถบรรทุกหนักชะลอตัว',
-        photoUrl: 'assets/route_photos/point1_tcsb_ratchaburi.jpg'
-      },
-      {
-        order: 1,
-        type: 'rest',
-        name: 'จุดพักรถ ปตท. แยกบายพาสสระบุรี (PTT Station Bypass)',
-        lat: 14.5680,
-        lng: 100.9250,
-        road: 'ทล.1 เลี่ยงเมืองสระบุรี',
-        distanceKm: 18,
-        recommendation: 'ตรวจสอบลมยางและเช็คระบบไฟเบรกก่อนเข้าสู่ทางหลวงสาย 21',
-        hazard: 'ทางแยกร่วมเลี่ยงเมือง มีรถบรรทุกหักเลี้ยวเลนซ้ายบ่อยครั้ง',
-        photoUrl: 'assets/route_photos/point2_esso_nakhonpathom.jpg'
-      },
-      {
-        order: 2,
-        type: 'rest',
-        name: 'PTT Station ปตท. จิฟฟี่ พัฒนานิคม กม.25',
-        lat: 14.8820,
-        lng: 100.8650,
-        road: 'ทล.21 (สระบุรี-หล่มสัก กม.25)',
-        distanceKm: 46,
-        recommendation: 'จุดพักรถตามเกณฑ์กฎหมาย: พักสายตา 30 นาที ดื่มน้ำ ล้างหน้า ตรวจสอบความปลอดภัยสินค้า',
-        hazard: 'ทางตรงยาว เสี่ยงต่ออาการหลับใน ให้รักษาความเร็วไม่เกิน 80 กม./ชม.',
-        photoUrl: 'assets/route_photos/point5_ptt_chachoengsao.jpg'
-      },
-      {
-        order: 3,
-        type: 'destination',
-        name: 'บจก. บีฟู้ดส์ โปรดักส์อินเตอร์เนชั่นแนล (ลพบุรี)',
-        lat: 14.9250,
-        lng: 100.8420,
-        road: 'ซอยเทศบาลตำบลพัฒนานิคม ลพบุรี',
-        distanceKm: 24,
-        recommendation: 'จุดส่งมอบสินค้า: ติดต่อป้อม รปภ. แลกบัตร และเทียบท่าโหลดสินค้าตามช่องที่กำหนด',
-        hazard: 'ทางเข้าแคบ มีรถรับส่งพนักงานและรถเกษตรกรวิ่งสวนทางบ่อย',
-        photoUrl: 'assets/route_photos/point6_scg_chonburi.jpg'
-      }
-    ]
-  },
-  {
-    id: 'ROUTE-003',
-    name: 'เส้นทางสระบุรี TCSB – บ.คาร์กิลล์มีทส์ (ไทยแลนด์) โชคชัย โคราช',
-    feed: 'FEED_03',
-    customer: 'บจก. คาร์กิลล์มีทส์ (ไทยแลนด์) โชคชัย',
-    roads: 'ทล.2 (มิตรภาพ) – ทล.24 (โชคชัย - เดชอุดม)',
-    speedLimit: 80,
-    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
-    reviewDate: '16.09.2567',
-    estimatedTime: '3.5 - 5 ชม.',
-    waypoints: [
-      {
-        order: 0,
-        type: 'origin',
-        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
-        lat: 14.5303,
-        lng: 100.9150,
-        road: 'ทล.1 / ทล.2 มิตรภาพ',
-        distanceKm: 0,
-        recommendation: 'ขึ้นสินค้า ตรวจเช็คระบบเบรกและเกียร์ก่อนขึ้นเขาดงพญาเย็น',
-        hazard: 'ระวังรถหนาแน่นช่วงทางแยกต่างระดับสระบุรี',
-        photoUrl: 'assets/route_photos/point1_tcsb_ratchaburi.jpg'
-      },
-      {
-        order: 1,
-        type: 'rest',
-        name: 'จุดพักรถ ปตท. มวกเหล็ก (PTT Station Muak Lek)',
-        lat: 14.6530,
-        lng: 101.1850,
-        road: 'ทล.2 มิตรภาพ กม.35',
-        distanceKm: 42,
-        recommendation: 'จุดพักรถที่ 1: ตรวจเช็คระดับน้ำมันเบรกและลมยาง พักคลายความร้อนของเครื่องยนต์',
-        hazard: 'ทางขึ้นเนินชันและโค้งต่อเนื่อง ระวังรถบรรทุกหนักชะลอความเร็ว',
-        photoUrl: 'assets/route_photos/point2_esso_nakhonpathom.jpg'
-      },
-      {
-        order: 2,
-        type: 'rest',
-        name: 'ปั๊มบางจาก ลำตะคอง คลองไผ่',
-        lat: 14.8620,
-        lng: 101.5580,
-        road: 'ทล.2 มิตรภาพ กม.86 ริมอ่างเก็บน้ำลำตะคอง',
-        distanceKm: 58,
-        recommendation: 'จุดพักรถที่ 2 (จุดพักหลัก): พักผ่อน 30 นาที ดื่มน้ำ ตรวจเช็คสายรัดกล่องสินค้า',
-        hazard: 'ทางลงเขาชันยาวช่วงคลองไผ่ ห้ามใช้เกียร์ว่างเด็ดขาด ใช้ Engine Brake สม่ำเสมอ',
-        photoUrl: 'assets/route_photos/point3_bangchak_pinklao.jpg'
-      },
-      {
-        order: 3,
-        type: 'rest',
-        name: 'จุดพักรถ ปตท. บายพาส ปักธงชัย-โชคชัย',
-        lat: 14.8890,
-        lng: 102.0450,
-        road: 'ทล.24 สายโชคชัย-เดชอุดม',
-        distanceKm: 65,
-        recommendation: 'จุดพักรถที่ 3: ตรวจสอบความพร้อมรอบคันก่อนเข้าโรงงานลูกค้าปลายทาง',
-        hazard: 'ทางแยกสัญญาณไฟขนาดใหญ่ มีรถเลี้ยวขวาข้ามเลน',
-        photoUrl: 'assets/route_photos/point5_ptt_chachoengsao.jpg'
-      },
-      {
-        order: 4,
-        type: 'destination',
-        name: 'บ.คาร์กิลล์มีทส์ (ไทยแลนด์) อ.โชคชัย',
-        lat: 14.7320,
-        lng: 102.1640,
-        road: 'ถนนโชคชัย-ครบุรี นครราชสีมา',
-        distanceKm: 25,
-        recommendation: 'จุดส่งมอบสินค้า: ผ่านจุดฆ่าเชื้อล้อรถและปฏิบัติตามมาตรฐาน Bio-Security ของโรงงาน',
-        hazard: 'ถนนสายรอง 2 เลนสวน ระวังรถจักรยานยนต์และรถเกษตรกรรม',
-        photoUrl: 'assets/route_photos/point6_scg_chonburi.jpg'
-      }
-    ]
-  },
-  {
-    id: 'ROUTE-004',
-    name: 'เส้นทางสระบุรี TCSB – บจก.ไทยคอนเทนเนอร์ ระยอง (มาบตาพุด)',
-    feed: 'FEED_04',
-    customer: 'บจก. ไทยคอนเทนเนอร์ ระยอง (Thai Containers Rayong)',
-    roads: 'ทล.1 – ถนนกาญจนาภิเษก (ทล.9) – มอเตอร์เวย์ (ทล.7) – ทล.36',
-    speedLimit: 80,
-    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
-    reviewDate: '14.09.2567',
-    estimatedTime: '4 - 5.5 ชม.',
-    waypoints: [
-      {
-        order: 0,
-        type: 'origin',
-        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
-        lat: 14.5303,
-        lng: 100.9150,
+        lat: 14.583968,
+        lng: 100.973825,
         road: 'ทล.1 พหลโยธิน',
         distanceKm: 0,
-        recommendation: 'ขึ้นสินค้า ตรวจเช็คซีลและอุปกรณ์ความปลอดภัยประจำรถ',
-        hazard: 'ปริมาณรถหนาแน่นช่วงเช้า',
-        photoUrl: 'assets/route_photos/point1_tcsb_ratchaburi.jpg'
+        recommendation: 'จุดเริ่มต้น: ตรวจเช็คเอกสารใบกำกับสินค้า ตรวจความพร้อมพนักงานขับรถ (วัดแอลกอฮอล์/ความดัน) และตรวจสภาพรถ F-CAM-032 ก่อนออกเดินทางระยะไกล',
+        hazard: 'ระวังรถหนาแน่นช่วงต่างระดับสระบุรีและถนนวงแหวนกาญจนาภิเษก',
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
       },
       {
         order: 1,
         type: 'rest',
-        name: 'ปั๊ม ปตท. วังน้อย อยุธยา (PTT Wang Noi)',
-        lat: 14.2320,
-        lng: 100.7150,
-        road: 'ทล.1 กม.65 ขาเข้ากรุงเทพฯ',
-        distanceKm: 45,
-        recommendation: 'จุดพักรถที่ 1: ตรวจเช็คสายรัดและดุมล้อ พักผ่อน 15 นาที',
-        hazard: 'รถบรรทุกเข้า-ออกปั๊มหนาแน่น ให้ระวังทางแยก',
-        photoUrl: 'assets/route_photos/point2_esso_nakhonpathom.jpg'
+        name: 'ปั๊ม PT ถ.พระราม 2 ขาออก กม.55 (จ.สมุทรสงคราม)',
+        lat: 13.3855,
+        lng: 99.9880,
+        road: 'ถ.พระราม 2 ขาออก กม.55',
+        distanceKm: 194,
+        recommendation: 'จุดพักรถที่ 1: เติมน้ำมัน ตรวจเช็คความตึงของสายรัดสินค้า พักสายตา 30 นาที ดื่มน้ำ ล้างหน้า',
+        hazard: 'การจราจรถนนพระราม 2 หนาแน่น ระวังแนวก่อสร้างทางยกระดับ',
+        photoUrl: 'assets/route_photos/pt_station_hd.jpg'
       },
       {
         order: 2,
         type: 'rest',
-        name: 'จุดพักรถ มอเตอร์เวย์ M7 บางปะกง (Service Area)',
-        lat: 13.5680,
-        lng: 100.9850,
-        road: 'ทางหลวงพิเศษหมายเลข 7 (Motorway M7 กม.49)',
-        distanceKm: 85,
-        recommendation: 'จุดพักรถทางการกรมทางหลวง: พักผ่อน 30 นาที ตรวจเช็คสภาพร่างกายและยานพาหนะ',
-        hazard: 'รถวิ่งด้วยความเร็วสูงในช่องทางหลัก ชิดซ้ายอย่างปลอดภัยก่อนเลี้ยวเข้าจุดพักรถ',
-        photoUrl: 'assets/route_photos/point4_shell_bangna.jpg'
+        name: 'ESSO เขาน้อย (จ.ประจวบคีรีขันธ์)',
+        lat: 12.404338,
+        lng: 99.923664,
+        road: 'ทล.4 เพชรเกษม',
+        distanceKm: 146,
+        recommendation: 'จุดพักรถที่ 2: ตรวจเช็คอุณหภูมิดุมล้อและลมยาง พักรับประทานอาหาร',
+        hazard: 'ทางโค้งและจุดกลับรถช่วงเขาน้อย ใช้ความเร็วไม่เกิน 80 กม./ชม.',
+        photoUrl: 'assets/route_photos/esso_station_hd.jpg'
       },
       {
         order: 3,
         type: 'rest',
-        name: 'ปั๊ม ปตท. มาบข่า-นิคมพัฒนา ระยอง',
-        lat: 12.8250,
-        lng: 101.1850,
-        road: 'ทล.36 (พัทยา-ระยอง)',
-        distanceKm: 68,
-        recommendation: 'จุดพักรถที่ 3: ตรวจเช็คใบส่งของและความพร้อมก่อนเข้านิคมอุตสาหกรรม',
-        hazard: 'ทางแยกร่วมทล.36 มีรถบรรทุกสารเคมีและตู้คอนเทนเนอร์จำนวนมาก',
-        photoUrl: 'assets/route_photos/point5_ptt_chachoengsao.jpg'
+        name: 'PTT ทุ่งคา (จ.ชุมพร)',
+        lat: 10.422068,
+        lng: 99.130395,
+        road: 'ทล.41 ขาล่อง',
+        distanceKm: 260,
+        recommendation: 'จุดพักรถที่ 3: พักผ่อน 30 นาที สลับพนักงานขับรถหรือพักสายตา ตรวจระบบไฟสัญญาณ',
+        hazard: 'ทางตรงยาวช่วงชุมพร เสี่ยงต่ออาการหลับใน แนะนำให้หยุดพักล้างหน้า',
+        photoUrl: 'assets/route_photos/ptt_station_hd.jpg'
       },
       {
         order: 4,
+        type: 'rest',
+        name: 'PTT ปากแพรก อ.ทุ่งสง (จ.นครศรีธรรมราช)',
+        lat: 8.155067,
+        lng: 99.696312,
+        road: 'ทล.41 เชื่อม ทล.403',
+        distanceKm: 290,
+        recommendation: 'จุดพักรถที่ 4 (จุดพักสุดท้ายก่อนเข้าสตูล): ตรวจเช็คความเรียบร้อยรอบคัน เติมน้ำมันให้พร้อม',
+        hazard: 'ทางแยกสัญญาณไฟทุ่งสง และเส้นทางขึ้น-ลงเขาเขตพัทลุง-ตรัง',
+        photoUrl: 'assets/route_photos/ptt_station_hd.jpg'
+      },
+      {
+        order: 5,
         type: 'destination',
-        name: 'บจก.ไทยคอนเทนเนอร์ ระยอง (นิคมมาบตาพุด)',
-        lat: 12.7210,
-        lng: 101.1450,
-        road: 'นิคมอุตสาหกรรมมาบตาพุด ระยอง',
-        distanceKm: 22,
-        recommendation: 'จุดส่งมอบสินค้า: ปฏิบัติตามกฎความปลอดภัยเข้มงวดของนิคมอุตสาหกรรม ดับเครื่องทันทีที่เทียบท่า',
-        hazard: 'พื้นที่ควบคุมสารเคมีและความปลอดภัยสูง ขับขี่ความเร็วไม่เกิน 30 กม./ชม. ภายในนิคม',
-        photoUrl: 'assets/route_photos/point6_scg_chonburi.jpg'
+        name: 'โรงงานผลิตภัณฑ์ปลากระป๋องสยาม จ.สตูล',
+        lat: 6.658056,
+        lng: 100.076994,
+        road: 'ทล.406 สตูล',
+        distanceKm: 210,
+        recommendation: 'ถึงจุดหมายปลายทาง: ติดต่อป้อม รปภ. ดับเครื่อง ดึงเบรกมือ สวมอุปกรณ์ PPE ครบชุดก่อนลงจากรถ และส่งมอบเอกสารใบส่งของ (POD)',
+        hazard: 'ถนนสายรอง 2 เลนสวน ระวังรถจักรยานยนต์และรถเกษตรกรในพื้นที่',
+        photoUrl: 'assets/route_photos/siam_canned_fish_hd.jpg'
+      }
+    ]
+  },
+
+  // 1.1 ขาขึ้น: โรงงานปลากระป๋องสยาม จ.สตูล -> TCSB สระบุรี (1,100 กม.)
+  {
+    id: 'ROUTE-SOUTH-UP',
+    name: 'โรงงานผลิตภัณฑ์ปลากระป๋องสยาม จ.สตูล – สระบุรี (TCSB) (ขาขึ้น)',
+    feed: 'FEED_SOUTH',
+    customer: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
+    roads: 'ทล.406 ➔ ทล.41 ➔ ทล.4 (เพชรเกษม) ➔ ถ.พระราม 2 ➔ ทล.1',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '17.09.2567',
+    estimatedTime: '15 - 18 ชม.',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานผลิตภัณฑ์ปลากระป๋องสยาม จ.สตูล',
+        lat: 6.658056,
+        lng: 100.076994,
+        road: 'ทล.406 สตูล',
+        distanceKm: 0,
+        recommendation: 'จุดเริ่มต้นขาขึ้น: ตรวจเช็คเอกสารขากลับ ตรวจความพร้อมพนักงานขับรถ และตรวจสภาพรถ F-CAM-032 ก่อนออกเดินทาง',
+        hazard: 'ระวังทางโค้งและทางแยกร่วมก่อนเข้าทางหลวงสายหลัก',
+        photoUrl: 'assets/route_photos/siam_canned_fish_hd.jpg'
+      },
+      {
+        order: 1,
+        type: 'rest',
+        name: 'PTT ทุ่งสง ขาขึ้น (ติดแม็คโคร) จ.นครศรีธรรมราช',
+        lat: 8.157909,
+        lng: 99.666395,
+        road: 'ทล.41 ขาขึ้น',
+        distanceKm: 215,
+        recommendation: 'จุดพักรถที่ 1: ตรวจเช็คสภาพยางและระบบเบรก พักสายตา 30 นาที ดื่มน้ำ',
+        hazard: 'ทางแยกร่วมบายพาสทุ่งสง มีรถบรรทุกหนาแน่น',
+        photoUrl: 'assets/route_photos/ptt_station_hd.jpg'
+      },
+      {
+        order: 2,
+        type: 'rest',
+        name: 'PT หลังสวน ขาขึ้น (ติด HOMEMART) จ.ชุมพร',
+        lat: 9.943424,
+        lng: 99.061969,
+        road: 'ทล.41 ขาขึ้น',
+        distanceKm: 230,
+        recommendation: 'จุดพักรถที่ 2: พักรับประทานอาหาร เติมน้ำมัน ตรวจเช็คสายรัด',
+        hazard: 'ทางตรงยาว เสี่ยงต่ออาการหลับใน รักษาความเร็วไม่เกิน 80 กม./ชม.',
+        photoUrl: 'assets/route_photos/pt_station_hd.jpg'
+      },
+      {
+        order: 3,
+        type: 'rest',
+        name: 'PT ประจวบฯ ขาขึ้น (ก่อนถึงด่านสิงขร) จ.ประจวบคีรีขันธ์',
+        lat: 11.741378,
+        lng: 99.748831,
+        road: 'ทล.4 เพชรเกษม ขาขึ้น',
+        distanceKm: 235,
+        recommendation: 'จุดพักรถที่ 3: ตรวจสอบความร้อนของดุมล้อและระบบเบรก พักสายตา 30 นาที',
+        hazard: 'ระวังจุดตรวจและด่านตรวจความเร็วทางหลวง',
+        photoUrl: 'assets/route_photos/pt_station_hd.jpg'
+      },
+      {
+        order: 4,
+        type: 'rest',
+        name: 'บางจาก ถ.พระราม 2 ขาเข้า กม.77 (จ.สมุทรสงคราม)',
+        lat: 13.348472,
+        lng: 99.893725,
+        road: 'ถ.พระราม 2 ขาเข้า กม.77',
+        distanceKm: 205,
+        recommendation: 'จุดพักรถที่ 4 (จุดพักสุดท้ายก่อนถึงสระบุรี): ตรวจสอบความพร้อมก่อนเข้าเขตกรุงเทพฯ/ปริมณฑล',
+        hazard: 'ปริมาณรถหนาแน่นช่วงเข้าเขตพระราม 2 ระวังแนวก่อสร้าง',
+        photoUrl: 'assets/route_photos/bangchak_station_hd.jpg'
+      },
+      {
+        order: 5,
+        type: 'destination',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
+        lat: 14.583968,
+        lng: 100.973825,
+        road: 'ทล.1 พหลโยธิน',
+        distanceKm: 215,
+        recommendation: 'ถึงจุดหมายปลายทาง: คืนตู้/ลงสินค้า ส่งมอบเอกสาร รายงานสถานะจบเที่ยววิ่ง',
+        hazard: 'ระวังรถเข้า-ออกบริเวณปากทางเข้าโรงงาน',
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
+      }
+    ]
+  },
+
+  // 1.2 เส้นทาง: โรงงานสยามบรรจุภัณฑ์ ราชบุรี (TCRB) -> บจก.โดล ไทยแลนด์ (ประจวบคีรีขันธ์)
+  {
+    id: 'ROUTE-DOLE-WEST',
+    name: 'ราชบุรี (TCRB) – บจก.โดล ไทยแลนด์ (กุยบุรี ประจวบคีรีขันธ์)',
+    feed: 'FEED_WEST',
+    customer: 'บจก. โดล ไทยแลนด์ (Dole Thailand)',
+    roads: 'ถนนเพชรเกษม (ทางหลวงหมายเลข 4)',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '17.09.2567',
+    estimatedTime: '5 - 6 ชม.',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCRB) ราชบุรี',
+        lat: 13.512634,
+        lng: 99.614982,
+        road: 'ทล.4 เพชรเกษม',
+        distanceKm: 0,
+        recommendation: 'จุดเริ่มต้น: ตรวจเช็คเอกสารใบส่งของ ตรวจสภาพรถ F-CAM-032 และวัดแอลกอฮอล์/ความดัน',
+        hazard: 'ระวังรถเข้า-ออกบริเวณปากทางเข้าโรงงาน',
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
+      },
+      {
+        order: 1,
+        type: 'rest',
+        name: 'ปั๊มน้ำมัน ปตท. บ้านโป่ง (PTT Ban Pong)',
+        lat: 13.812474,
+        lng: 99.862284,
+        road: 'ทล.4 กม.68',
+        distanceKm: 38,
+        recommendation: 'จุดพักระยะสั้น: เติมน้ำมันและเช็คสภาพรถก่อนเดินทางไกลสู่ภาคใต้',
+        hazard: 'ทางแยกสัญญาณไฟบ้านโป่ง ระวังรถตัดหน้า',
+        photoUrl: 'assets/route_photos/ptt_station_hd.jpg'
+      },
+      {
+        order: 2,
+        type: 'rest',
+        name: 'ปั๊มน้ำมัน เชลล์ ชะอำ (Shell Cha-am)',
+        lat: 12.796727,
+        lng: 99.967843,
+        road: 'ทล.4 เพชรเกษม กม.168',
+        distanceKm: 100,
+        recommendation: 'จุดพักครึ่งทาง: พักรับประทานอาหาร พักสายตา 30 นาที ตรวจเช็คลมยางและสายรัดสินค้า',
+        hazard: 'ทางแยกร่วมชะอำ-หัวหิน ปริมาณรถหนาแน่นช่วงวันหยุด',
+        photoUrl: 'assets/route_photos/shell_station_hd.jpg'
+      },
+      {
+        order: 3,
+        type: 'rest',
+        name: 'ปั๊มน้ำมัน ปตท. ปราณบุรี (PTT Pranburi)',
+        lat: 12.375826,
+        lng: 99.878658,
+        road: 'ทล.4 เพชรเกษม กม.248',
+        distanceKm: 80,
+        recommendation: 'จุดพักสำคัญก่อนเข้าเขตประจวบคีรีขันธ์: ตรวจสอบความร้อนของดุมล้อและระบบเบรก',
+        hazard: 'ทางแยกบายพาสปราณบุรี ระวังรถความเร็วสูง',
+        photoUrl: 'assets/route_photos/ptt_station_hd.jpg'
+      },
+      {
+        order: 4,
+        type: 'rest',
+        name: 'ปั๊มน้ำมัน ปตท. คลองวาฬ (PTT Khlong Wan)',
+        lat: 11.811658,
+        lng: 99.778439,
+        road: 'ทล.4 เพชรเกษม กม.318',
+        distanceKm: 70,
+        recommendation: 'จุดพักสุดท้ายก่อนถึงโรงงาน: พักสายตา 15 นาที ตรวจเช็คความเรียบร้อยของสินค้า',
+        hazard: 'ทางตรงยาวช่วงทับสะแก-กุยบุรี ระวังอาการหลับใน',
+        photoUrl: 'assets/route_photos/ptt_station_hd.jpg'
+      },
+      {
+        order: 5,
+        type: 'destination',
+        name: 'บริษัท โดล ไทยแลนด์ จำกัด (Dole Thailand)',
+        lat: 11.780480,
+        lng: 99.762230,
+        road: 'ทางหลวงเพชรเกษม กุยบุรี',
+        distanceKm: 67,
+        recommendation: 'จุดหมายปลายทาง: ดับเครื่อง ดึงเบรกมือ สวมอุปกรณ์ PPE ครบชุดก่อนเข้าโรงงานอาหารแปรรูป',
+        hazard: 'ทางเข้าโรงงานมีรถบรรทุกผลไม้และรถเกษตรกรเข้า-ออกสม่ำเสมอ',
+        photoUrl: 'assets/route_photos/dole_thailand_hd.jpg'
+      }
+    ]
+  },
+
+  // 2.1 TCSB สระบุรี -> บจก. นีโอ แฟคทอรี่ (73.8 กม. - ระยะสั้น)
+  {
+    id: 'ROUTE-SHORT-NEO',
+    name: 'สระบุรี (TCSB) – บจก. นีโอ แฟคทอรี่ (ลำลูกกา)',
+    feed: 'FEED_SHORT',
+    customer: 'บจก. นีโอ แฟคทอรี่ (Neo Factory)',
+    roads: 'ถนนหมายเลข 1 ➔ ถนน 3222 ➔ ถนน 305',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '17.09.2567',
+    estimatedTime: '1.2 - 1.5 ชม.',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
+        lat: 14.583968,
+        lng: 100.973825,
+        road: 'ทล.1 พหลโยธิน',
+        distanceKm: 0,
+        recommendation: 'จุดขึ้นสินค้า: ตรวจเช็คเอกสารและสายรัดสินค้าให้แน่นหนา (เส้นทางระยะสั้น < 150 กม. ไม่มีจุดพักรถตามเกณฑ์)',
+        hazard: 'ทางเข้าหนองแคเป็นถนนเส้นเล็ก ระวังรถมอเตอร์ไซค์และทางแคบ',
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
+      },
+      {
+        order: 1,
+        type: 'destination',
+        name: 'บจก. นีโอ แฟคทอรี่ (ลำลูกกา คลอง 13)',
+        lat: 14.0789,
+        lng: 100.8920,
+        road: 'ถนน 305 รังสิต-นครนายก เชื่อมคลอง 13',
+        distanceKm: 73.8,
+        recommendation: 'ถึงจุดหมายปลายทาง: เทียบท่าโหลดสินค้า ดับเครื่อง สวมหมวกนิรภัยและรองเท้าเซฟตี้',
+        hazard: 'สะพานข้ามคลองและทางโค้งแคบ ใช้ความเร็วต่ำ',
+        photoUrl: 'assets/route_photos/neo_factory_hd.jpg'
+      }
+    ]
+  },
+
+  // 2.2 TCSB สระบุรี -> บจก. คาร์กิลล์มีทส์ (ไทยแลนด์) (30 กม. - ระยะสั้น)
+  {
+    id: 'ROUTE-SHORT-CARGILL',
+    name: 'สระบุรี (TCSB) – บจก. คาร์กิลล์มีทส์ (ไทยแลนด์)',
+    feed: 'FEED_SHORT',
+    customer: 'บจก. คาร์กิลล์มีทส์ (ไทยแลนด์)',
+    roads: 'ถนน 3188 ➔ อดิเรกสาร ➔ ถนน 1 ➔ ถนน 3034 (หรือผ่าน สบ.1001)',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '17.09.2567',
+    estimatedTime: '45 - 60 นาที',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
+        lat: 14.583968,
+        lng: 100.973825,
+        road: 'ทล.1 / ถนน 3188',
+        distanceKm: 0,
+        recommendation: 'จุดขึ้นสินค้า: ตรวจเช็คตู้คอนเทนเนอร์/ผ้าใบคลุม (ระยะทาง 30 กม. ไม่มีจุดพักรถ)',
+        hazard: 'ถนนอดิเรกสารมีรถสัญจรในชุมชน ระวังคนข้ามถนน',
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
+      },
+      {
+        order: 1,
+        type: 'destination',
+        name: 'บจก. คาร์กิลล์มีทส์ (ไทยแลนด์)',
+        lat: 14.6150,
+        lng: 100.9850,
+        road: 'ถนน 3034 สระบุรี',
+        distanceKm: 30,
+        recommendation: 'จุดส่งมอบ: ปฏิบัติตามมาตรฐาน Bio-Security และเทียบท่าโหลดสินค้า',
+        hazard: 'ทางเข้าโรงงานมีรถรับส่งพนักงานสัญจรช่วงเวลาเปลี่ยนกะ',
+        photoUrl: 'assets/route_photos/cargill_meats_hd.jpg'
+      }
+    ]
+  },
+
+  // 2.3 TCSB สระบุรี -> บจก. บีฟู้ดส์ โปรดักส์ (43 กม. - ระยะสั้น)
+  {
+    id: 'ROUTE-SHORT-BFOODS',
+    name: 'สระบุรี (TCSB) – บจก. บีฟู้ดส์ โปรดักส์ (พัฒนานิคม)',
+    feed: 'FEED_SHORT',
+    customer: 'บจก. บีฟู้ดส์ โปรดักส์ อินเตอร์เนชั่นแนล',
+    roads: 'ถนนอดิเรกสาร ➔ ถนน 1 ➔ ถนนสระบุรี-หล่มสัก ➔ ต.ช่องสาริกา',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '17.09.2567',
+    estimatedTime: '45 - 60 นาที',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
+        lat: 14.583968,
+        lng: 100.973825,
+        road: 'ทล.1 พหลโยธิน',
+        distanceKm: 0,
+        recommendation: 'จุดขึ้นสินค้า: ตรวจสอบความพร้อม พขร. และยานพาหนะ (ระยะทาง 43 กม. ไม่มีจุดพักรถ)',
+        hazard: 'ทางแยกร่วมสระบุรี-หล่มสัก ระวังรถบรรทุกหนัก',
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
+      },
+      {
+        order: 1,
+        type: 'destination',
+        name: 'บจก. บีฟู้ดส์ โปรดักส์ (ช่องสาริกา พัฒนานิคม)',
+        lat: 14.9250,
+        lng: 100.8420,
+        road: 'ต.ช่องสาริกา พัฒนานิคม ลพบุรี',
+        distanceKm: 43,
+        recommendation: 'จุดส่งมอบสินค้า: ติดต่อป้อม รปภ. แลกบัตร และเทียบท่าโหลดสินค้าตามช่องที่กำหนด',
+        hazard: 'ทางเข้าซอยเทศบาลมีรถมอเตอร์ไซค์และรถเกษตรกรวิ่งสวนทาง',
+        photoUrl: 'assets/route_photos/cargill_meats_hd.jpg'
+      }
+    ]
+  },
+
+  // 2.4 TCSB สระบุรี -> บ.อายิโนะโมะโต๊ะ เบทาโกร โฟรเซ่นฟู้ดส์ (37.9 กม. - ระยะสั้น)
+  {
+    id: 'ROUTE-SHORT-AJINOMOTO',
+    name: 'สระบุรี (TCSB) – บ.อายิโนะโมะโต๊ะ เบทาโกร โฟรเซ่นฟู้ดส์',
+    feed: 'FEED_SHORT',
+    customer: 'บ.อายิโนะโมะโต๊ะ เบทาโกร โฟรเซ่นฟู้ดส์ (ไทยแลนด์)',
+    roads: 'ถนนอดิเรกสาร ➔ ถนน 1 ➔ ถนนสระบุรี-หล่มสัก ➔ ถนน 3334',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '17.09.2567',
+    estimatedTime: '40 - 55 นาที',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
+        lat: 14.583968,
+        lng: 100.973825,
+        road: 'ทล.1 พหลโยธิน',
+        distanceKm: 0,
+        recommendation: 'จุดขึ้นสินค้า: ตรวจเช็คความสะอาดตู้บรรทุกสินค้า (ระยะทาง 37.9 กม. ไม่มีจุดพักรถ)',
+        hazard: 'ปริมาณรถหนาแน่นช่วงทางแยกบายพาส',
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
+      },
+      {
+        order: 1,
+        type: 'destination',
+        name: 'บ.อายิโนะโมะโต๊ะ เบทาโกร โฟรเซ่นฟู้ดส์ (ไทยแลนด์)',
+        lat: 14.8850,
+        lng: 100.8750,
+        road: 'ถนน 3334 ลพบุรี',
+        distanceKm: 37.9,
+        recommendation: 'ถึงจุดหมายปลายทาง: เข้าจุดตรวจสุขอนามัยโรงงานอาหารแช่แข็ง และส่งมอบ POD',
+        hazard: 'ทางเลี้ยวเข้าโรงงานกระชั้นชิด ให้เปิดสัญญาณไฟเลี้ยวก่อนล่วงหน้า',
+        photoUrl: 'assets/route_photos/siam_canned_fish_hd.jpg'
+      }
+    ]
+  },
+
+  // 2.5 TCSB สระบุรี -> บมจ. โรแยล ซีรามิค อุตสาหกรรม (35.6 กม. - ระยะสั้น)
+  {
+    id: 'ROUTE-SHORT-ROYAL',
+    name: 'สระบุรี (TCSB) – บมจ. โรแยล ซีรามิค อุตสาหกรรม (หนองแค)',
+    feed: 'FEED_SHORT',
+    customer: 'บมจ. โรแยล ซีรามิค อุตสาหกรรม (หนองแค)',
+    roads: 'ถนนอดิเรกสาร ➔ ถนน 1 ➔ ถนน 33 ➔ ถนนมิตรภาพ',
+    speedLimit: 80,
+    reviewer: 'Nichanan Aj. (SCGJWD Logistics)',
+    reviewDate: '17.09.2567',
+    estimatedTime: '40 - 50 นาที',
+    waypoints: [
+      {
+        order: 0,
+        type: 'origin',
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี',
+        lat: 14.583968,
+        lng: 100.973825,
+        road: 'ทล.1 พหลโยธิน',
+        distanceKm: 0,
+        recommendation: 'จุดขึ้นสินค้า: ตรวจสอบการรัดกล่องบรรจุภัณฑ์เซรามิกอย่างแน่นหนา (ระยะทาง 35.6 กม. ไม่มีจุดพักรถ)',
+        hazard: 'ทางเข้าหนองแคเป็นถนนเส้นเล็ก ระวังรถมอเตอร์ไซค์',
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
+      },
+      {
+        order: 1,
+        type: 'destination',
+        name: 'บมจ. โรแยล ซีรามิค อุตสาหกรรม (หนองแค)',
+        lat: 14.3850,
+        lng: 100.8950,
+        road: 'ถนนพหลโยธิน กม.89 อ.หนองแค สระบุรี',
+        distanceKm: 35.6,
+        recommendation: 'ถึงจุดหมายปลายทาง: เทียบท่าโหลดกล่องสินค้ากระเบื้องเซรามิก และลงชื่อส่งมอบเอกสาร',
+        hazard: 'ทางแยกคู่ขนานพหลโยธิน มีรถชะลอเลี้ยวเข้าเขตนิคมอุตสาหกรรม',
+        photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
       }
     ]
   }
@@ -9858,12 +10145,13 @@ function initRoutePlanning() {
 
   if (saved) {
     try {
-      appState.routes = JSON.parse(saved);
-      // Migrate old unsplash URLs to authentic Google Maps photos
-      const r1 = appState.routes.find(r => r.id === 'ROUTE-001');
-      if (r1 && r1.waypoints && r1.waypoints.length > 0 && r1.waypoints[0].photoUrl && r1.waypoints[0].photoUrl.includes('unsplash')) {
+      const parsed = JSON.parse(saved);
+      // Migrate to full 9 routes if outdated or incomplete
+      if (!Array.isArray(parsed) || parsed.length < 9 || !parsed.some(r => r.id === 'ROUTE-SOUTH-DOWN')) {
         appState.routes = JSON.parse(JSON.stringify(DEFAULT_ROUTE_PLANS));
         needSave = true;
+      } else {
+        appState.routes = parsed;
       }
     } catch (e) {
       console.warn('Failed to parse saved route plans, reverting to defaults:', e);
@@ -9891,7 +10179,9 @@ function initRoutePlanning() {
   const select = document.getElementById('routeSelectDropdown');
   if (select) {
     select.innerHTML = appState.routes.map(r => {
-      return `<option value="${escapeHtml(r.id)}" ${r.id === appState.currentRouteId ? 'selected' : ''}>[${escapeHtml(r.feed)}] ${escapeHtml(r.name)}</option>`;
+      const stopCount = (r.waypoints || []).filter(w => w.type === 'rest').length;
+      const stopLabel = stopCount > 0 ? `(${stopCount} จุดพัก)` : '(ระยะสั้น ไม่มีจุดพัก)';
+      return `<option value="${escapeHtml(r.id)}" ${r.id === appState.currentRouteId ? 'selected' : ''}>[${escapeHtml(r.feed)}] ${escapeHtml(r.name)} ${stopLabel}</option>`;
     }).join('');
   }
 
@@ -9911,6 +10201,59 @@ function initRoutePlanning() {
   }
 
   renderRoutePlan(appState.currentRouteId);
+}
+
+// Google Maps Official Multi-Waypoint Navigation URL generator
+function getGoogleMapsDirectionUrl(route) {
+  if (!route || !route.waypoints || route.waypoints.length === 0) return '#';
+  const origin = `${route.waypoints[0].lat},${route.waypoints[0].lng}`;
+  const dest = `${route.waypoints[route.waypoints.length - 1].lat},${route.waypoints[route.waypoints.length - 1].lng}`;
+  const intermediate = route.waypoints.slice(1, -1);
+  let waypointsParam = '';
+  if (intermediate.length > 0) {
+    waypointsParam = '&waypoints=' + encodeURIComponent(intermediate.map(w => `${w.lat},${w.lng}`).join('|'));
+  }
+  return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}${waypointsParam}&travelmode=driving`;
+}
+
+function copyRouteGoogleMapsUrl() {
+  const route = appState.routes.find(r => r.id === appState.currentRouteId) || appState.routes[0];
+  if (!route) return;
+  const url = getGoogleMapsDirectionUrl(route);
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      if (typeof showToastNotification === 'function') {
+        showToastNotification('คัดลอกลิงก์ Google Maps นำทางพร้อมจุดแวะพักเรียบร้อยแล้ว', 'success');
+      } else {
+        alert('คัดลอกลิงก์นำทาง Google Maps เรียบร้อยแล้ว:\n' + url);
+      }
+    }).catch(() => {
+      prompt('คัดลอกลิงก์นำทาง Google Maps (Ctrl+C):', url);
+    });
+  } else {
+    prompt('คัดลอกลิงก์นำทาง Google Maps (Ctrl+C):', url);
+  }
+}
+
+function shareRouteToLine() {
+  const route = appState.routes.find(r => r.id === appState.currentRouteId) || appState.routes[0];
+  if (!route) return;
+
+  const url = getGoogleMapsDirectionUrl(route);
+  const totalDist = (route.waypoints || []).reduce((s, w) => s + (Number(w.distanceKm) || 0), 0);
+  const restCount = (route.waypoints || []).filter(w => w.type === 'rest').length;
+  
+  const lineText = `📍 [แผนการเดินรถ & จุดพัก TTMK Logistics]\n` +
+    `🚚 เส้นทาง: ${route.name}\n` +
+    `🏢 ลูกค้า: ${route.customer || '-'}\n` +
+    `🛣️ สายทาง: ${route.roads || '-'}\n` +
+    `📏 ระยะทางรวม: ${totalDist} กม. | จุดพักรถ: ${restCount} จุด\n` +
+    `⏱️ เวลาประมาณการ: ${route.estimatedTime || '-'}\n` +
+    `🧭 ลิงก์นำทาง Google Maps (เปิดบนมือถือ พขร. พร้อมจุดพักครบถ้วน):\n${url}`;
+
+  const shareUrl = `https://line.me/R/msg/text/?` + encodeURIComponent(lineText);
+  window.open(shareUrl, '_blank');
 }
 
 function setRouteViewMode(mode) {
@@ -9977,7 +10320,9 @@ function filterRoutePlansByFeed(feedKey) {
     : appState.routes.filter(r => r.feed === feedKey);
 
   select.innerHTML = filtered.map(r => {
-    return `<option value="${escapeHtml(r.id)}" ${r.id === appState.currentRouteId ? 'selected' : ''}>[${escapeHtml(r.feed)}] ${escapeHtml(r.name)}</option>`;
+    const stopCount = (r.waypoints || []).filter(w => w.type === 'rest').length;
+    const stopLabel = stopCount > 0 ? `(${stopCount} จุดพัก)` : '(ระยะสั้น ไม่มีจุดพัก)';
+    return `<option value="${escapeHtml(r.id)}" ${r.id === appState.currentRouteId ? 'selected' : ''}>[${escapeHtml(r.feed)}] ${escapeHtml(r.name)} ${stopLabel}</option>`;
   }).join('');
 
   if (filtered.length > 0) {
@@ -9989,12 +10334,18 @@ function filterRoutePlansByFeed(feedKey) {
   }
 }
 
-function openRoutePhotoModal(photoUrl, title, lat, lng, road, rec, haz) {
+// Global state for current opened modal place
+let currentModalPlace = null;
+
+function openRoutePhotoModal(photoUrl, title, lat, lng, road, rec, haz, type) {
   const modal = document.getElementById('routePhotoModal');
   if (!modal) return;
 
+  currentModalPlace = { photoUrl, title, lat, lng, road, rec, haz, type };
+
   const imgEl = document.getElementById('photoModalImg');
   const titleEl = document.getElementById('photoModalTitle');
+  const badgeEl = document.getElementById('photoModalBadge');
   const roadEl = document.getElementById('photoModalRoad');
   const gpsEl = document.getElementById('photoModalGps');
   const recEl = document.getElementById('photoModalRec');
@@ -10002,9 +10353,24 @@ function openRoutePhotoModal(photoUrl, title, lat, lng, road, rec, haz) {
   const hazBox = document.getElementById('photoModalHazBox');
   const mapsLink = document.getElementById('photoModalMapsLink');
   const streetViewLink = document.getElementById('photoModalStreetViewLink');
+  const mapIframe = document.getElementById('photoModalMapIframe');
 
-  if (imgEl) imgEl.src = photoUrl || 'assets/route_photos/point1_tcsb_ratchaburi.jpg';
+  if (imgEl) imgEl.src = photoUrl || 'assets/route_photos/scg_packaging_factory_hd.jpg';
   if (titleEl) titleEl.textContent = title || 'ภาพถ่ายสถานที่ Google Maps';
+
+  if (badgeEl) {
+    if (type === 'origin') {
+      badgeEl.textContent = 'จุดเริ่มต้น (Origin)';
+      badgeEl.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+    } else if (type === 'destination') {
+      badgeEl.textContent = 'จุดหมายปลายทาง (Destination)';
+      badgeEl.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300';
+    } else {
+      badgeEl.textContent = 'จุดพักรถมาตรฐาน (Rest Stop)';
+      badgeEl.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300';
+    }
+  }
+
   if (roadEl) roadEl.textContent = road || '-';
   if (gpsEl) gpsEl.textContent = `${lat}, ${lng}`;
   if (recEl) recEl.textContent = rec || '-';
@@ -10019,12 +10385,57 @@ function openRoutePhotoModal(photoUrl, title, lat, lng, road, rec, haz) {
   if (mapsLink) mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   if (streetViewLink) streetViewLink.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;
 
+  if (mapIframe) {
+    mapIframe.src = `https://maps.google.com/maps?q=${lat},${lng}&t=m&z=17&ie=UTF8&iwloc=&output=embed`;
+  }
+
+  switchModalPreviewTab('photo');
   modal.classList.remove('hidden');
+}
+
+function switchModalPreviewTab(tab) {
+  const btnPhoto = document.getElementById('btnModalViewPhoto');
+  const btnMap = document.getElementById('btnModalViewMap');
+  const photoContainer = document.getElementById('modalPhotoContainer');
+  const mapContainer = document.getElementById('modalMapIframeContainer');
+
+  if (tab === 'map') {
+    if (btnPhoto) btnPhoto.className = 'px-3 py-1 rounded-lg font-bold text-xs text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1.5';
+    if (btnMap) btnMap.className = 'px-3 py-1 rounded-lg font-bold text-xs bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm flex items-center gap-1.5';
+    if (photoContainer) photoContainer.classList.add('hidden');
+    if (mapContainer) mapContainer.classList.remove('hidden');
+  } else {
+    if (btnPhoto) btnPhoto.className = 'px-3 py-1 rounded-lg font-bold text-xs bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm flex items-center gap-1.5';
+    if (btnMap) btnMap.className = 'px-3 py-1 rounded-lg font-bold text-xs text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1.5';
+    if (photoContainer) photoContainer.classList.remove('hidden');
+    if (mapContainer) mapContainer.classList.add('hidden');
+  }
+}
+
+function shareCurrentPlaceToLine() {
+  if (!currentModalPlace) return;
+  const p = currentModalPlace;
+  const mapLink = `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`;
+  const streetLink = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${p.lat},${p.lng}`;
+  
+  const text = `📍 [พิกัดจุดแวะพัก/ส่งมอบ TTMK]\n` +
+    `🏢 สถานที่: ${p.title}\n` +
+    `🛣️ ถนน: ${p.road || '-'}\n` +
+    `📌 พิกัด GPS: ${p.lat}, ${p.lng}\n` +
+    `🛡️ ข้อแนะนำ: ${p.rec || '-'}\n` +
+    (p.haz ? `⚠️ จุดระวัง: ${p.haz}\n` : '') +
+    `🧭 เปิด Google Maps นำทาง:\n${mapLink}\n` +
+    `🚶‍♂️ Google Street View 360°:\n${streetLink}`;
+
+  const shareUrl = `https://line.me/R/msg/text/?` + encodeURIComponent(text);
+  window.open(shareUrl, '_blank');
 }
 
 function closeRoutePhotoModal() {
   const modal = document.getElementById('routePhotoModal');
   if (modal) modal.classList.add('hidden');
+  const mapIframe = document.getElementById('photoModalMapIframe');
+  if (mapIframe) mapIframe.src = '';
 }
 
 function renderRoutePlan(routeId) {
@@ -10056,7 +10467,7 @@ function renderRoutePlan(routeId) {
   if (kpiSpeed) kpiSpeed.textContent = `≤ ${route.speedLimit || 80}`;
 
   const kpiRest = document.getElementById('routeKpiRestStops');
-  if (kpiRest) kpiRest.textContent = `${restStopsCount} จุด`;
+  if (kpiRest) kpiRest.textContent = restStopsCount > 0 ? `${restStopsCount} จุด` : 'ไม่มี (ระยะสั้น)';
 
   // 4. Update Table Titles & Roads Text
   const mapRoads = document.getElementById('routeMapRoadsText');
@@ -10091,7 +10502,7 @@ function renderRoutePlan(routeId) {
         markerIcon = '<i class="fa-solid fa-gas-pump text-amber-500"></i>';
       }
 
-      const photoUrl = wp.photoUrl || 'assets/route_photos/point1_tcsb_ratchaburi.jpg';
+      const photoUrl = wp.photoUrl || 'assets/route_photos/scg_packaging_factory_hd.jpg';
       const mapLink = `https://www.google.com/maps/search/?api=1&query=${wp.lat},${wp.lng}`;
       const streetViewLink = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${wp.lat},${wp.lng}`;
 
@@ -10111,14 +10522,14 @@ function renderRoutePlan(routeId) {
           <!-- Location Name & Photo Grid -->
           <div class="flex items-start gap-3">
             <!-- Clickable Photo Thumbnail -->
-            <div class="relative w-28 h-20 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 cursor-pointer group shadow-sm"
-                 onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}')"
-                 title="คลิกเพื่อดูรูปขยายและ Google Maps Street View">
+            <div class="relative w-28 h-20 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 cursor-pointer group shadow-sm bg-slate-950"
+                 onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}', '${wp.type}')"
+                 title="คลิกเพื่อดูรูปขยายและ Google Maps Live 3D">
               <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(wp.name)}" 
-                   onerror="this.src='assets/route_photos/point1_tcsb_ratchaburi.jpg'"
+                   onerror="this.src='assets/route_photos/scg_packaging_factory_hd.jpg'"
                    class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
-              <div class="absolute bottom-0 inset-x-0 bg-slate-900/80 text-[9px] text-white py-0.5 text-center flex items-center justify-center gap-1 font-semibold">
-                <i class="fa-brands fa-google text-blue-400"></i> ดูรูป
+              <div class="absolute bottom-0 inset-x-0 bg-slate-900/85 text-[9px] text-white py-0.5 text-center flex items-center justify-center gap-1 font-semibold">
+                <i class="fa-brands fa-google text-blue-400"></i> ดูรูป HD
               </div>
             </div>
 
@@ -10131,7 +10542,7 @@ function renderRoutePlan(routeId) {
               <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                 <i class="fa-solid fa-road text-slate-400 mr-1"></i>${escapeHtml(wp.road || '-')}
               </p>
-              <div class="flex items-center gap-1.5 pt-0.5">
+              <div class="flex items-center gap-1.5 pt-0.5 flex-wrap">
                 <a href="${streetViewLink}" target="_blank"
                    class="px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 text-[10px] font-bold border border-amber-200 dark:border-amber-800 transition flex items-center gap-1">
                   <i class="fa-solid fa-street-view"></i> Street View
@@ -10182,10 +10593,9 @@ function renderRoutePlan(routeId) {
       }
 
       const mapLink = `https://www.google.com/maps/search/?api=1&query=${wp.lat},${wp.lng}`;
-      const streetViewLink = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${wp.lat},${wp.lng}`;
       const distanceDisplay = wp.distanceKm > 0 ? `${wp.distanceKm}` : '-';
       const isDistanceHigh = wp.distanceKm > 180;
-      const photoUrl = wp.photoUrl || 'assets/route_photos/point1_tcsb_ratchaburi.jpg';
+      const photoUrl = wp.photoUrl || 'assets/route_photos/scg_packaging_factory_hd.jpg';
 
       rowsHtml += `
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
@@ -10204,8 +10614,8 @@ function renderRoutePlan(routeId) {
           </td>
           <td class="py-3 px-3 align-middle text-center font-mono text-[11px] text-slate-600 dark:text-slate-400">
             <div>[${wp.lat.toFixed(4)}, ${wp.lng.toFixed(4)}]</div>
-            <a href="${mapLink}" target="_blank" class="inline-flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-700 dark:text-blue-400 underline mt-0.5">
-              <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i> แผนที่
+            <a href="${mapLink}" target="_blank" class="inline-flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-700 dark:text-blue-400 underline mt-0.5 font-bold">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i> Google Maps
             </a>
           </td>
           <td class="py-3 px-3 align-middle text-slate-700 dark:text-slate-300 font-medium">
@@ -10227,14 +10637,14 @@ function renderRoutePlan(routeId) {
             </div>
           </td>
           <td class="py-3 px-3 text-center align-middle">
-            <div class="relative w-28 h-16 mx-auto rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer group"
-                 onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}')"
-                 title="คลิกดูรูปขยายและ Street View">
+            <div class="relative w-28 h-16 mx-auto rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer group bg-slate-950"
+                 onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}', '${wp.type}')"
+                 title="คลิกดูรูปขยายและ Street View 360°">
               <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(wp.name)}" 
-                   onerror="this.src='assets/route_photos/point1_tcsb_ratchaburi.jpg'"
+                   onerror="this.src='assets/route_photos/scg_packaging_factory_hd.jpg'"
                    class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
-              <div class="absolute inset-x-0 bottom-0 bg-slate-900/80 text-[8.5px] text-white py-0.5 flex items-center justify-center gap-1">
-                <i class="fa-brands fa-google text-blue-400"></i> Google Maps
+              <div class="absolute inset-x-0 bottom-0 bg-slate-900/85 text-[8.5px] text-white py-0.5 flex items-center justify-center gap-1 font-semibold">
+                <i class="fa-brands fa-google text-blue-400"></i> พรีวิว Google
               </div>
             </div>
           </td>
@@ -10276,13 +10686,13 @@ function renderRoutePlan(routeId) {
         popupAnchor: [0, -14]
       });
 
-      const photoUrl = wp.photoUrl || 'assets/route_photos/point1_tcsb_ratchaburi.jpg';
+      const photoUrl = wp.photoUrl || 'assets/route_photos/scg_packaging_factory_hd.jpg';
 
       const popupContent = `
         <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4; max-width: 250px; padding: 2px;">
           <div style="font-weight: bold; color: #0f172a; margin-bottom: 3px; font-size: 13px;">${escapeHtml(wp.name)}</div>
-          <div style="width: 100%; height: 90px; border-radius: 6px; overflow: hidden; margin-bottom: 6px;">
-            <img src="${escapeHtml(photoUrl)}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='assets/route_photos/point1_tcsb_ratchaburi.jpg'">
+          <div style="width: 100%; height: 95px; border-radius: 6px; overflow: hidden; margin-bottom: 6px; background: #0f172a;">
+            <img src="${escapeHtml(photoUrl)}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='assets/route_photos/scg_packaging_factory_hd.jpg'">
           </div>
           <div style="color: #475569; font-size: 11px;"><strong>ถนน:</strong> ${escapeHtml(wp.road || '-')}</div>
           <div style="color: #475569; font-size: 11px;"><strong>ระยะช่วง:</strong> ${wp.distanceKm} กม.</div>
@@ -10375,7 +10785,7 @@ function openAddRouteModal(editId = null) {
     if (title) title.textContent = 'เพิ่มเส้นทางเดินรถ & จุดพักรถบรรทุกใหม่ (Add Route)';
     
     // Default preset rows (Origin, Rest 1, Destination)
-    addRoutePointRow({ type: 'origin', name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี', lat: 14.5303, lng: 100.9150, road: 'ทล.1', distanceKm: 0, recommendation: 'ตรวจเช็คแอลกอฮอล์/ความดัน และตรวจสภาพรถก่อนออก' });
+    addRoutePointRow({ type: 'origin', name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) สระบุรี', lat: 14.583968, lng: 100.973825, road: 'ทล.1', distanceKm: 0, recommendation: 'ตรวจเช็คแอลกอฮอล์/ความดัน และตรวจสภาพรถก่อนออก' });
     addRoutePointRow({ type: 'rest', name: 'ปั๊ม ปตท. จิฟฟี่ จุดพักรถมาตรฐาน', lat: 14.2320, lng: 100.7150, road: 'ทล.1', distanceKm: 45, recommendation: 'จุดพักรถตามเกณฑ์ พัก 30 นาที ตรวจเช็คลมยางและสายรัด' });
     addRoutePointRow({ type: 'destination', name: 'โรงงานลูกค้าปลายทาง', lat: 13.5680, lng: 100.9850, road: 'ทล.7', distanceKm: 75, recommendation: 'เทียบท่า ดับเครื่อง สวม PPE ครบชุด' });
   }
@@ -10514,7 +10924,7 @@ function saveRouteFromModal() {
       distanceKm: parseFloat(r.querySelector('.point-dist')?.value) || 0,
       recommendation: r.querySelector('.point-rec')?.value.trim() || '',
       hazard: r.querySelector('.point-haz')?.value.trim() || '',
-      photoUrl: 'assets/route_photos/point1_tcsb_ratchaburi.jpg'
+      photoUrl: 'assets/route_photos/scg_packaging_factory_hd.jpg'
     };
   });
 
@@ -10551,7 +10961,9 @@ function saveRouteFromModal() {
   const select = document.getElementById('routeSelectDropdown');
   if (select) {
     select.innerHTML = appState.routes.map(r => {
-      return `<option value="${escapeHtml(r.id)}" ${r.id === appState.currentRouteId ? 'selected' : ''}>[${escapeHtml(r.feed)}] ${escapeHtml(r.name)}</option>`;
+      const stopCount = (r.waypoints || []).filter(w => w.type === 'rest').length;
+      const stopLabel = stopCount > 0 ? `(${stopCount} จุดพัก)` : '(ระยะสั้น ไม่มีจุดพัก)';
+      return `<option value="${escapeHtml(r.id)}" ${r.id === appState.currentRouteId ? 'selected' : ''}>[${escapeHtml(r.feed)}] ${escapeHtml(r.name)} ${stopLabel}</option>`;
     }).join('');
     select.value = routeObj.id;
   }
@@ -10566,7 +10978,7 @@ function saveRouteFromModal() {
   }
 }
 
-// Printable A4 Sheet
+// Printable A4 Sheet with Route Map and QR Code
 function printRoutePlanSheet() {
   const route = appState.routes.find(r => r.id === appState.currentRouteId) || appState.routes[0];
   if (!route) return;
@@ -10578,55 +10990,87 @@ function printRoutePlanSheet() {
   const waypoints = route.waypoints || [];
   const totalDistance = waypoints.reduce((sum, wp) => sum + (Number(wp.distanceKm) || 0), 0);
   const restStopsCount = waypoints.filter(wp => wp.type === 'rest').length;
+  const gmapsUrl = getGoogleMapsDirectionUrl(route);
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&margin=4&data=${encodeURIComponent(gmapsUrl)}`;
 
   printableArea.innerHTML = `
-    <div style="font-family: 'Sarabun', Tahoma, sans-serif; color: #1e293b; max-width: 900px; margin: 0 auto; line-height: 1.4;">
+    <div style="font-family: 'Sarabun', Tahoma, sans-serif; color: #1e293b; max-width: 920px; margin: 0 auto; line-height: 1.35;">
       
       <!-- Document Header -->
-      <div style="border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-start;">
+      <div style="border-bottom: 2.5px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start;">
         <div>
           <div style="font-size: 11px; font-weight: bold; color: #1e3a8a; letter-spacing: 0.5px;">SCGJWD LOGISTICS • TRANSPORT SAFETY MANAGEMENT (TSM)</div>
-          <div style="font-size: 16px; font-weight: bold; color: #0f172a; margin-top: 2px;">
+          <div style="font-size: 15px; font-weight: bold; color: #0f172a; margin-top: 2px;">
             แผนการเดินรถ & จุดพักรถบรรทุกตามมาตรฐานความปลอดภัย (ROUTE PLANNING SHEET)
           </div>
-          <div style="font-size: 12px; color: #475569; margin-top: 2px;">
-            เส้นทาง: ${escapeHtml(route.name)}
+          <div style="font-size: 11.5px; color: #475569; margin-top: 2px;">
+            เส้นทาง: <strong>${escapeHtml(route.name)}</strong>
           </div>
         </div>
-        <div style="text-align: right; font-size: 11px; color: #475569;">
+        <div style="text-align: right; font-size: 10.5px; color: #475569;">
           <div><strong>รหัสแผน:</strong> ${escapeHtml(route.id)}</div>
           <div><strong>กลุ่มงาน:</strong> ${escapeHtml(route.feed)}</div>
           <div><strong>วันที่ทบทวน:</strong> ${escapeHtml(route.reviewDate || '-')}</div>
         </div>
       </div>
 
-      <!-- Route Metadata Grid -->
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; margin-bottom: 12px; font-size: 11px;">
-        <div><strong>ลูกค้า:</strong> ${escapeHtml(route.customer || '-')}</div>
-        <div><strong>ระยะทางรวม:</strong> ${totalDistance} กม.</div>
-        <div><strong>เวลาเดินทางประมาณการ:</strong> ${escapeHtml(route.estimatedTime || '-')}</div>
-        <div><strong>ความเร็วควบคุม:</strong> ไม่เกิน ${route.speedLimit || 80} กม./ชม.</div>
-        <div style="grid-column: span 3;"><strong>สายทางหลัก:</strong> ${escapeHtml(route.roads || '-')}</div>
-        <div><strong>จำนวนจุดพักรถ:</strong> ${restStopsCount} จุด</div>
+      <!-- Top Section: Metadata Grid + Navigation QR Code -->
+      <div style="display: grid; grid-template-columns: 1fr 140px; gap: 10px; margin-bottom: 10px; align-items: stretch;">
+        
+        <!-- Metadata Box -->
+        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; font-size: 10.5px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+          <div><strong>ลูกค้า:</strong> ${escapeHtml(route.customer || '-')}</div>
+          <div><strong>ระยะทางรวม:</strong> ${totalDistance} กม.</div>
+          <div><strong>เวลาเดินทางประมาณการ:</strong> ${escapeHtml(route.estimatedTime || '-')}</div>
+          <div><strong>ความเร็วควบคุม:</strong> ไม่เกิน ${route.speedLimit || 80} กม./ชม.</div>
+          <div><strong>จำนวนจุดพักรถ:</strong> ${restStopsCount > 0 ? restStopsCount + ' จุด' : 'ไม่มี (ระยะสั้น < 150 กม.)'}</div>
+          <div><strong>ผู้ทบทวน:</strong> ${escapeHtml(route.reviewer || 'Nichanan Aj.')}</div>
+          <div style="grid-column: span 3; border-top: 1px dashed #cbd5e1; padding-top: 4px; margin-top: 2px;">
+            <strong>สายทางหลัก:</strong> ${escapeHtml(route.roads || '-')}
+          </div>
+        </div>
+
+        <!-- QR Code for Mobile GPS Navigation -->
+        <div style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px; text-align: center; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <img src="${qrUrl}" alt="QR Google Maps" style="width: 82px; height: 82px; display: block; margin: 0 auto;">
+          <div style="font-size: 8.5px; font-weight: bold; color: #1e40af; margin-top: 3px; line-height: 1.1;">
+            สแกนเปิด Google Maps<br>นำทางบนมือถือ พขร.
+          </div>
+        </div>
+
       </div>
 
-      <!-- Legal Compliance Alert Banner -->
-      <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 6px 10px; margin-bottom: 12px; font-size: 10.5px; color: #1e40af;">
-        <strong>ข้อกำหนดตาม พ.ร.บ.การขนส่งทางบก พ.ศ. 2522:</strong> ขับขี่ติดต่อกันไม่เกิน 4 ชั่วโมง ต้องหยุดพักไม่น้อยกว่า 30 นาที | 
-        <strong>ข้อแนะนำ SCGJWD:</strong> หยุดพักตรวจเช็ครถทุกๆ 2 ชั่วโมง หรือตามจุดพักที่กำหนดในตาราง
+      <!-- Real Route Path Schematic Bar -->
+      <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 10px; color: #1e3a8a;">
+        <div style="font-weight: bold; margin-bottom: 4px; display: flex; items-center; justify-content: space-between;">
+          <span>🗺️ ลำดับการเดินทางจริง (Route Schematic Path):</span>
+          <span>ความเร็วควบคุม GPS ≤ 80 กม./ชม.</span>
+        </div>
+        <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px; font-weight: bold;">
+          ${waypoints.map((w, idx) => {
+            const isLast = idx === waypoints.length - 1;
+            const badgeColor = w.type === 'origin' ? '#10b981' : (w.type === 'destination' ? '#ef4444' : '#2563eb');
+            return `
+              <span style="background: ${badgeColor}; color: #ffffff; padding: 2px 6px; border-radius: 4px; font-size: 9px;">
+                ${idx === 0 ? 'ต้นทาง' : (isLast ? 'ปลายทาง' : 'พัก ' + idx)}: ${escapeHtml(w.name)}
+              </span>
+              ${!isLast ? '<span style="color: #64748b; font-size: 10px;">➔ ' + (waypoints[idx+1].distanceKm > 0 ? waypoints[idx+1].distanceKm + ' กม. ➔' : '') + '</span>' : ''}
+            `;
+          }).join('')}
+        </div>
       </div>
 
       <!-- Waypoints Table -->
-      <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; margin-bottom: 14px;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 10px;">
         <thead>
           <tr style="background: #1e3a8a; color: #ffffff;">
-            <th style="border: 1px solid #1e3a8a; padding: 6px 4px; text-align: center; width: 45px;">จุดที่</th>
-            <th style="border: 1px solid #1e3a8a; padding: 6px 6px; text-align: left;">ชื่อจุด / สถานที่</th>
-            <th style="border: 1px solid #1e3a8a; padding: 6px 4px; text-align: center; width: 100px;">พิกัด GPS</th>
-            <th style="border: 1px solid #1e3a8a; padding: 6px 6px; text-align: left; width: 120px;">หมายเลขถนน</th>
-            <th style="border: 1px solid #1e3a8a; padding: 6px 4px; text-align: center; width: 65px;">ระยะช่วง</th>
-            <th style="border: 1px solid #1e3a8a; padding: 6px 6px; text-align: left;">ข้อแนะนำความปลอดภัย</th>
-            <th style="border: 1px solid #1e3a8a; padding: 6px 6px; text-align: left; width: 160px;">จุดที่ต้องระวัง</th>
+            <th style="border: 1px solid #1e3a8a; padding: 5px 4px; text-align: center; width: 45px;">จุดที่</th>
+            <th style="border: 1px solid #1e3a8a; padding: 5px 6px; text-align: left;">ชื่อจุด / สถานที่</th>
+            <th style="border: 1px solid #1e3a8a; padding: 5px 4px; text-align: center; width: 105px;">พิกัด GPS</th>
+            <th style="border: 1px solid #1e3a8a; padding: 5px 6px; text-align: left; width: 120px;">หมายเลขถนน</th>
+            <th style="border: 1px solid #1e3a8a; padding: 5px 4px; text-align: center; width: 60px;">ระยะช่วง</th>
+            <th style="border: 1px solid #1e3a8a; padding: 5px 6px; text-align: left;">ข้อแนะนำความปลอดภัย</th>
+            <th style="border: 1px solid #1e3a8a; padding: 5px 6px; text-align: left; width: 150px;">จุดที่ต้องระวัง</th>
           </tr>
         </thead>
         <tbody>
@@ -10634,41 +11078,46 @@ function printRoutePlanSheet() {
             const stepLabel = wp.type === 'origin' ? 'เริ่มต้น' : (wp.type === 'destination' ? 'ปลายทาง' : `จุดที่ ${idx}`);
             return `
               <tr style="border-bottom: 1px solid #cbd5e1; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                <td style="border: 1px solid #cbd5e1; padding: 5px 4px; text-align: center; font-weight: bold;">${stepLabel}</td>
-                <td style="border: 1px solid #cbd5e1; padding: 5px 6px; font-weight: bold; color: #0f172a;">${escapeHtml(wp.name)}</td>
-                <td style="border: 1px solid #cbd5e1; padding: 5px 4px; text-align: center; font-family: monospace; font-size: 9.5px;">${wp.lat.toFixed(4)}, ${wp.lng.toFixed(4)}</td>
-                <td style="border: 1px solid #cbd5e1; padding: 5px 6px;">${escapeHtml(wp.road || '-')}</td>
-                <td style="border: 1px solid #cbd5e1; padding: 5px 4px; text-align: center; font-weight: bold;">${wp.distanceKm > 0 ? wp.distanceKm + ' กม.' : '-'}</td>
-                <td style="border: 1px solid #cbd5e1; padding: 5px 6px;">${escapeHtml(wp.recommendation || '-')}</td>
-                <td style="border: 1px solid #cbd5e1; padding: 5px 6px; color: #b45309;">${escapeHtml(wp.hazard || '-')}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 4px 4px; text-align: center; font-weight: bold;">${stepLabel}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 4px 6px; font-weight: bold; color: #0f172a;">${escapeHtml(wp.name)}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 4px 4px; text-align: center; font-family: monospace; font-size: 9px;">${wp.lat.toFixed(4)}, ${wp.lng.toFixed(4)}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 4px 6px;">${escapeHtml(wp.road || '-')}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 4px 4px; text-align: center; font-weight: bold;">${wp.distanceKm > 0 ? wp.distanceKm + ' กม.' : '-'}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 4px 6px;">${escapeHtml(wp.recommendation || '-')}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 4px 6px; color: #b45309;">${escapeHtml(wp.hazard || '-')}</td>
               </tr>
             `;
           }).join('')}
         </tbody>
       </table>
 
-      <!-- Emergency Parking Protocol Box -->
-      <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 12px; margin-bottom: 14px; font-size: 10px; color: #78350f;">
-        <div style="font-weight: bold; font-size: 11px; margin-bottom: 3px;">⚠️ ขั้นตอนปฏิบัติเมื่อจำเป็นต้องจอดรถไหล่ทางในภาวะฉุกเฉิน:</div>
-        <div>1. เปิดสัญญาณไฟฉุกเฉิน (Hazard Lights) ทันทีที่หยุดรถชิดขอบทางด้านซ้ายสุด</div>
-        <div>2. นำกรวยสะท้อนแสงหรือป้ายเตือนตั้งท้ายรถ <strong>จุดที่ 1 ห่าง 5 เมตร</strong> และ <strong>จุดที่ 2 ห่าง 50 เมตร</strong> จากท้ายรถ</div>
-        <div>3. สวมใส่เสื้อสะท้อนแสง และยืนอยู่ในจุดที่ปลอดภัยนอกแนวการจราจรขณะรอความช่วยเหลือ</div>
+      <!-- Emergency Parking Protocol Box with Graphic -->
+      <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 9.5px; color: #78350f; display: grid; grid-template-columns: 240px 1fr; gap: 8px; align-items: center;">
+        <div>
+          <img src="assets/emergency_shoulder_parking.jpg" alt="การจอดรถฉุกเฉิน" style="width: 100%; height: auto; border-radius: 4px; border: 1px solid #fde68a;">
+        </div>
+        <div>
+          <div style="font-weight: bold; font-size: 10.5px; margin-bottom: 2px;">⚠️ ขั้นตอนปฏิบัติเมื่อจำเป็นต้องจอดรถไหล่ทางในภาวะฉุกเฉิน:</div>
+          <div>1. เปิดสัญญาณไฟฉุกเฉิน (Hazard Lights) ทันทีที่หยุดรถชิดขอบทางด้านซ้ายสุด</div>
+          <div>2. นำกรวยสะท้อนแสงหรือป้ายเตือนตั้งท้ายรถ <strong>จุดที่ 1 ห่าง 5 เมตร</strong> และ <strong>จุดที่ 2 ห่าง 50 เมตร</strong> จากท้ายรถ</div>
+          <div>3. สวมใส่เสื้อสะท้อนแสง และยืนอยู่ในจุดที่ปลอดภัยนอกแนวการจราจรขณะรอความช่วยเหลือ</div>
+        </div>
       </div>
 
       <!-- Signature Section -->
-      <div style="display: flex; justify-content: space-between; margin-top: 25px; padding-top: 10px; font-size: 11px; text-align: center;">
+      <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 8px; font-size: 10px; text-align: center;">
         <div style="width: 28%;">
-          <div style="height: 35px;"></div>
+          <div style="height: 28px;"></div>
           <div style="border-top: 1px dashed #64748b; padding-top: 4px;">(${escapeHtml(route.reviewer || 'Nichanan Aj.')})</div>
           <div>ผู้จัดทำแผนการเดินรถ / TSM</div>
         </div>
         <div style="width: 28%;">
-          <div style="height: 35px;"></div>
+          <div style="height: 28px;"></div>
           <div style="border-top: 1px dashed #64748b; padding-top: 4px;">(......................................................)</div>
           <div>หัวหน้างานจัดคิว / Dispatcher</div>
         </div>
         <div style="width: 28%;">
-          <div style="height: 35px;"></div>
+          <div style="height: 28px;"></div>
           <div style="border-top: 1px dashed #64748b; padding-top: 4px;">(......................................................)</div>
           <div>พนักงานขับรถผู้รับแผน (Driver)</div>
         </div>
