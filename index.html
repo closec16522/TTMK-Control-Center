@@ -2302,9 +2302,35 @@
             </a>
 
             <button type="button" onclick="openAddRouteModal()"
-                    class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow flex items-center gap-1.5">
+                    class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow flex items-center gap-1.5">
               <i class="fa-solid fa-plus"></i>
               <span>เพิ่มเส้นทาง / ลูกค้าใหม่</span>
+            </button>
+
+            <!-- Edit Current Route Button -->
+            <button type="button" onclick="openAddRouteModal(appState.currentRouteId)"
+                    id="btnEditCurrentRoute"
+                    class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow flex items-center gap-1.5"
+                    title="แก้ไขข้อมูลเส้นทางและจุดแวะพักของเส้นทางที่เลือก">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>แก้ไข / อัปเดตเส้นทาง</span>
+            </button>
+
+            <!-- Copy Navigation Link Button -->
+            <button type="button" onclick="copyRouteGoogleMapsUrl()"
+                    id="btnCopyRouteUrl"
+                    class="px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold transition border border-indigo-300 dark:border-indigo-700 flex items-center gap-1.5"
+                    title="คัดลอกลิงก์ Google Maps นำทางพร้อมจุดแวะพักทั้งหมด ส่งให้ พขร.">
+              <i class="fa-solid fa-copy text-indigo-600"></i>
+              <span>คัดลอก Link เส้นทาง</span>
+            </button>
+
+            <!-- Share to LINE Button -->
+            <button type="button" onclick="shareRouteToLine()"
+                    class="px-3 py-1.5 rounded-xl bg-[#06c755]/10 hover:bg-[#06c755]/20 text-[#06c755] font-bold transition border border-[#06c755]/30 flex items-center gap-1.5"
+                    title="แชร์ข้อมูลแผนเส้นทางและจุดแวะพักเข้าแอป LINE">
+              <i class="fa-brands fa-line text-base text-[#06c755]"></i>
+              <span>แชร์เข้า LINE</span>
             </button>
 
             <button type="button" onclick="printRoutePlanSheet()"
@@ -2314,7 +2340,7 @@
             </button>
 
             <!-- Sync with Google Sheet Button -->
-            <button type="button" onclick="syncRoutesFromGoogleSheet()"
+            <button type="button" onclick="if(window.syncRoutesFromGoogleSheet) window.syncRoutesFromGoogleSheet(); else syncRoutesFromGoogleSheet();"
                     id="btnSyncRouteSheet"
                     class="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 font-bold transition border border-emerald-300 dark:border-emerald-700 flex items-center gap-1.5"
                     title="ดึงข้อมูลเส้นทางล่าสุดจาก Google Sheet: Route_Plans">
@@ -2360,13 +2386,31 @@
             </select>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5 flex-wrap">
             <span id="routeCustomerBadge" class="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-bold border border-indigo-200 dark:border-indigo-800">
               ลูกค้า: บจก. กลุ่มสยามบรรจุภัณฑ์ โรงงานชลบุรี
             </span>
             <span id="routeDateBadge" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono">
               ทบทวน: 17.09.2567
             </span>
+            <button type="button" onclick="copyRouteGoogleMapsUrl()"
+                    class="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 font-bold border border-indigo-200 dark:border-indigo-800 flex items-center gap-1 transition shadow-sm"
+                    title="คัดลอกลิงก์นำทาง Google Maps">
+              <i class="fa-solid fa-copy text-indigo-600"></i>
+              <span>คัดลอก Link</span>
+            </button>
+            <button type="button" onclick="shareRouteToLine()"
+                    class="px-2 py-1 rounded-lg bg-[#06c755]/10 hover:bg-[#06c755]/20 text-[#06c755] font-bold border border-[#06c755]/30 flex items-center gap-1 transition shadow-sm"
+                    title="แชร์แผนเส้นทางเข้า LINE">
+              <i class="fa-brands fa-line text-sm"></i>
+              <span>LINE</span>
+            </button>
+            <button type="button" onclick="openAddRouteModal(appState.currentRouteId)"
+                    class="px-2 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800 flex items-center gap-1 transition shadow-sm"
+                    title="แก้ไขข้อมูลเส้นทางและจุดพักรถ">
+              <i class="fa-solid fa-pen-to-square text-amber-600"></i>
+              <span>แก้ไขแผน</span>
+            </button>
           </div>
         </div>
 
@@ -4103,6 +4147,12 @@
             <i class="fa-brands fa-google text-blue-400"></i>
             <span>Google Maps Place Preview</span>
           </div>
+          <!-- Upload Custom Photo Overlay Button -->
+          <label class="absolute top-2 right-2 px-2.5 py-1 rounded-lg bg-slate-900/85 hover:bg-slate-900 backdrop-blur-sm text-white text-[11px] font-bold shadow-md border border-white/30 cursor-pointer flex items-center gap-1.5 transition z-10" title="อัปโหลดรูปภาพสถานที่จริงสำหรับอ้างอิง">
+            <i class="fa-solid fa-camera text-amber-400"></i>
+            <span>อัปโหลดรูปถ่ายจริง</span>
+            <input type="file" accept="image/*" class="hidden" onchange="uploadCurrentModalPlacePhoto(this.files[0])">
+          </label>
         </div>
 
         <!-- 2. Live Map Embed Iframe Container -->
@@ -4136,19 +4186,29 @@
         <!-- Actions Bar -->
         <div class="flex items-center justify-between pt-1 gap-2 flex-wrap">
           <a id="photoModalMapsLink" href="#" target="_blank"
-             class="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5 min-w-[140px]">
+             class="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5 min-w-[130px]">
             <i class="fa-solid fa-diamond-turn-right"></i>
             <span>Google Maps นำทาง</span>
           </a>
           <a id="photoModalStreetViewLink" href="#" target="_blank"
-             class="flex-1 py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5 min-w-[140px]">
+             class="flex-1 py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5 min-w-[130px]">
             <i class="fa-solid fa-street-view"></i>
             <span>Street View 360°</span>
           </a>
           <button type="button" id="photoModalLineBtn" onclick="shareCurrentPlaceToLine()"
-                  class="py-2 px-3.5 rounded-xl bg-[#06c755] hover:bg-[#05b34c] text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5">
+                  class="py-2 px-3 rounded-xl bg-[#06c755] hover:bg-[#05b34c] text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5 min-w-[120px]">
             <i class="fa-brands fa-line text-sm"></i>
-            <span>ส่งจุดนี้เข้า LINE</span>
+            <span>ส่งเข้า LINE</span>
+          </button>
+          <label class="py-2 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5 min-w-[130px] cursor-pointer" title="อัปโหลดรูปถ่ายสถานที่จริงเพื่ออ้างอิง">
+            <i class="fa-solid fa-cloud-arrow-up text-amber-300"></i>
+            <span>อัปโหลดรูปเอง</span>
+            <input type="file" accept="image/*" class="hidden" onchange="uploadCurrentModalPlacePhoto(this.files[0])">
+          </label>
+          <button type="button" onclick="copyCurrentPlaceGps()"
+                  class="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold transition flex items-center justify-center gap-1.5 border border-slate-300 dark:border-slate-700" title="คัดลอกพิกัด GPS">
+            <i class="fa-solid fa-copy text-blue-500"></i>
+            <span>คัดลอกพิกัด</span>
           </button>
         </div>
       </div>
@@ -4309,6 +4369,18 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <button type="button" onclick="copyRouteGoogleMapsUrl()"
+                  class="px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-xs font-bold border border-indigo-200 dark:border-indigo-800 transition flex items-center gap-1.5"
+                  title="คัดลอกลิงก์ Google Maps นำทาง">
+            <i class="fa-solid fa-copy text-indigo-600"></i>
+            <span>คัดลอก Link</span>
+          </button>
+          <button type="button" onclick="shareRouteToLine()"
+                  class="px-3 py-1.5 rounded-xl bg-[#06c755]/10 hover:bg-[#06c755]/20 text-[#06c755] text-xs font-bold border border-[#06c755]/30 transition flex items-center gap-1.5"
+                  title="แชร์เข้า LINE">
+            <i class="fa-brands fa-line text-sm"></i>
+            <span>LINE</span>
+          </button>
           <button type="button" onclick="window.print()"
                   class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow transition flex items-center gap-1.5">
             <i class="fa-solid fa-print"></i>
@@ -5088,17 +5160,19 @@
           }
         } catch(e){}
 
-        // 4. Query GAS Web App for live alcohol logs (Google Sheet: Alcohol_Logs)
-        try {
-          const gasAlcResp = await fetch(`${CONFIG.GAS_URL}?action=listAlcoholLogs`);
-          if (gasAlcResp.ok) {
-            const alcData = await gasAlcResp.json();
-            if (alcData.logs && alcData.logs.length > 0) {
-              appState.alcoholLogs = alcData.logs;
-              loaded = true;
+        // 4. Query GAS Web App for live alcohol logs (Google Sheet: Alcohol_Logs) only as fallback
+        if (!appState.alcoholLogs || appState.alcoholLogs.length === 0) {
+          try {
+            const gasAlcResp = await fetch(`${CONFIG.GAS_URL}?action=listAlcoholLogs`);
+            if (gasAlcResp.ok) {
+              const alcData = await gasAlcResp.json();
+              if (alcData && alcData.logs && alcData.logs.length > 0) {
+                appState.alcoholLogs = alcData.logs;
+                loaded = true;
+              }
             }
-          }
-        } catch(e){}
+          } catch(e){}
+        }
 
         // 5. Query GAS Web App for live Truck_Inspection_Logs (Google Sheet: Truck_Inspection_Logs)
         try {
@@ -10411,18 +10485,50 @@ function copyRouteGoogleMapsUrl() {
   if (!route) return;
   const url = getGoogleMapsDirectionUrl(route);
 
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(url).then(() => {
-      if (typeof showToastNotification === 'function') {
-        showToastNotification('คัดลอกลิงก์ Google Maps นำทางพร้อมจุดแวะพักเรียบร้อยแล้ว', 'success');
-      } else {
-        alert('คัดลอกลิงก์นำทาง Google Maps เรียบร้อยแล้ว:\n' + url);
-      }
-    }).catch(() => {
+  const notifySuccess = () => {
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: 'success',
+        title: 'คัดลอกลิงก์นำทางเรียบร้อยแล้ว!',
+        html: `
+          <div class="text-left text-xs space-y-2 text-slate-700 dark:text-slate-300">
+            <div>เส้นทาง: <strong>${escapeHtml(route.name)}</strong></div>
+            <div class="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-lg font-mono text-[11px] break-all select-all border border-slate-200 dark:border-slate-700">
+              ${url}
+            </div>
+            <div class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold">
+              ✓ ลิงก์นี้ประกอบด้วยจุดต้นทาง จุดแวะพักทุกจุด และปลายทางตามมาตรฐานความปลอดภัย พร้อมเปิดนำทางบน Google Maps มือถือได้ทันที
+            </div>
+          </div>
+        `,
+        confirmButtonText: 'ตกลง',
+        confirmButtonColor: '#2563eb'
+      });
+    } else if (typeof showToastNotification === 'function') {
+      showToastNotification('คัดลอกลิงก์นำทาง Google Maps เรียบร้อยแล้ว', 'success');
+    } else {
+      alert('คัดลอกลิงก์นำทางเรียบร้อยแล้ว:\n' + url);
+    }
+  };
+
+  const fallbackCopy = () => {
+    const el = document.createElement('textarea');
+    el.value = url;
+    document.body.appendChild(el);
+    el.select();
+    try {
+      document.execCommand('copy');
+      notifySuccess();
+    } catch(e) {
       prompt('คัดลอกลิงก์นำทาง Google Maps (Ctrl+C):', url);
-    });
+    }
+    document.body.removeChild(el);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(notifySuccess).catch(fallbackCopy);
   } else {
-    prompt('คัดลอกลิงก์นำทาง Google Maps (Ctrl+C):', url);
+    fallbackCopy();
   }
 }
 
@@ -10527,11 +10633,22 @@ function filterRoutePlansByFeed(feedKey) {
 // Global state for current opened modal place
 let currentModalPlace = null;
 
-function openRoutePhotoModal(photoUrl, title, lat, lng, road, rec, haz, type) {
+function openRoutePhotoModal(photoUrl, title, lat, lng, road, rec, haz, type, routeId = null, waypointIndex = null) {
   const modal = document.getElementById('routePhotoModal');
   if (!modal) return;
 
-  currentModalPlace = { photoUrl, title, lat, lng, road, rec, haz, type };
+  currentModalPlace = {
+    photoUrl,
+    title,
+    lat,
+    lng,
+    road,
+    rec,
+    haz,
+    type,
+    routeId: routeId || appState.currentRouteId,
+    waypointIndex
+  };
 
   const imgEl = document.getElementById('photoModalImg');
   const titleEl = document.getElementById('photoModalTitle');
@@ -10666,6 +10783,154 @@ function closeRoutePhotoModal() {
   if (mapIframe) mapIframe.src = '';
 }
 
+// คัดลอกพิกัด GPS ของสถานที่ใน Modal
+function copyCurrentPlaceGps() {
+  if (!currentModalPlace) return;
+  const coord = `${currentModalPlace.lat}, ${currentModalPlace.lng}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(coord).then(() => {
+      if (typeof showToastNotification === 'function') {
+        showToastNotification(`คัดลอกพิกัด GPS: ${coord} เรียบร้อยแล้ว`, 'success');
+      }
+    }).catch(() => {
+      prompt('คัดลอกพิกัด GPS (Ctrl+C):', coord);
+    });
+  } else {
+    prompt('คัดลอกพิกัด GPS (Ctrl+C):', coord);
+  }
+}
+
+// อัปโหลดรูปภาพสถานที่จริงจาก Modal พรีวิว
+async function uploadCurrentModalPlacePhoto(file) {
+  if (!file) return;
+  if (!currentModalPlace) {
+    alert('ไม่พบข้อมูลสถานที่ที่เลือก');
+    return;
+  }
+
+  if (file.size > 15 * 1024 * 1024) {
+    alert('ขนาดรูปภาพต้องไม่เกิน 15 MB');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl = e.target.result;
+
+    // 1. อัปเดตการแสดงผลใน Modal ทันที
+    const imgEl = document.getElementById('photoModalImg');
+    if (imgEl) imgEl.src = dataUrl;
+
+    // 2. ค้นหา Route และ Waypoint เพื่ออัปเดตใน Memory & LocalStorage
+    const routeId = currentModalPlace.routeId || appState.currentRouteId;
+    const route = appState.routes.find(r => r.id === routeId);
+    let targetWp = null;
+
+    if (route && Array.isArray(route.waypoints)) {
+      if (typeof currentModalPlace.waypointIndex === 'number' && route.waypoints[currentModalPlace.waypointIndex]) {
+        targetWp = route.waypoints[currentModalPlace.waypointIndex];
+      } else {
+        targetWp = route.waypoints.find(w => w.name === currentModalPlace.title || (Math.abs(w.lat - currentModalPlace.lat) < 0.001 && Math.abs(w.lng - currentModalPlace.lng) < 0.001));
+      }
+
+      if (targetWp) {
+        targetWp.photoUrl = dataUrl;
+        currentModalPlace.photoUrl = dataUrl;
+        localStorage.setItem('TTMK_ROUTE_PLANS', JSON.stringify(appState.routes));
+        renderRoutePlan(route.id);
+      }
+    }
+
+    if (typeof showToastNotification === 'function') {
+      showToastNotification('อัปเดตรูปถ่ายสถานที่เรียบร้อยแล้ว กำลังจัดเก็บเข้า Google Drive...', 'info');
+    }
+
+    // 3. ส่งอัปโหลดเข้า Google Drive โฟลเดอร์ 02_Rest_Stop_Evidence ผ่าน GAS_ROUTES_URL
+    if (CONFIG.GAS_ROUTES_URL) {
+      try {
+        const cleanName = (currentModalPlace.title || 'RestStop').replace(/[^a-zA-Z0-9_\u0E00-\u0E7F]/g, '_');
+        const filename = `Place_${routeId}_${cleanName}_${Date.now()}.jpg`;
+
+        const resp = await fetch(CONFIG.GAS_ROUTES_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'upload_rest_stop_evidence',
+            filename: filename,
+            base64Photo: dataUrl
+          })
+        });
+
+        if (resp.ok) {
+          const res = await resp.json();
+          if (res && res.status === 'success' && res.url) {
+            console.log('Photo uploaded to Google Drive:', res);
+            if (targetWp) {
+              targetWp.photoUrl = res.url;
+              localStorage.setItem('TTMK_ROUTE_PLANS', JSON.stringify(appState.routes));
+              
+              // ซิงค์ Route ฉบับอัปเดตรูปลงแผ่นงาน Route_Plans
+              fetch(CONFIG.GAS_ROUTES_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                  action: 'save_route',
+                  id: route.id,
+                  name: route.name,
+                  feed: route.feed,
+                  customer: route.customer,
+                  totalDistanceKm: (route.waypoints || []).reduce((s, w) => s + (Number(w.distanceKm) || 0), 0),
+                  estimatedTime: route.estimatedTime,
+                  restStopsCount: (route.waypoints || []).filter(w => w.type === 'rest').length,
+                  speedLimit: route.speedLimit,
+                  waypoints: route.waypoints,
+                  googleMapsUrl: getGoogleMapsDirectionUrl(route),
+                  reviewer: route.reviewer,
+                  reviewDate: route.reviewDate
+                })
+              }).catch(e => console.warn('Sync updated route to sheet error:', e));
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Background upload to Drive error:', err);
+      }
+    }
+
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: 'success',
+        title: 'อัปโหลดรูปภาพสำเร็จ!',
+        text: 'บันทึกรูปภาพสถานที่อ้างอิงและอัปเดตแผนการเดินรถเรียบร้อยแล้ว',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+// อัปโหลดรูปภาพสำหรับ Waypoint จากตารางโดยตรง
+function uploadWaypointPhoto(routeId, waypointIndex, file) {
+  if (!file) return;
+  const route = appState.routes.find(r => r.id === routeId);
+  if (!route || !route.waypoints || !route.waypoints[waypointIndex]) return;
+  const wp = route.waypoints[waypointIndex];
+  currentModalPlace = {
+    photoUrl: wp.photoUrl,
+    title: wp.name,
+    lat: wp.lat,
+    lng: wp.lng,
+    road: wp.road,
+    rec: wp.recommendation,
+    haz: wp.hazard,
+    type: wp.type,
+    routeId,
+    waypointIndex
+  };
+  uploadCurrentModalPlacePhoto(file);
+}
+
 function renderRoutePlan(routeId) {
   const route = appState.routes.find(r => r.id === routeId) || appState.routes[0];
   if (!route) return;
@@ -10751,7 +11016,7 @@ function renderRoutePlan(routeId) {
           <div class="flex items-start gap-3">
             <!-- Clickable Photo Thumbnail with Brand Badge -->
             <div class="relative w-28 h-20 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 cursor-pointer group shadow-sm bg-slate-950"
-                 onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}', '${wp.type}')"
+                 onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}', '${wp.type}', '${escapeHtml(route.id)}', ${idx})"
                  title="คลิกเพื่อดูรูปขยายและ Google Maps Live 3D">
               ${getPlaceBrandBadge(wp.name, wp.type)}
               <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(wp.name)}" 
@@ -10867,7 +11132,7 @@ function renderRoutePlan(routeId) {
           </td>
           <td class="py-3 px-3 text-center align-middle">
             <div class="relative w-28 h-16 mx-auto rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer group bg-slate-950"
-                 onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}', '${wp.type}')"
+                 onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}', '${wp.type}', '${escapeHtml(route.id)}', ${idx})"
                  title="คลิกดูรูปขยายและ Google Maps">
               ${getPlaceBrandBadge(wp.name, wp.type)}
               <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(wp.name)}" 
@@ -10877,6 +11142,11 @@ function renderRoutePlan(routeId) {
                 <i class="fa-brands fa-google text-blue-400"></i> พรีวิว Google
               </div>
             </div>
+            <label class="mt-1 inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-purple-100 dark:hover:bg-purple-900/50 hover:text-purple-700 dark:hover:text-purple-300 text-slate-600 dark:text-slate-300 font-bold border border-slate-300 dark:border-slate-700 cursor-pointer transition shadow-xs" title="อัปโหลดรูปภาพสถานที่จริงสำหรับจุดนี้">
+              <i class="fa-solid fa-camera text-purple-600 dark:text-purple-400"></i>
+              <span>เปลี่ยนรูป</span>
+              <input type="file" accept="image/*" class="hidden" onchange="uploadWaypointPhoto('${escapeHtml(route.id)}', ${idx}, this.files[0])">
+            </label>
           </td>
         </tr>
       `;
@@ -11407,8 +11677,24 @@ function closeRoutePlanPrintModal() {
       if (liveSyncIntervalId) clearInterval(liveSyncIntervalId);
       liveSyncIntervalId = setInterval(() => {
         syncAllSheetData(false);
-      }, 15000); // 15-second real-time polling
+      }, 30000); // 30-second safe real-time polling to prevent GAS throttling
     }
+
+    // Expose Route Planning & Safety functions explicitly to window
+    window.syncRoutesFromGoogleSheet = syncRoutesFromGoogleSheet;
+    window.openAddRouteModal = openAddRouteModal;
+    window.closeAddRouteModal = closeAddRouteModal;
+    window.copyRouteGoogleMapsUrl = copyRouteGoogleMapsUrl;
+    window.shareRouteToLine = shareRouteToLine;
+    window.printRoutePlanSheet = printRoutePlanSheet;
+    window.closeRoutePlanPrintModal = closeRoutePlanPrintModal;
+    window.openRoutePhotoModal = openRoutePhotoModal;
+    window.closeRoutePhotoModal = closeRoutePhotoModal;
+    window.uploadCurrentModalPlacePhoto = uploadCurrentModalPlacePhoto;
+    window.uploadWaypointPhoto = uploadWaypointPhoto;
+    window.copyCurrentPlaceGps = copyCurrentPlaceGps;
+    window.onSelectRoutePlan = onSelectRoutePlan;
+    window.filterRoutePlansByFeed = filterRoutePlansByFeed;
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
