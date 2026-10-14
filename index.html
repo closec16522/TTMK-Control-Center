@@ -2092,6 +2092,7 @@
         <div id="erpVehiclesPanel" class="glass-panel p-5 space-y-4">
           <!-- Toolbar -->
           <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div>
               <div class="flex items-center gap-2 flex-wrap">
                 <h3 class="font-bold text-sm md:text-base text-slate-800 dark:text-white flex items-center gap-2">
                   <i class="fa-solid fa-truck-moving text-blue-600"></i>
@@ -4015,7 +4016,82 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- MODAL 7: Route Plan Add / Edit Manager Modal                     -->
+  <!-- ============================================================== -->
+  <!-- MODAL: Route Location & Google Maps Photo Detail Modal           -->
+  <!-- ============================================================== -->
+  <div id="routePhotoModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+    <div class="glass-panel max-w-2xl w-full p-4 sm:p-5 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl max-h-[94vh] flex flex-col my-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 gap-2">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm shadow-sm">
+            <i class="fa-solid fa-map-location-dot"></i>
+          </div>
+          <div>
+            <h3 id="photoModalTitle" class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+              ภาพถ่ายสถานที่ & Google Maps Street View
+            </h3>
+            <p id="photoModalSubtitle" class="text-xs text-slate-500 dark:text-slate-400">
+              พิกัด GPS และข้อแนะนำความปลอดภัยประจำจุดพักรถ
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="closeRoutePhotoModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="flex-1 overflow-y-auto p-1 space-y-3.5 my-2 text-xs">
+        <!-- Photo Container -->
+        <div class="relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-950 shadow-inner group">
+          <img id="photoModalImg" src="" alt="Location Photo" class="w-full h-56 sm:h-72 object-cover object-center transition duration-300">
+          <div class="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-sm text-white text-[11px] font-semibold flex items-center gap-1.5 border border-white/20">
+            <i class="fa-brands fa-google text-blue-400"></i>
+            <span>ภาพถ่ายสถานที่จริง / Google Maps</span>
+          </div>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="grid grid-cols-2 gap-2.5 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div>
+            <span class="text-slate-500 dark:text-slate-400 font-semibold block">สายทาง / หมายเลขถนน:</span>
+            <span id="photoModalRoad" class="font-bold text-slate-800 dark:text-white text-xs block mt-0.5">-</span>
+          </div>
+          <div>
+            <span class="text-slate-500 dark:text-slate-400 font-semibold block">พิกัด GPS (Lat, Lng):</span>
+            <span id="photoModalGps" class="font-mono font-bold text-blue-600 dark:text-blue-400 text-xs block mt-0.5">-</span>
+          </div>
+          <div class="col-span-2 pt-1 border-t border-slate-200 dark:border-slate-700">
+            <span class="text-emerald-700 dark:text-emerald-400 font-bold block mb-0.5">ข้อแนะนำความปลอดภัย:</span>
+            <p id="photoModalRec" class="text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed">-</p>
+          </div>
+          <div id="photoModalHazBox" class="col-span-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
+            <span class="text-amber-800 dark:text-amber-300 font-bold block mb-0.5">จุดที่ต้องระวัง:</span>
+            <p id="photoModalHaz" class="text-amber-700 dark:text-amber-400 text-[11px] leading-relaxed">-</p>
+          </div>
+        </div>
+
+        <!-- Actions Bar -->
+        <div class="flex items-center justify-between pt-1 gap-2">
+          <a id="photoModalMapsLink" href="#" target="_blank"
+             class="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-diamond-turn-right"></i>
+            <span>เปิด Google Maps นำทาง</span>
+          </a>
+          <a id="photoModalStreetViewLink" href="#" target="_blank"
+             class="flex-1 py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-center transition shadow-sm flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-street-view"></i>
+            <span>Google Street View 360°</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+    <!-- MODAL 7: Route Plan Add / Edit Manager Modal                     -->
   <!-- ============================================================== -->
   <div id="routePlanModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
     <div class="glass-panel max-w-4xl w-full p-4 sm:p-6 shadow-2xl relative border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-2xl max-h-[94vh] flex flex-col my-auto">
@@ -9496,14 +9572,14 @@ const DEFAULT_ROUTE_PLANS = [
       {
         order: 0,
         type: 'origin',
-        name: 'โรงงานสยามบรรจุภัณฑ์ (TCRB) ราชบุรี',
-        lat: 13.5282,
+        name: 'โรงงานสยามบรรจุภัณฑ์ (TCSB) ราชบุรี',
+        lat: 14.5582,
         lng: 99.8166,
         road: 'ทล.4 (เพชรเกษม)',
         distanceKm: 0,
-        recommendation: 'จุดปล่อยรถ/ขึ้นสินค้า ตรวจเช็คเอกสารใบกำกับสินค้า ตรวจความพร้อมพนักงานขับรถ (วัดแอลกอฮอล์/ความดัน) และตรวจสภาพรถ F-CAM-032 ก่อนออกเดินทาง',
+        recommendation: 'จุดเริ่มต้น: ตรวจเช็คเอกสารใบกำกับสินค้า ตรวจความพร้อมพนักงานขับรถ (วัดแอลกอฮอล์/ความดัน) และตรวจสภาพรถ F-CAM-032 ก่อนออกเดินทาง',
         hazard: 'ระวังรถเข้า-ออกบริเวณปากทางเข้าโรงงาน ใช้ความเร็วไม่เกิน 20 กม./ชม. ในพื้นที่โรงงาน',
-        photoUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point1_tcsb_ratchaburi.jpg'
       },
       {
         order: 1,
@@ -9511,23 +9587,23 @@ const DEFAULT_ROUTE_PLANS = [
         name: 'ปั๊มเอสโซ่ อาร์.เอส.ออยล์นครปฐม',
         lat: 13.8213,
         lng: 100.0433,
-        road: 'ทล.4 (เพชรเกษม กม.56)',
+        road: 'ถนนเพชรเกษม (ถนนหมายเลข 4)',
         distanceKm: 56,
-        recommendation: 'จุดพักรถที่ 1: ตรวจเช็คความตึงของสายรัดสินค้า (Lashing), ตรวจเช็คลมยางและอุณหภูมิยาง, ล้างหน้าพักผ่อน 15-30 นาที',
-        hazard: 'จุดกลับรถและทางแยกสัญญาณไฟจราจรช่วงนครปฐม ระวังรถจักรยานยนต์ตัดหน้า',
-        photoUrl: 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=400&q=80'
+        recommendation: 'เติมน้ำมันและพักผ่อน 15-30 นาที ตรวจเช็คความตึงสายรัดสินค้า และตรวจเช็คลมยาง',
+        hazard: 'อาจมีรถหนาแน่นช่วงเวลาสูงสุด ระวังรถจักรยานยนต์และจุดกลับรถ',
+        photoUrl: 'assets/route_photos/point2_esso_nakhonpathom.jpg'
       },
       {
         order: 2,
         type: 'rest',
-        name: 'ปั๊มน้ำมันบางจาก - บจก. สินปิ่นเกล้า',
+        name: 'ปั๊มน้ำมันบางจาก - บริษัท สินปิ่นเกล้า จำกัด',
         lat: 13.7861,
         lng: 100.3500,
-        road: 'ถ.บรมราชชนนี (มุ่งหน้าสะพานพระปิ่นเกล้า/กาญจนาภิเษก)',
+        road: 'ถนนบรมราชชนนี',
         distanceKm: 92,
-        recommendation: 'จุดพักรถที่ 2: หยุดพักผ่อน รับประทานอาหาร ดื่มน้ำ ตรวจเช็คระบบไฟส่องสว่างและสัญญาณเตือนท้ายรถ',
-        hazard: 'ปริมาณการจราจรหนาแน่นช่วงเข้าเขตปริมณฑล/พุทธมณฑล ห้ามใช้ความเร็วเกิน 60 กม./ชม. ในช่องทางคู่ขนาน',
-        photoUrl: 'https://images.unsplash.com/photo-1527018607616-0526648e861c?auto=format&fit=crop&w=400&q=80'
+        recommendation: 'เติมน้ำมันและพักผ่อน ดื่มน้ำ พักสายตา ตรวจเช็คระบบไฟส่องสว่างท้ายรถ',
+        hazard: 'ถนนบรมราชชนนีอาจมีการจราจรหนาแน่น ห้ามใช้ความเร็วเกิน 60 กม./ชม. ในช่องทางคู่ขนาน',
+        photoUrl: 'assets/route_photos/point3_bangchak_pinklao.jpg'
       },
       {
         order: 3,
@@ -9535,35 +9611,35 @@ const DEFAULT_ROUTE_PLANS = [
         name: 'Shell ออยล์นวงค์ A',
         lat: 13.5988,
         lng: 100.6503,
-        road: 'ถ.บางนา-ตราด (ทล.34 กม.22)',
+        road: 'ถนนบางนา-ตราด (ทล.34 กม.22)',
         distanceKm: 82,
-        recommendation: 'จุดพักรถที่ 3: ตรวจสอบความร้อนของดุมล้อและระบบเบรก, ตรวจเช็ค GPS Tracking, พักสายตาไม่น้อยกว่า 20 นาที',
-        hazard: 'ทางเบี่ยงสะพานกลับรถและจุดขึ้นลงทางด่วนบูรพาวิถี ระวังรถเปลี่ยนเลนกะทันหัน',
-        photoUrl: 'https://images.unsplash.com/photo-1590496793929-36417d3117de?auto=format&fit=crop&w=400&q=80'
+        recommendation: 'เติมน้ำมันและพักผ่อน ตรวจสอบความร้อนของดุมล้อและระบบเบรก พักสายตาไม่น้อยกว่า 20 นาที',
+        hazard: 'อาจมีการจราจรหนาแน่นช่วงเวลาเร่งด่วน ระวังจุดกลับรถและทางขึ้นสะพานยกระดับ',
+        photoUrl: 'assets/route_photos/point4_shell_bangna.jpg'
       },
       {
         order: 4,
         type: 'rest',
-        name: 'PTT Station ปตท.จิฟฟี่ สาขาฉะเชิงเทรา-บางนา ตราด กม.49',
-        lat: 13.5186,
+        name: 'PTT Station ปตท.จิฟฟี่ สาขาฉะเชิงเทรา-บางนา ตราด (กม.49)',
+        lat: 13.7452,
         lng: 101.0058,
-        road: 'ถ.บางนา-ตราด (กม.49 ขาออก มุ่งหน้าชลบุรี)',
+        road: 'ถนนบางนา-ตราด (กม.49 ขาออก)',
         distanceKm: 48,
-        recommendation: 'จุดพักรถที่ 4 (จุดพักสุดท้ายก่อนส่งมอบ): ปั๊มขนาดใหญ่ มีลานจอดรถบรรทุกกว้างขวาง ตรวจเช็คความเรียบร้อยของสินค้าก่อนเข้าโรงงานลูกค้า',
-        hazard: 'จุดชะลอตัวก่อนข้ามแม่น้ำบางปะกง ลมพัดขวางบนสะพาน ให้จับพวงมาลัยสองมือมั่นคง',
-        photoUrl: 'https://images.unsplash.com/photo-1617886903355-9354bb57751f?auto=format&fit=crop&w=400&q=80'
+        recommendation: 'เติมน้ำมันและพักผ่อน (จุดพักสุดท้ายก่อนถึงปลายทาง) ปั๊มขนาดใหญ่ มีลานจอดรถบรรทุกกว้างขวาง ตรวจเช็คความเรียบร้อยสินค้า',
+        hazard: 'อาจมีการจราจรหนาแน่นช่วงเวลาเร่งด่วน ระวังลมพัดขวางบนสะพานข้ามแม่น้ำบางปะกง',
+        photoUrl: 'assets/route_photos/point5_ptt_chachoengsao.jpg'
       },
       {
         order: 5,
         type: 'destination',
-        name: 'บจก. กลุ่มสยามบรรจุภัณฑ์ จำกัด โรงงานชลบุรี',
+        name: 'บริษัท กลุ่มสยามบรรจุภัณฑ์ จำกัด โรงงานชลบุรี',
         lat: 13.3648,
         lng: 100.9866,
-        road: 'ถ.สุขุมวิท (นิคมอุตสาหกรรมทองโกรว์ / นิคมอมตะซิตี้ ชลบุรี)',
+        road: 'ถนนสุขุมวิท',
         distanceKm: 80,
-        recommendation: 'จุดส่งมอบสินค้าปลายทาง: ดับเครื่องยนต์ ดึงเบรกมือ สวมใส่อุปกรณ์ PPE (หมวก, เสื้อสะท้อนแสง, รองเท้าเซฟตี้) ครบชุดก่อนลงจากรถ และส่งมอบเอกสารใบส่งของ (POD)',
-        hazard: 'ทางแยกและทางเข้า-ออกนิคมอุตสาหกรรม มีรถบรรทุกขนาดใหญ่และตู้คอนเทนเนอร์เข้าออกหนาแน่น',
-        photoUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80'
+        recommendation: 'ถึงจุดหมายปลายทาง: ดับเครื่องยนต์ ดึงเบรกมือ สวมใส่อุปกรณ์ PPE (หมวก, เสื้อสะท้อนแสง, รองเท้าเซฟตี้) ครบชุดก่อนลงจากรถ และส่งมอบเอกสารใบส่งของ (POD)',
+        hazard: 'ตรวจสอบสภาพถนนและสภาพการจราจร ระวังรถบรรทุกตู้คอนเทนเนอร์เข้า-ออกนิคมอุตสาหกรรม',
+        photoUrl: 'assets/route_photos/point6_scg_chonburi.jpg'
       }
     ]
   },
@@ -9588,7 +9664,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 0,
         recommendation: 'จุดขึ้นสินค้า ตรวจสอบสภาพซีลล็อกตู้คอนเทนเนอร์/ผ้าใบคลุม และชั่งน้ำหนักรถก่อนเดินทาง',
         hazard: 'จุดกลับรถหน้าโรงงานปูนซีเมนต์ ระวังรถบรรทุกหนักชะลอตัว',
-        photoUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point1_tcsb_ratchaburi.jpg'
       },
       {
         order: 1,
@@ -9600,7 +9676,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 18,
         recommendation: 'ตรวจสอบลมยางและเช็คระบบไฟเบรกก่อนเข้าสู่ทางหลวงสาย 21',
         hazard: 'ทางแยกร่วมเลี่ยงเมือง มีรถบรรทุกหักเลี้ยวเลนซ้ายบ่อยครั้ง',
-        photoUrl: 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point2_esso_nakhonpathom.jpg'
       },
       {
         order: 2,
@@ -9612,7 +9688,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 46,
         recommendation: 'จุดพักรถตามเกณฑ์กฎหมาย: พักสายตา 30 นาที ดื่มน้ำ ล้างหน้า ตรวจสอบความปลอดภัยสินค้า',
         hazard: 'ทางตรงยาว เสี่ยงต่ออาการหลับใน ให้รักษาความเร็วไม่เกิน 80 กม./ชม.',
-        photoUrl: 'https://images.unsplash.com/photo-1617886903355-9354bb57751f?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point5_ptt_chachoengsao.jpg'
       },
       {
         order: 3,
@@ -9624,7 +9700,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 24,
         recommendation: 'จุดส่งมอบสินค้า: ติดต่อป้อม รปภ. แลกบัตร และเทียบท่าโหลดสินค้าตามช่องที่กำหนด',
         hazard: 'ทางเข้าแคบ มีรถรับส่งพนักงานและรถเกษตรกรวิ่งสวนทางบ่อย',
-        photoUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point6_scg_chonburi.jpg'
       }
     ]
   },
@@ -9649,7 +9725,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 0,
         recommendation: 'ขึ้นสินค้า ตรวจเช็คระบบเบรกและเกียร์ก่อนขึ้นเขาดงพญาเย็น',
         hazard: 'ระวังรถหนาแน่นช่วงทางแยกต่างระดับสระบุรี',
-        photoUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point1_tcsb_ratchaburi.jpg'
       },
       {
         order: 1,
@@ -9661,7 +9737,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 42,
         recommendation: 'จุดพักรถที่ 1: ตรวจเช็คระดับน้ำมันเบรกและลมยาง พักคลายความร้อนของเครื่องยนต์',
         hazard: 'ทางขึ้นเนินชันและโค้งต่อเนื่อง ระวังรถบรรทุกหนักชะลอความเร็ว',
-        photoUrl: 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point2_esso_nakhonpathom.jpg'
       },
       {
         order: 2,
@@ -9673,7 +9749,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 58,
         recommendation: 'จุดพักรถที่ 2 (จุดพักหลัก): พักผ่อน 30 นาที ดื่มน้ำ ตรวจเช็คสายรัดกล่องสินค้า',
         hazard: 'ทางลงเขาชันยาวช่วงคลองไผ่ ห้ามใช้เกียร์ว่างเด็ดขาด ใช้ Engine Brake สม่ำเสมอ',
-        photoUrl: 'https://images.unsplash.com/photo-1527018607616-0526648e861c?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point3_bangchak_pinklao.jpg'
       },
       {
         order: 3,
@@ -9685,7 +9761,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 65,
         recommendation: 'จุดพักรถที่ 3: ตรวจสอบความพร้อมรอบคันก่อนเข้าโรงงานลูกค้าปลายทาง',
         hazard: 'ทางแยกสัญญาณไฟขนาดใหญ่ มีรถเลี้ยวขวาข้ามเลน',
-        photoUrl: 'https://images.unsplash.com/photo-1617886903355-9354bb57751f?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point5_ptt_chachoengsao.jpg'
       },
       {
         order: 4,
@@ -9697,7 +9773,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 25,
         recommendation: 'จุดส่งมอบสินค้า: ผ่านจุดฆ่าเชื้อล้อรถและปฏิบัติตามมาตรฐาน Bio-Security ของโรงงาน',
         hazard: 'ถนนสายรอง 2 เลนสวน ระวังรถจักรยานยนต์และรถเกษตรกรรม',
-        photoUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point6_scg_chonburi.jpg'
       }
     ]
   },
@@ -9722,7 +9798,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 0,
         recommendation: 'ขึ้นสินค้า ตรวจเช็คซีลและอุปกรณ์ความปลอดภัยประจำรถ',
         hazard: 'ปริมาณรถหนาแน่นช่วงเช้า',
-        photoUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point1_tcsb_ratchaburi.jpg'
       },
       {
         order: 1,
@@ -9734,7 +9810,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 45,
         recommendation: 'จุดพักรถที่ 1: ตรวจเช็คสายรัดและดุมล้อ พักผ่อน 15 นาที',
         hazard: 'รถบรรทุกเข้า-ออกปั๊มหนาแน่น ให้ระวังทางแยก',
-        photoUrl: 'https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point2_esso_nakhonpathom.jpg'
       },
       {
         order: 2,
@@ -9746,7 +9822,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 85,
         recommendation: 'จุดพักรถทางการกรมทางหลวง: พักผ่อน 30 นาที ตรวจเช็คสภาพร่างกายและยานพาหนะ',
         hazard: 'รถวิ่งด้วยความเร็วสูงในช่องทางหลัก ชิดซ้ายอย่างปลอดภัยก่อนเลี้ยวเข้าจุดพักรถ',
-        photoUrl: 'https://images.unsplash.com/photo-1590496793929-36417d3117de?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point4_shell_bangna.jpg'
       },
       {
         order: 3,
@@ -9758,7 +9834,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 68,
         recommendation: 'จุดพักรถที่ 3: ตรวจเช็คใบส่งของและความพร้อมก่อนเข้านิคมอุตสาหกรรม',
         hazard: 'ทางแยกร่วมทล.36 มีรถบรรทุกสารเคมีและตู้คอนเทนเนอร์จำนวนมาก',
-        photoUrl: 'https://images.unsplash.com/photo-1617886903355-9354bb57751f?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point5_ptt_chachoengsao.jpg'
       },
       {
         order: 4,
@@ -9770,7 +9846,7 @@ const DEFAULT_ROUTE_PLANS = [
         distanceKm: 22,
         recommendation: 'จุดส่งมอบสินค้า: ปฏิบัติตามกฎความปลอดภัยเข้มงวดของนิคมอุตสาหกรรม ดับเครื่องทันทีที่เทียบท่า',
         hazard: 'พื้นที่ควบคุมสารเคมีและความปลอดภัยสูง ขับขี่ความเร็วไม่เกิน 30 กม./ชม. ภายในนิคม',
-        photoUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=400&q=80'
+        photoUrl: 'assets/route_photos/point6_scg_chonburi.jpg'
       }
     ]
   }
@@ -9778,15 +9854,28 @@ const DEFAULT_ROUTE_PLANS = [
 
 function initRoutePlanning() {
   const saved = localStorage.getItem('TTMK_ROUTE_PLANS');
+  let needSave = false;
+
   if (saved) {
     try {
       appState.routes = JSON.parse(saved);
+      // Migrate old unsplash URLs to authentic Google Maps photos
+      const r1 = appState.routes.find(r => r.id === 'ROUTE-001');
+      if (r1 && r1.waypoints && r1.waypoints.length > 0 && r1.waypoints[0].photoUrl && r1.waypoints[0].photoUrl.includes('unsplash')) {
+        appState.routes = JSON.parse(JSON.stringify(DEFAULT_ROUTE_PLANS));
+        needSave = true;
+      }
     } catch (e) {
       console.warn('Failed to parse saved route plans, reverting to defaults:', e);
       appState.routes = JSON.parse(JSON.stringify(DEFAULT_ROUTE_PLANS));
+      needSave = true;
     }
   } else {
     appState.routes = JSON.parse(JSON.stringify(DEFAULT_ROUTE_PLANS));
+    needSave = true;
+  }
+
+  if (needSave) {
     localStorage.setItem('TTMK_ROUTE_PLANS', JSON.stringify(appState.routes));
   }
 
@@ -9822,6 +9911,31 @@ function initRoutePlanning() {
   }
 
   renderRoutePlan(appState.currentRouteId);
+}
+
+function setRouteViewMode(mode) {
+  const btnSplit = document.getElementById('btnRouteModeSplit');
+  const btnTable = document.getElementById('btnRouteModeTable');
+  const splitContainer = document.getElementById('routeSplitViewContainer');
+  const tableContainer = document.getElementById('routeTableViewContainer');
+
+  if (mode === 'table') {
+    if (btnSplit) btnSplit.className = 'px-2.5 py-1 rounded-lg font-bold text-xs transition text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1';
+    if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg font-bold text-xs transition bg-blue-600 text-white shadow-sm flex items-center gap-1';
+    if (tableContainer) {
+      tableContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+  } else {
+    if (btnSplit) btnSplit.className = 'px-2.5 py-1 rounded-lg font-bold text-xs transition bg-blue-600 text-white shadow-sm flex items-center gap-1';
+    if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg font-bold text-xs transition text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1';
+    if (splitContainer) {
+      splitContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  setTimeout(() => {
+    if (appState.routePlanningMap) appState.routePlanningMap.invalidateSize();
+  }, 200);
 }
 
 function setRouteMapLayer(type) {
@@ -9875,6 +9989,44 @@ function filterRoutePlansByFeed(feedKey) {
   }
 }
 
+function openRoutePhotoModal(photoUrl, title, lat, lng, road, rec, haz) {
+  const modal = document.getElementById('routePhotoModal');
+  if (!modal) return;
+
+  const imgEl = document.getElementById('photoModalImg');
+  const titleEl = document.getElementById('photoModalTitle');
+  const roadEl = document.getElementById('photoModalRoad');
+  const gpsEl = document.getElementById('photoModalGps');
+  const recEl = document.getElementById('photoModalRec');
+  const hazEl = document.getElementById('photoModalHaz');
+  const hazBox = document.getElementById('photoModalHazBox');
+  const mapsLink = document.getElementById('photoModalMapsLink');
+  const streetViewLink = document.getElementById('photoModalStreetViewLink');
+
+  if (imgEl) imgEl.src = photoUrl || 'assets/route_photos/point1_tcsb_ratchaburi.jpg';
+  if (titleEl) titleEl.textContent = title || 'ภาพถ่ายสถานที่ Google Maps';
+  if (roadEl) roadEl.textContent = road || '-';
+  if (gpsEl) gpsEl.textContent = `${lat}, ${lng}`;
+  if (recEl) recEl.textContent = rec || '-';
+
+  if (haz && haz.trim()) {
+    if (hazEl) hazEl.textContent = haz;
+    if (hazBox) hazBox.classList.remove('hidden');
+  } else {
+    if (hazBox) hazBox.classList.add('hidden');
+  }
+
+  if (mapsLink) mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  if (streetViewLink) streetViewLink.href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}`;
+
+  modal.classList.remove('hidden');
+}
+
+function closeRoutePhotoModal() {
+  const modal = document.getElementById('routePhotoModal');
+  if (modal) modal.classList.add('hidden');
+}
+
 function renderRoutePlan(routeId) {
   const route = appState.routes.find(r => r.id === routeId) || appState.routes[0];
   if (!route) return;
@@ -9916,7 +10068,102 @@ function renderRoutePlan(routeId) {
   const tableMeta = document.getElementById('routeTableMeta');
   if (tableMeta) tableMeta.textContent = `${route.roads || ''} • วันที่ทบทวน: ${route.reviewDate || '-'} • ผู้จัดทำ: ${route.reviewer || 'Nichanan Aj.'}`;
 
-  // 5. Render Table Rows (ตามแบบรูปภาพ 4 & 5)
+  // 5. Render Right Column: Waypoints Sequence Timeline Cards
+  const cardListEl = document.getElementById('routeWaypointsCardList');
+  if (cardListEl) {
+    let cardsHtml = '';
+    waypoints.forEach((wp, idx) => {
+      let stepLabel = '';
+      let badgeStyle = '';
+      let markerIcon = '';
+
+      if (wp.type === 'origin') {
+        stepLabel = 'จุดเริ่มต้น (Origin)';
+        badgeStyle = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-300';
+        markerIcon = '<i class="fa-solid fa-warehouse text-emerald-600"></i>';
+      } else if (wp.type === 'destination') {
+        stepLabel = 'ปลายทาง (Destination)';
+        badgeStyle = 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-300';
+        markerIcon = '<i class="fa-solid fa-flag-checkered text-rose-600"></i>';
+      } else {
+        stepLabel = `จุดพักที่ ${idx} (Rest Stop)`;
+        badgeStyle = 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-300';
+        markerIcon = '<i class="fa-solid fa-gas-pump text-amber-500"></i>';
+      }
+
+      const photoUrl = wp.photoUrl || 'assets/route_photos/point1_tcsb_ratchaburi.jpg';
+      const mapLink = `https://www.google.com/maps/search/?api=1&query=${wp.lat},${wp.lng}`;
+      const streetViewLink = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${wp.lat},${wp.lng}`;
+
+      cardsHtml += `
+        <div class="glass-panel p-3.5 space-y-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition shadow-sm bg-white dark:bg-slate-900">
+          
+          <!-- Card Header -->
+          <div class="flex items-center justify-between gap-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeStyle}">
+              ${stepLabel}
+            </span>
+            <span class="text-xs font-digital font-bold text-slate-700 dark:text-slate-300">
+              ${wp.distanceKm > 0 ? `${wp.distanceKm} กม.` : 'กม. 0'}
+            </span>
+          </div>
+
+          <!-- Location Name & Photo Grid -->
+          <div class="flex items-start gap-3">
+            <!-- Clickable Photo Thumbnail -->
+            <div class="relative w-28 h-20 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 cursor-pointer group shadow-sm"
+                 onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}')"
+                 title="คลิกเพื่อดูรูปขยายและ Google Maps Street View">
+              <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(wp.name)}" 
+                   onerror="this.src='assets/route_photos/point1_tcsb_ratchaburi.jpg'"
+                   class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+              <div class="absolute bottom-0 inset-x-0 bg-slate-900/80 text-[9px] text-white py-0.5 text-center flex items-center justify-center gap-1 font-semibold">
+                <i class="fa-brands fa-google text-blue-400"></i> ดูรูป
+              </div>
+            </div>
+
+            <!-- Details -->
+            <div class="flex-1 min-w-0 space-y-1">
+              <h4 class="font-bold text-xs text-slate-900 dark:text-white leading-snug flex items-start gap-1">
+                ${markerIcon}
+                <span class="truncate-2-lines">${escapeHtml(wp.name)}</span>
+              </h4>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                <i class="fa-solid fa-road text-slate-400 mr-1"></i>${escapeHtml(wp.road || '-')}
+              </p>
+              <div class="flex items-center gap-1.5 pt-0.5">
+                <a href="${streetViewLink}" target="_blank"
+                   class="px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 text-[10px] font-bold border border-amber-200 dark:border-amber-800 transition flex items-center gap-1">
+                  <i class="fa-solid fa-street-view"></i> Street View
+                </a>
+                <a href="${mapLink}" target="_blank"
+                   class="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 text-[10px] font-bold border border-blue-200 dark:border-blue-800 transition flex items-center gap-1">
+                  <i class="fa-solid fa-location-arrow"></i> นำทาง
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recommendation & Caution -->
+          <div class="text-[11px] space-y-1 pt-1 border-t border-slate-100 dark:border-slate-800">
+            <div class="text-emerald-700 dark:text-emerald-400 leading-relaxed">
+              <strong>ข้อแนะนำ:</strong> ${escapeHtml(wp.recommendation || '-')}
+            </div>
+            ${wp.hazard ? `
+              <div class="text-amber-700 dark:text-amber-400 leading-relaxed flex items-start gap-1">
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 flex-shrink-0"></i>
+                <span><strong>ระวัง:</strong> ${escapeHtml(wp.hazard)}</span>
+              </div>
+            ` : ''}
+          </div>
+
+        </div>
+      `;
+    });
+    cardListEl.innerHTML = cardsHtml;
+  }
+
+  // 6. Render Full Table Rows (ตามแบบรูปภาพ 4 & 5)
   const tbody = document.getElementById('routePlanTableBody');
   if (tbody) {
     let rowsHtml = '';
@@ -9924,28 +10171,30 @@ function renderRoutePlan(routeId) {
       let stepLabel = '';
       let badgeBg = '';
       if (wp.type === 'origin') {
-        stepLabel = 'จุดเริ่มต้น';
+        stepLabel = 'เริ่มต้น';
         badgeBg = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300';
       } else if (wp.type === 'destination') {
         stepLabel = 'ปลายทาง';
         badgeBg = 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border-rose-300';
       } else {
-        stepLabel = `จุดที่ ${idx}`;
+        stepLabel = `${idx}`;
         badgeBg = 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border-blue-300';
       }
 
       const mapLink = `https://www.google.com/maps/search/?api=1&query=${wp.lat},${wp.lng}`;
-      const distanceDisplay = wp.distanceKm > 0 ? `${wp.distanceKm} กม.` : '-';
+      const streetViewLink = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${wp.lat},${wp.lng}`;
+      const distanceDisplay = wp.distanceKm > 0 ? `${wp.distanceKm}` : '-';
       const isDistanceHigh = wp.distanceKm > 180;
+      const photoUrl = wp.photoUrl || 'assets/route_photos/point1_tcsb_ratchaburi.jpg';
 
       rowsHtml += `
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
-          <td class="py-3 px-3 text-center align-top">
-            <span class="inline-block px-2 py-0.5 rounded text-[11px] font-bold border ${badgeBg}">
+          <td class="py-3 px-3 text-center align-middle">
+            <span class="inline-block px-2.5 py-1 rounded text-xs font-bold border ${badgeBg}">
               ${stepLabel}
             </span>
           </td>
-          <td class="py-3 px-3 align-top font-bold text-slate-800 dark:text-white">
+          <td class="py-3 px-3 align-middle font-bold text-slate-800 dark:text-white">
             <div class="flex items-start gap-1.5">
               ${wp.type === 'origin' ? '<i class="fa-solid fa-warehouse text-emerald-600 mt-0.5"></i>' : 
                 wp.type === 'destination' ? '<i class="fa-solid fa-flag-checkered text-rose-600 mt-0.5"></i>' : 
@@ -9953,36 +10202,41 @@ function renderRoutePlan(routeId) {
               <span>${escapeHtml(wp.name)}</span>
             </div>
           </td>
-          <td class="py-3 px-3 align-top font-mono text-[11px] text-slate-600 dark:text-slate-400">
-            <div>${wp.lat.toFixed(4)}, ${wp.lng.toFixed(4)}</div>
+          <td class="py-3 px-3 align-middle text-center font-mono text-[11px] text-slate-600 dark:text-slate-400">
+            <div>[${wp.lat.toFixed(4)}, ${wp.lng.toFixed(4)}]</div>
             <a href="${mapLink}" target="_blank" class="inline-flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-700 dark:text-blue-400 underline mt-0.5">
-              <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i> เปิดแผนที่
+              <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i> แผนที่
             </a>
           </td>
-          <td class="py-3 px-3 align-top text-slate-700 dark:text-slate-300 font-medium">
+          <td class="py-3 px-3 align-middle text-slate-700 dark:text-slate-300 font-medium">
             ${escapeHtml(wp.road || '-')}
           </td>
-          <td class="py-3 px-3 text-center align-top font-bold">
-            <span class="${isDistanceHigh ? 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-1.5 py-0.5 rounded font-mono' : 'text-slate-800 dark:text-slate-200 font-mono'}">
+          <td class="py-3 px-3 text-center align-middle font-bold">
+            <span class="${isDistanceHigh ? 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2 py-0.5 rounded font-digital text-sm' : 'text-slate-800 dark:text-slate-200 font-digital text-sm'}">
               ${distanceDisplay}
             </span>
             ${isDistanceHigh ? '<div class="text-[9px] text-rose-500 font-semibold mt-0.5">เกิน 180 กม.!</div>' : ''}
           </td>
-          <td class="py-3 px-3 align-top text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
+          <td class="py-3 px-3 align-middle text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
             ${escapeHtml(wp.recommendation || '-')}
           </td>
-          <td class="py-3 px-3 align-top text-amber-700 dark:text-amber-400 text-[11px] leading-relaxed bg-amber-50/40 dark:bg-amber-950/20 rounded">
+          <td class="py-3 px-3 align-middle text-amber-700 dark:text-amber-400 text-[11px] leading-relaxed bg-amber-50/40 dark:bg-amber-950/20 rounded">
             <div class="flex items-start gap-1">
               <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 flex-shrink-0"></i>
               <span>${escapeHtml(wp.hazard || '-')}</span>
             </div>
           </td>
-          <td class="py-3 px-3 text-center align-top">
-            ${wp.photoUrl ? `
-              <img src="${escapeHtml(wp.photoUrl)}" alt="${escapeHtml(wp.name)}" class="w-16 h-12 object-cover rounded-lg border border-slate-200 dark:border-slate-700 mx-auto shadow-sm hover:scale-105 transition cursor-pointer" onclick="window.open('${escapeHtml(wp.photoUrl)}', '_blank')">
-            ` : `
-              <div class="w-16 h-12 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 text-[10px] mx-auto border border-dashed border-slate-300 dark:border-slate-700">ไม่มีรูป</div>
-            `}
+          <td class="py-3 px-3 text-center align-middle">
+            <div class="relative w-28 h-16 mx-auto rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer group"
+                 onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}')"
+                 title="คลิกดูรูปขยายและ Street View">
+              <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(wp.name)}" 
+                   onerror="this.src='assets/route_photos/point1_tcsb_ratchaburi.jpg'"
+                   class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+              <div class="absolute inset-x-0 bottom-0 bg-slate-900/80 text-[8.5px] text-white py-0.5 flex items-center justify-center gap-1">
+                <i class="fa-brands fa-google text-blue-400"></i> Google Maps
+              </div>
+            </div>
           </td>
         </tr>
       `;
@@ -9990,7 +10244,7 @@ function renderRoutePlan(routeId) {
     tbody.innerHTML = rowsHtml;
   }
 
-  // 6. Render Map Markers and Polyline
+  // 7. Render Map Markers and Polyline
   if (appState.routePlanningMap && typeof L !== 'undefined') {
     if (appState.routeMarkersLayer) appState.routeMarkersLayer.clearLayers();
     if (appState.routePolylineLayer) appState.routePolylineLayer.clearLayers();
@@ -10022,9 +10276,14 @@ function renderRoutePlan(routeId) {
         popupAnchor: [0, -14]
       });
 
+      const photoUrl = wp.photoUrl || 'assets/route_photos/point1_tcsb_ratchaburi.jpg';
+
       const popupContent = `
-        <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4; max-width: 240px; padding: 2px;">
+        <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4; max-width: 250px; padding: 2px;">
           <div style="font-weight: bold; color: #0f172a; margin-bottom: 3px; font-size: 13px;">${escapeHtml(wp.name)}</div>
+          <div style="width: 100%; height: 90px; border-radius: 6px; overflow: hidden; margin-bottom: 6px;">
+            <img src="${escapeHtml(photoUrl)}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='assets/route_photos/point1_tcsb_ratchaburi.jpg'">
+          </div>
           <div style="color: #475569; font-size: 11px;"><strong>ถนน:</strong> ${escapeHtml(wp.road || '-')}</div>
           <div style="color: #475569; font-size: 11px;"><strong>ระยะช่วง:</strong> ${wp.distanceKm} กม.</div>
           <div style="margin-top: 4px; padding-top: 4px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #16a34a;">
@@ -10035,9 +10294,12 @@ function renderRoutePlan(routeId) {
               <strong>จุดระวัง:</strong> ${escapeHtml(wp.hazard)}
             </div>
           ` : ''}
-          <div style="margin-top: 6px;">
+          <div style="margin-top: 6px; display: flex; gap: 8px;">
+            <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${wp.lat},${wp.lng}" target="_blank" style="color: #d97706; text-decoration: underline; font-weight: bold; font-size: 11px;">
+              Street View 360°
+            </a>
             <a href="https://www.google.com/maps/search/?api=1&query=${wp.lat},${wp.lng}" target="_blank" style="color: #2563eb; text-decoration: underline; font-weight: bold; font-size: 11px;">
-              เปิด Google Maps นำทาง
+              เปิด Google Maps
             </a>
           </div>
         </div>
@@ -10252,7 +10514,7 @@ function saveRouteFromModal() {
       distanceKm: parseFloat(r.querySelector('.point-dist')?.value) || 0,
       recommendation: r.querySelector('.point-rec')?.value.trim() || '',
       hazard: r.querySelector('.point-haz')?.value.trim() || '',
-      photoUrl: ''
+      photoUrl: 'assets/route_photos/point1_tcsb_ratchaburi.jpg'
     };
   });
 
