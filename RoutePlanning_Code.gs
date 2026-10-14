@@ -364,15 +364,16 @@ function getRoutePlansFromSheet() {
 }
 
 /**
- * เพิ่มเส้นทางใหม่ลง Google Sheet
+ * เพิ่มหรืออัปเดตเส้นทางลง Google Sheet (Route_Plans)
  */
 function saveNewRouteToSheet(data) {
   const ss = SpreadsheetApp.openById(ROUTE_CONFIG.SPREADSHEET_ID);
   const sheet = ss.getSheetByName(ROUTE_CONFIG.SHEET_NAME);
   if (!sheet) throw new Error("ไม่พบแผ่นงาน Route_Plans");
 
+  const targetId = data.id || ("ROUTE-" + Date.now());
   const row = [
-    data.id || ("ROUTE-" + Date.now()),
+    targetId,
     data.name || "-",
     data.feed || "FEED_01",
     data.customer || "-",
@@ -386,8 +387,26 @@ function saveNewRouteToSheet(data) {
     data.reviewDate || Utilities.formatDate(new Date(), "Asia/Bangkok", "dd.MM.yyyy")
   ];
 
-  sheet.appendRow(row);
-  return { status: "success", message: "บันทึกเส้นทางใหม่สำเร็จ", routeId: row[0] };
+  // ตรวจสอบว่ามี Route_ID นี้อยู่แล้วหรือไม่ หากมีให้อัปเดตแถวเดิม
+  const lastRow = sheet.getLastRow();
+  let foundRowIdx = -1;
+  if (lastRow > 1) {
+    const ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (let i = 0; i < ids.length; i++) {
+      if (ids[i][0] === targetId) {
+        foundRowIdx = i + 2;
+        break;
+      }
+    }
+  }
+
+  if (foundRowIdx > 0) {
+    sheet.getRange(foundRowIdx, 1, 1, row.length).setValues([row]);
+    return { status: "success", message: "อัปเดตแผนเส้นทางเรียบร้อยแล้ว", routeId: targetId };
+  } else {
+    sheet.appendRow(row);
+    return { status: "success", message: "บันทึกแผนเส้นทางใหม่สำเร็จ", routeId: targetId };
+  }
 }
 
 /**

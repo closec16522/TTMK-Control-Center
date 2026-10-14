@@ -4347,6 +4347,7 @@
       GAS_URL: "https://script.google.com/macros/s/AKfycbxbyJ1yWNodowMh-OLxqBuFvH-Pk-TLwg7dRv_lwT7bbTJBu5MH_lhqxE3KwJ7lDH407g/exec",
       GAS_TRUCK_URL: "https://script.google.com/macros/s/AKfycbwvZxSw_p62y6ZwegF8iUiEdxyEJrF01yB37AumDHwgLcSFBoRSZUmwgvdtLJ-6hCFE/exec",
       GAS_MAINTENANCE_URL: "https://script.google.com/macros/s/AKfycbxkyA3Ion2-rStHiNbiRhDGF105yy71O41LKdSH79CXyLw94ukyOoKBRUPj6dYZAmWn/exec",
+      GAS_ROUTES_URL: "https://script.google.com/macros/s/AKfycbyG5Ng-_E9R0a9w9r5YiHj8jn3FR_vws7doDaQ3hBKwuAHLH4bq0VKGZLoV86UBNmRN/exec",
       DRIVE_ROOT: "1lM3KyJTSNvQlHWzbCVLS8QLlfQTfgpi0",
       DRIVE_FOLDER_ROUTE_PLANS: "1oaFFK-Xt35bnKUiLBJ3eJXeG12Npvnui",
       DRIVE_FOLDER_REST_STOPS: "1V54IZ4H7w_rx0la5jFnfCxaoJICBmNfx",
@@ -5151,6 +5152,11 @@
         }
 
         renderAllTables();
+
+        // 8. ซิงค์แผนเส้นทางเดินรถและจุดพักรถ (Route_Plans) จาก Google Sheet
+        if (typeof syncRoutesFromGoogleSheet === 'function') {
+          syncRoutesFromGoogleSheet(false).catch(() => {});
+        }
 
         const syncTimeEl = document.getElementById('alcoholLastSyncTimeText');
         if (syncTimeEl) {
@@ -10233,6 +10239,158 @@ function initRoutePlanning() {
   }
 
   renderRoutePlan(appState.currentRouteId);
+
+  // ซิงค์แผนเส้นทางล่าสุดจาก Google Sheet ผ่าน GAS_ROUTES_URL อัตโนมัติ (แบบ silent)
+  if (typeof syncRoutesFromGoogleSheet === 'function') {
+    syncRoutesFromGoogleSheet(false).catch(() => {});
+  }
+}
+
+// ซิงค์แผนเส้นทางเดินรถและจุดพักรถจาก Google Sheet (Route_Plans) ผ่าน Google Apps Script Web App
+async function syncRoutesFromGoogleSheet(showToast = true) {
+  const btn = document.getElementById('btnSyncRouteSheet');
+  const icon = btn ? btn.querySelector('i') : null;
+  if (icon) icon.classList.add('fa-spin');
+
+  try {
+    let loaded = false;
+    let syncedRoutes = null;
+
+    // 1. ดึงตรงผ่าน Google Apps Script Web App (GAS_ROUTES_URL)
+    if (CONFIG.GAS_ROUTES_URL) {
+      try {
+        const resp = await fetch(`${CONFIG.GAS_ROUTES_URL}?action=list_routes`);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && data.status === 'success' && Array.isArray(data.routes) && data.routes.length > 0) {
+            syncedRoutes = data.routes;
+            loaded = true;
+          }
+        }
+      } catch (err) {
+        console.warn('Direct GAS_ROUTES_URL fetch failed, falling back to GViz:', err);
+      }
+    }
+
+    // 2. หากเรียก GAS ไม่สำเร็จ ลองดึงผ่าน Google Visualization (GViz) API จากแผ่นงาน Route_Plans
+    if (!loaded) {
+      try {
+        const gvizUrl = `https://docs.google.com/spreadsheets/d/${CONFIG.SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Route_Plans`;
+        const resp = await fetch(gvizUrl);
+        if (resp.ok) {
+          const text = await resp.text();
+          const startIdx = text.indexOf('{');
+          const endIdx = text.lastIndexOf('}');
+          if (startIdx >= 0 && endIdx >= 0) {
+            const json = JSON.parse(text.substring(startIdx, endIdx + 1));
+            const rows = json.table && json.table.rows ? json.table.rows : [];
+            if (rows.length > 0) {
+              const parsed = [];
+              rows.forEach(r => {
+                const c = r.c || [];
+                const val = (idx) => (c[idx] && c[idx].v !== null && c[idx].v !== undefined) ? c[idx].v : '';
+                const id = String(val(0) || '').trim();
+                const name = String(val(1) || '').trim();
+                if (id && name) {
+                  let waypoints = [];
+                  const wpRaw = val(8);
+                  try {
+                    waypoints = typeof wpRaw === 'string' ? JSON.parse(wpRaw) : wpRaw;
+                  } catch(e) {}
+                  parsed.push({
+                    id,
+                    name,
+                    feed: String(val(2) || 'FEED_01'),
+                    customer: String(val(3) || '-'),
+                    totalDistanceKm: Number(val(4)) || 0,
+                    estimatedTime: String(val(5) || '-'),
+                    restStopsCount: Number(val(6)) || 0,
+                    speedLimit: Number(val(7)) || 80,
+                    waypoints: Array.isArray(waypoints) ? waypoints : [],
+                    googleMapsUrl: String(val(9) || ''),
+                    reviewer: String(val(10) || 'Nichanan Aj.'),
+                    reviewDate: String(val(11) || '-')
+                  });
+                }
+              });
+              if (parsed.length > 0) {
+                syncedRoutes = parsed;
+                loaded = true;
+              }
+            }
+          }
+        }
+      } catch (gvizErr) {
+        console.warn('GViz fetch Route_Plans error:', gvizErr);
+      }
+    }
+
+    if (loaded && syncedRoutes && syncedRoutes.length > 0) {
+      // ตรวจสอบและผสานข้อมูลเส้นทาง
+      appState.routes = syncedRoutes;
+      localStorage.setItem('TTMK_ROUTE_PLANS', JSON.stringify(appState.routes));
+
+      // ตรวจสอบว่า currentRouteId ยังมีอยู่ในรายการใหม่หรือไม่
+      if (!appState.routes.some(r => r.id === appState.currentRouteId)) {
+        appState.currentRouteId = appState.routes[0].id;
+      }
+
+      // อัปเดต Dropdown เลือกเส้นทาง
+      const select = document.getElementById('routeSelectDropdown');
+      if (select) {
+        select.innerHTML = appState.routes.map(r => {
+          const stopCount = (r.waypoints || []).filter(w => w.type === 'rest').length;
+          const stopLabel = stopCount > 0 ? `(${stopCount} จุดพัก)` : '(ระยะสั้น ไม่มีจุดพัก)';
+          return `<option value="${escapeHtml(r.id)}" ${r.id === appState.currentRouteId ? 'selected' : ''}>[${escapeHtml(r.feed)}] ${escapeHtml(r.name)} ${stopLabel}</option>`;
+        }).join('');
+        select.value = appState.currentRouteId;
+      }
+
+      // แสดงผลแผนเส้นทางปัจจุบันใหม่
+      renderRoutePlan(appState.currentRouteId);
+
+      if (showToast) {
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            icon: 'success',
+            title: 'ซิงค์เส้นทางสำเร็จ!',
+            text: `ดึงข้อมูลแผนการเดินรถ ${syncedRoutes.length} เส้นทาง จากแผ่นงาน Route_Plans เรียบร้อยแล้ว`,
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else if (typeof showToastNotification === 'function') {
+          showToastNotification(`ซิงค์ข้อมูลเส้นทางสำเร็จ (${syncedRoutes.length} เส้นทาง)`, 'success');
+        }
+      }
+      return true;
+    } else {
+      if (showToast) {
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            icon: 'info',
+            title: 'ใช้ข้อมูลในเครื่อง',
+            text: 'ไม่สามารถติดต่อ Google Apps Script ได้ในขณะนี้ ระบบจะใช้ข้อมูลเส้นทางมาตรฐานที่บันทึกไว้',
+            timer: 2500,
+            showConfirmButton: false
+          });
+        }
+      }
+      return false;
+    }
+  } catch (err) {
+    console.error('Error syncing routes:', err);
+    if (showToast && typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาดในการซิงค์',
+        text: err.message || 'โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต',
+        confirmButtonText: 'ตกลง'
+      });
+    }
+    return false;
+  } finally {
+    if (icon) icon.classList.remove('fa-spin');
+  }
 }
 
 // Google Maps Official Multi-Waypoint Navigation URL generator
@@ -11042,6 +11200,33 @@ function saveRouteFromModal() {
 
   closeAddRouteModal();
   renderRoutePlan(routeObj.id);
+
+  // ส่งบันทึกลง Google Sheet (แผ่นงาน Route_Plans) แบบ Asynchronous ผ่าน GAS Web App
+  if (CONFIG.GAS_ROUTES_URL) {
+    fetch(CONFIG.GAS_ROUTES_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'save_route',
+        id: routeObj.id,
+        name: routeObj.name,
+        feed: routeObj.feed,
+        customer: routeObj.customer,
+        totalDistanceKm: totalDist,
+        estimatedTime: routeObj.estimatedTime,
+        restStopsCount: waypoints.filter(w => w.type === 'rest').length,
+        speedLimit: routeObj.speedLimit,
+        waypoints: routeObj.waypoints,
+        googleMapsUrl: getGoogleMapsDirectionUrl(routeObj),
+        reviewer: routeObj.reviewer,
+        reviewDate: routeObj.reviewDate
+      })
+    }).then(r => r.json()).then(res => {
+      console.log('Route plan successfully synchronized with Google Sheet:', res);
+    }).catch(err => {
+      console.warn('Background sync route to Google Sheet error:', err);
+    });
+  }
 
   if (typeof showToastNotification === 'function') {
     showToastNotification('บันทึกแผนเส้นทางเดินรถและจุดพักรถเรียบร้อยแล้ว', 'success');
