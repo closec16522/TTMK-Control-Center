@@ -4050,21 +4050,26 @@
       <!-- Modal Content -->
       <div class="flex-1 overflow-y-auto p-1 space-y-3.5 my-2 text-xs">
         
-        <!-- Tab Views inside Modal: Photo vs Live Map -->
-        <div class="flex items-center justify-between bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
-          <div class="flex items-center gap-1">
+        <!-- Tab Views inside Modal: Photo vs Live Map vs Satellite -->
+        <div class="flex items-center justify-between bg-slate-100 dark:bg-slate-800 p-1 rounded-xl flex-wrap gap-1">
+          <div class="flex items-center gap-1 flex-wrap">
             <button type="button" id="btnModalViewPhoto" onclick="switchModalPreviewTab('photo')"
                     class="px-3 py-1 rounded-lg font-bold text-xs bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm flex items-center gap-1.5">
-              <i class="fa-solid fa-image"></i>
+              <i class="fa-solid fa-image text-blue-600"></i>
               <span>ภาพสถานที่จริง (HD Photo)</span>
             </button>
             <button type="button" id="btnModalViewMap" onclick="switchModalPreviewTab('map')"
                     class="px-3 py-1 rounded-lg font-bold text-xs text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1.5">
-              <i class="fa-brands fa-google text-blue-500"></i>
-              <span>Google Maps Live Preview (3D)</span>
+              <i class="fa-solid fa-map-location-dot text-indigo-500"></i>
+              <span>Google Maps แผนที่สด</span>
+            </button>
+            <button type="button" id="btnModalViewSat" onclick="switchModalPreviewTab('sat')"
+                    class="px-3 py-1 rounded-lg font-bold text-xs text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1.5">
+              <i class="fa-solid fa-satellite text-emerald-500"></i>
+              <span>ดาวเทียมสำรวจ (Satellite 3D)</span>
             </button>
           </div>
-          <span class="text-[10px] text-slate-400 font-mono hidden sm:inline px-2">พิกัดชัดเจนระดับมิเตอร์</span>
+          <span class="text-[10px] text-slate-400 font-mono hidden sm:inline px-2">พิกัด GPS สำรวจจริง</span>
         </div>
 
         <!-- 1. Photo Container -->
@@ -10393,20 +10398,58 @@ function openRoutePhotoModal(photoUrl, title, lat, lng, road, rec, haz, type) {
   modal.classList.remove('hidden');
 }
 
+function getPlaceBrandBadge(name, type) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('ปตท') || n.includes('ptt')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-blue-600 text-white shadow z-10">PTT Station</span>';
+  if (n.includes('บางจาก') || n.includes('bangchak')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-600 text-white shadow z-10">บางจาก</span>';
+  if (n.includes('shell') || n.includes('เชลล์')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-amber-400 text-slate-900 shadow z-10">Shell</span>';
+  if (n.includes('pt') || n.includes('พีที')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-green-600 text-white shadow z-10">PT Max</span>';
+  if (n.includes('esso') || n.includes('เอสโซ่')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-red-600 text-white shadow z-10">ESSO</span>';
+  if (n.includes('scg') || n.includes('สยามบรรจุภัณฑ์') || n.includes('tcsb') || n.includes('tcrb')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-red-700 text-white shadow z-10">SCG Packaging</span>';
+  if (n.includes('นีโอ') || n.includes('neo')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-cyan-600 text-white shadow z-10">NEO Factory</span>';
+  if (n.includes('โดล') || n.includes('dole')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-yellow-400 text-red-700 shadow z-10">Dole</span>';
+  if (n.includes('คาร์กิลล์') || n.includes('cargill')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-800 text-white shadow z-10">Cargill</span>';
+  if (n.includes('บีฟู้ดส์') || n.includes('bfoods') || n.includes('เบทาโกร')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-orange-600 text-white shadow z-10">B-Foods</span>';
+  if (n.includes('ปลากระป๋อง') || n.includes('tin food')) return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-blue-800 text-white shadow z-10">สยามปลากระป๋อง</span>';
+  if (type === 'origin') return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-600 text-white shadow z-10">ต้นทาง</span>';
+  if (type === 'destination') return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-rose-600 text-white shadow z-10">ปลายทาง</span>';
+  return '<span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-blue-600 text-white shadow z-10">จุดพักรถ</span>';
+}
+
 function switchModalPreviewTab(tab) {
   const btnPhoto = document.getElementById('btnModalViewPhoto');
   const btnMap = document.getElementById('btnModalViewMap');
+  const btnSat = document.getElementById('btnModalViewSat');
   const photoContainer = document.getElementById('modalPhotoContainer');
   const mapContainer = document.getElementById('modalMapIframeContainer');
+  const mapIframe = document.getElementById('photoModalMapIframe');
+  const activeClass = 'px-3 py-1 rounded-lg font-bold text-xs bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm flex items-center gap-1.5';
+  const inactiveClass = 'px-3 py-1 rounded-lg font-bold text-xs text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1.5';
 
-  if (tab === 'map') {
-    if (btnPhoto) btnPhoto.className = 'px-3 py-1 rounded-lg font-bold text-xs text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1.5';
-    if (btnMap) btnMap.className = 'px-3 py-1 rounded-lg font-bold text-xs bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm flex items-center gap-1.5';
+  if (!currentModalPlace) return;
+
+  if (tab === 'sat') {
+    if (btnPhoto) btnPhoto.className = inactiveClass;
+    if (btnMap) btnMap.className = inactiveClass;
+    if (btnSat) btnSat.className = activeClass;
     if (photoContainer) photoContainer.classList.add('hidden');
     if (mapContainer) mapContainer.classList.remove('hidden');
+    if (mapIframe) {
+      mapIframe.src = `https://maps.google.com/maps?q=${currentModalPlace.lat},${currentModalPlace.lng}&t=k&z=18&ie=UTF8&iwloc=&output=embed`;
+    }
+  } else if (tab === 'map') {
+    if (btnPhoto) btnPhoto.className = inactiveClass;
+    if (btnMap) btnMap.className = activeClass;
+    if (btnSat) btnSat.className = inactiveClass;
+    if (photoContainer) photoContainer.classList.add('hidden');
+    if (mapContainer) mapContainer.classList.remove('hidden');
+    if (mapIframe) {
+      mapIframe.src = `https://maps.google.com/maps?q=${currentModalPlace.lat},${currentModalPlace.lng}&t=m&z=17&ie=UTF8&iwloc=&output=embed`;
+    }
   } else {
-    if (btnPhoto) btnPhoto.className = 'px-3 py-1 rounded-lg font-bold text-xs bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm flex items-center gap-1.5';
-    if (btnMap) btnMap.className = 'px-3 py-1 rounded-lg font-bold text-xs text-slate-600 dark:text-slate-400 hover:text-blue-600 flex items-center gap-1.5';
+    if (btnPhoto) btnPhoto.className = activeClass;
+    if (btnMap) btnMap.className = inactiveClass;
+    if (btnSat) btnSat.className = inactiveClass;
     if (photoContainer) photoContainer.classList.remove('hidden');
     if (mapContainer) mapContainer.classList.add('hidden');
   }
@@ -10521,10 +10564,11 @@ function renderRoutePlan(routeId) {
 
           <!-- Location Name & Photo Grid -->
           <div class="flex items-start gap-3">
-            <!-- Clickable Photo Thumbnail -->
+            <!-- Clickable Photo Thumbnail with Brand Badge -->
             <div class="relative w-28 h-20 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 cursor-pointer group shadow-sm bg-slate-950"
                  onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}', '${wp.type}')"
                  title="คลิกเพื่อดูรูปขยายและ Google Maps Live 3D">
+              ${getPlaceBrandBadge(wp.name, wp.type)}
               <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(wp.name)}" 
                    onerror="this.src='assets/route_photos/scg_packaging_factory_hd.jpg'"
                    class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
@@ -10639,7 +10683,8 @@ function renderRoutePlan(routeId) {
           <td class="py-3 px-3 text-center align-middle">
             <div class="relative w-28 h-16 mx-auto rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer group bg-slate-950"
                  onclick="openRoutePhotoModal('${escapeHtml(photoUrl)}', '${escapeHtml(wp.name)}', ${wp.lat}, ${wp.lng}, '${escapeHtml(wp.road || '')}', '${escapeHtml(wp.recommendation || '')}', '${escapeHtml(wp.hazard || '')}', '${wp.type}')"
-                 title="คลิกดูรูปขยายและ Street View 360°">
+                 title="คลิกดูรูปขยายและ Google Maps">
+              ${getPlaceBrandBadge(wp.name, wp.type)}
               <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(wp.name)}" 
                    onerror="this.src='assets/route_photos/scg_packaging_factory_hd.jpg'"
                    class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
