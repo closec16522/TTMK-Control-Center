@@ -1062,7 +1062,6 @@ async function submitRegistration() {
     return;
   }
 
-  const isEdit = regState.isEditMode;
   const isPhotoUpdated = !!regState.masterFaceBase64;
 
   Swal.fire({
