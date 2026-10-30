@@ -274,7 +274,13 @@
             <span id="camStandardTag" class="text-[9px] text-amber-400 font-mono">TTMK LIVE AUDIT</span>
           </div>
         </div>
-        <button onclick="closeCameraModal()" class="text-slate-400 hover:text-white text-lg p-1">&times;</button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="toggleCameraFacing()" id="btnToggleFacing" title="สลับกล้องหน้า/หลัง" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 text-xs font-mono flex items-center gap-1.5 transition active:scale-95">
+            <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span id="txtToggleFacing">สลับกล้อง</span>
+          </button>
+          <button onclick="closeCameraModal()" class="text-slate-400 hover:text-white text-lg p-1 leading-none">&times;</button>
+        </div>
       </div>
 
       <!-- Live Camera Viewfinder with HUD Sci-Fi Overlay -->
@@ -457,14 +463,12 @@
 
             <!-- Action Trigger & Preview Box -->
             <div>
-              <input type="file" id="inputSeatbeltDriverPhoto" accept="image/*" capture="environment" class="hidden" onchange="handlePreDeparturePhotoChange(event, 'seatbeltDriver')">
-              
-              <!-- Button to Open Camera -->
+              <!-- Button to Open Live Camera -->
               <div id="seatbeltDriverActionBox">
-                <button type="button" onclick="document.getElementById('inputSeatbeltDriverPhoto').click()"
+                <button type="button" onclick="startEquipmentCamera('seatbeltDriver', 'ภาพถ่ายการคาดเข็มขัดนิรภัย: พนักงานขับรถ (พขร.)')"
                   class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-cyan-600/30 to-blue-600/30 hover:from-cyan-600/50 hover:to-blue-600/50 text-cyan-200 border border-cyan-500/40 text-xs font-mono font-bold flex items-center justify-center gap-2 transition active:scale-[0.98]">
                   <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
-                  📸 ถ่ายภาพ / แนบรูป พขร. คาดเข็มขัดนิรภัย
+                  📸 เปิดกล้องสด: ถ่ายภาพ พขร. คาดเข็มขัดนิรภัย (Live Only)
                 </button>
               </div>
 
@@ -475,9 +479,9 @@
                   <p class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
                     <span>✓</span> แนบภาพ พขร. คาดเข็มขัดนิรภัยแล้ว
                   </p>
-                  <p class="text-[9px] text-slate-400 truncate mt-0.5">พขร. คาดเข็มขัดนิรภัยเรียบร้อย</p>
+                  <p class="text-[9px] text-slate-400 truncate mt-0.5">พขร. คาดเข็มขัดนิรภัยเรียบร้อย (ภาพสด Live Only)</p>
                   <div class="mt-2 flex gap-2">
-                    <button type="button" onclick="document.getElementById('inputSeatbeltDriverPhoto').click()" 
+                    <button type="button" onclick="startEquipmentCamera('seatbeltDriver', 'ภาพถ่ายการคาดเข็มขัดนิรภัย: พนักงานขับรถ (พขร.)')" 
                       class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-[10px] font-mono flex items-center gap-1 transition">
                       🔄 ถ่ายใหม่ (Retake)
                     </button>
@@ -518,14 +522,12 @@
 
             <!-- กล่องถ่ายรูป ผขถ. (จะซ่อนเมื่อติ๊กไม่มี ผขถ.) -->
             <div id="seatbeltAssistantWrapper">
-              <input type="file" id="inputSeatbeltAssistantPhoto" accept="image/*" capture="environment" class="hidden" onchange="handlePreDeparturePhotoChange(event, 'seatbeltAssistant')">
-              
-              <!-- Button to Open Camera -->
+              <!-- Button to Open Live Camera -->
               <div id="seatbeltAssistantActionBox">
-                <button type="button" onclick="document.getElementById('inputSeatbeltAssistantPhoto').click()"
+                <button type="button" onclick="startEquipmentCamera('seatbeltAssistant', 'ภาพถ่ายการคาดเข็มขัดนิรภัย: พนักงานท้ายรถ (ผขถ.)')"
                   class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-cyan-600/30 to-blue-600/30 hover:from-cyan-600/50 hover:to-blue-600/50 text-cyan-200 border border-cyan-500/40 text-xs font-mono font-bold flex items-center justify-center gap-2 transition active:scale-[0.98]">
                   <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
-                  📸 ถ่ายภาพ / แนบรูป ผขถ. คาดเข็มขัดนิรภัย
+                  📸 เปิดกล้องสด: ถ่ายภาพ ผขถ. คาดเข็มขัดนิรภัย (Live Only)
                 </button>
               </div>
 
@@ -536,9 +538,9 @@
                   <p class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
                     <span>✓</span> แนบภาพ ผขถ. คาดเข็มขัดนิรภัยแล้ว
                   </p>
-                  <p class="text-[9px] text-slate-400 truncate mt-0.5">ผขถ. คาดเข็มขัดนิรภัยเรียบร้อย</p>
+                  <p class="text-[9px] text-slate-400 truncate mt-0.5">ผขถ. คาดเข็มขัดนิรภัยเรียบร้อย (ภาพสด Live Only)</p>
                   <div class="mt-2 flex gap-2">
-                    <button type="button" onclick="document.getElementById('inputSeatbeltAssistantPhoto').click()" 
+                    <button type="button" onclick="startEquipmentCamera('seatbeltAssistant', 'ภาพถ่ายการคาดเข็มขัดนิรภัย: พนักงานท้ายรถ (ผขถ.)')" 
                       class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-[10px] font-mono flex items-center gap-1 transition">
                       🔄 ถ่ายใหม่ (Retake)
                     </button>
@@ -576,14 +578,12 @@
 
             <!-- Action Trigger & Preview Box -->
             <div>
-              <input type="file" id="inputDashcamPhoto" accept="image/*" capture="environment" class="hidden" onchange="handlePreDeparturePhotoChange(event, 'dashcam')">
-              
-              <!-- Button to Open Camera -->
+              <!-- Button to Open Live Camera -->
               <div id="dashcamActionBox">
-                <button type="button" onclick="document.getElementById('inputDashcamPhoto').click()"
+                <button type="button" onclick="startEquipmentCamera('dashcam', 'ภาพถ่ายกล้องบันทึกภาพหน้ารถ (Dashcam Operational Check)')"
                   class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-cyan-600/30 to-blue-600/30 hover:from-cyan-600/50 hover:to-blue-600/50 text-cyan-200 border border-cyan-500/40 text-xs font-mono font-bold flex items-center justify-center gap-2 transition active:scale-[0.98]">
                   <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
-                  📸 ถ่ายภาพ / แนบรูปกล้องหน้ารถ (สถานะ REC)
+                  📸 เปิดกล้องสด: ถ่ายภาพกล้องหน้ารถ REC (Live Only)
                 </button>
               </div>
 
@@ -594,9 +594,9 @@
                   <p class="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
                     <span>✓</span> แนบภาพกล้องหน้ารถแล้ว
                   </p>
-                  <p class="text-[9px] text-slate-400 truncate mt-0.5">ไฟ REC ทำงานปกติ มุมมองชัดเจน ไม่ถูกบดบัง</p>
+                  <p class="text-[9px] text-slate-400 truncate mt-0.5">ไฟ REC ทำงานปกติ มุมมองชัดเจน ไม่ถูกบดบัง (ภาพสด Live Only)</p>
                   <div class="mt-2 flex gap-2">
-                    <button type="button" onclick="document.getElementById('inputDashcamPhoto').click()" 
+                    <button type="button" onclick="startEquipmentCamera('dashcam', 'ภาพถ่ายกล้องบันทึกภาพหน้ารถ (Dashcam Operational Check)')" 
                       class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-[10px] font-mono flex items-center gap-1 transition">
                       🔄 ถ่ายใหม่ (Retake)
                     </button>
@@ -655,6 +655,7 @@
     let registeredDriver = null;
     let activeCameraStream = null;
     let currentCameraTarget = null;
+    let currentFacingMode = 'environment';
     let currentDefectQuestionRef = null;
 
     // Captured Images Map
@@ -1361,13 +1362,14 @@
       }
     }
 
-    // --- Live Camera Engine (Strictly Environment/Back Camera) ---
+    // --- Live Camera Engine (Strictly Hardware Live Camera // No Gallery Upload) ---
     async function startMandatoryCamera(key, title) {
       currentCameraTarget = key;
       currentDefectQuestionRef = null;
       document.getElementById('camNoteBox').classList.add('hidden');
       document.getElementById('camModalTitle').innerText = title;
       document.getElementById('hudTargetText').innerText = `TARGET: ${key.toUpperCase()}`;
+      currentFacingMode = 'environment';
       openCameraModal();
     }
 
@@ -1377,7 +1379,24 @@
       document.getElementById('camNoteInput').value = `[ข้อ ${question.no}] ${question.text}`;
       document.getElementById('camModalTitle').innerText = `ถ่ายรูปจุดชำรุด: ข้อ ${question.no}`;
       document.getElementById('hudTargetText').innerText = `TARGET: DEFECT_EVIDENCE`;
+      currentFacingMode = 'environment';
       openCameraModal();
+    }
+
+    async function startEquipmentCamera(type, title) {
+      currentCameraTarget = type;
+      currentDefectQuestionRef = null;
+      document.getElementById('camNoteBox').classList.add('hidden');
+      document.getElementById('camModalTitle').innerText = title;
+      document.getElementById('hudTargetText').innerText = `TARGET: ${type.toUpperCase()}`;
+      // เข็มขัดนิรภัย พขร. ให้ตั้งต้นเป็นกล้องหน้า (Selfie) เพื่อความสะดวกในการถ่ายภาพตนเองขณะนั่งประจำที่ ส่วนจุดอื่นตั้งต้นเป็นกล้องหลัง
+      currentFacingMode = (type === 'seatbeltDriver') ? 'user' : 'environment';
+      openCameraModal();
+    }
+
+    async function toggleCameraFacing() {
+      currentFacingMode = (currentFacingMode === 'environment') ? 'user' : 'environment';
+      await openCameraModal();
     }
 
     async function openCameraModal() {
@@ -1388,6 +1407,11 @@
       const now = new Date();
       document.getElementById('camTimestamp').innerText = now.toLocaleString('th-TH');
 
+      const txt = document.getElementById('txtToggleFacing');
+      if (txt) {
+        txt.innerText = (currentFacingMode === 'environment') ? 'กล้องหลัง' : 'กล้องหน้า';
+      }
+
       preview.classList.add('hidden');
       video.classList.remove('hidden');
       modal.classList.remove('hidden');
@@ -1395,18 +1419,43 @@
       try {
         if (activeCameraStream) {
           activeCameraStream.getTracks().forEach(t => t.stop());
+          activeCameraStream = null;
         }
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 } },
-          audio: false
-        });
+
+        // WebRTC stream with multi-level fallback for maximum Android & iOS Safari compatibility
+        let stream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: { ideal: currentFacingMode },
+              width: { ideal: 1280 },
+              height: { ideal: 960 }
+            },
+            audio: false
+          });
+        } catch (e1) {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: currentFacingMode },
+              audio: false
+            });
+          } catch (e2) {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+              audio: false
+            });
+          }
+        }
+
         activeCameraStream = stream;
         video.srcObject = stream;
+        await video.play().catch(() => {});
       } catch (err) {
+        console.error('Camera access error:', err);
         Swal.fire({
           icon: 'warning',
           title: 'ไม่สามารถเปิดกล้องได้',
-          text: 'กรุณาอนุญาตสิทธิ์การใช้งานกล้องถ่ายรูปในเบราว์เซอร์ เพื่อความปลอดภัยในการตรวจรถ',
+          text: 'กรุณาอนุญาตสิทธิ์การใช้งานกล้องถ่ายรูปในเบราว์เซอร์ เพื่อความปลอดภัยในการตรวจรถ (รองรับทั้ง Android และ iOS)',
           background: '#0a1120',
           color: '#fff'
         });
@@ -1439,7 +1488,14 @@
       const base64 = canvas.toDataURL('image/jpeg', 0.85);
       capturedImages[currentCameraTarget] = base64;
 
-      if (currentCameraTarget === 'dashboard') {
+      if (currentCameraTarget === 'seatbeltDriver') {
+        capturedImages.seatbelt = base64;
+        renderPreDeparturePhotoUI('seatbeltDriver');
+      } else if (currentCameraTarget === 'seatbeltAssistant') {
+        renderPreDeparturePhotoUI('seatbeltAssistant');
+      } else if (currentCameraTarget === 'dashcam') {
+        renderPreDeparturePhotoUI('dashcam');
+      } else if (currentCameraTarget === 'dashboard') {
         document.getElementById('badgeDashPhoto').classList.add('border-emerald-500', 'bg-emerald-950/40');
         document.getElementById('btnDashPhoto').innerText = '✓ ถ่ายแล้ว';
         document.getElementById('btnDashPhoto').className = 'px-2 py-0.5 bg-emerald-600 text-white font-bold rounded text-[10px]';
