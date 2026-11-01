@@ -4946,6 +4946,8 @@
 
     function closeTruckReportModal() {
       document.getElementById('truckReportModal').classList.add('hidden');
+      const pIframe = document.getElementById('truckModalPdfIframe');
+      if (pIframe) pIframe.src = 'about:blank';
     }
 
     function switchTruckModalTab(tab) {
@@ -4958,8 +4960,11 @@
 
       if (tab === 'pdf') {
         const pIframe = document.getElementById('truckModalPdfIframe');
-        if (pIframe && (!pIframe.src || pIframe.src === '' || pIframe.src.endsWith('about:blank'))) {
-          pIframe.src = pIframe.dataset.src || './CheckTruck/downloaded_all_trucks.pdf';
+        if (pIframe) {
+          const target = pIframe.dataset.pendingPdfUrl || pIframe.dataset.src || './CheckTruck/downloaded_all_trucks.pdf';
+          if (!pIframe.src || pIframe.src === '' || pIframe.src.endsWith('about:blank') || pIframe.src !== target) {
+            pIframe.src = target;
+          }
         }
         btnCheck.className = "flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center text-slate-600 dark:text-slate-400 hover:text-amber-600";
         btnPdf.className = "flex-1 py-1.5 px-2 rounded-lg font-bold transition text-center bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 shadow-sm";
@@ -5047,6 +5052,8 @@
 
     function closeMonthlyReportModal() {
       document.getElementById('monthlyReportModal').classList.add('hidden');
+      const mIframe = document.getElementById('monthlyModalPdfIframe');
+      if (mIframe) mIframe.src = 'about:blank';
     }
 
     function openDriverModal(id) {
