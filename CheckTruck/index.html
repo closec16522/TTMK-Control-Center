@@ -12,6 +12,9 @@
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <!-- Three.js 3D Engine & OrbitControls -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -137,6 +140,11 @@
 
       <button onclick="toggleAudio()" id="soundBtn" class="p-1.5 rounded-lg hud-glass text-cyan-400 hover:text-white transition" title="เปิด/ปิดเสียงเอฟเฟกต์">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+      </button>
+
+      <!-- Quick External Browser Launch -->
+      <button onclick="openInExternalBrowser(event)" class="p-1.5 rounded-lg hud-glass text-cyan-400 hover:text-white transition" title="เปิดในเบราว์เซอร์หลัก (Chrome / Safari)">
+        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
       </button>
     </div>
   </header>
@@ -1399,6 +1407,283 @@
       await openCameraModal();
     }
 
+    // --- LINE & External Browser Integration ---
+    function copyUrlToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+      } else {
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        } catch (e) {}
+      }
+    }
+    window.copyUrlToClipboard = copyUrlToClipboard;
+
+    function getLineExternalBrowserUrl(rawUrl) {
+      const current = rawUrl || window.location.href;
+      try {
+        const urlObj = new URL(current);
+        urlObj.searchParams.set("openExternalBrowser", "1");
+        return urlObj.toString();
+      } catch (e) {
+        const sep = current.includes("?") ? "&" : "?";
+        return current + sep + "openExternalBrowser=1";
+      }
+    }
+    window.getLineExternalBrowserUrl = getLineExternalBrowserUrl;
+
+    window.openInExternalBrowser = function(event) {
+      if (event && event.preventDefault) {
+        event.preventDefault();
+      }
+
+      const currentUrl = window.location.href;
+      const ua = navigator.userAgent || "";
+      const isLine = /Line\//i.test(ua);
+      const isAndroid = /Android/i.test(ua);
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+      const isHttps = window.location.protocol === "https:";
+      const protocol = isHttps ? "https" : "http";
+
+      // 1. คัดลอกลิงก์เก็บไว้ในคลิปบอร์ดสำรองเสมอ
+      copyUrlToClipboard(currentUrl);
+
+      // 2. คำนวณลิงก์สำหรับ LINE In-App Browser (?openExternalBrowser=1)
+      const lineUrl = getLineExternalBrowserUrl(currentUrl);
+
+      // 3. กรณีเปิดผ่านแอป LINE (ทั้ง Android และ iOS)
+      if (isLine) {
+        window.location.href = lineUrl;
+
+        if (isAndroid) {
+          setTimeout(() => {
+            try {
+              const rawUrl = currentUrl.replace(/^https?:\/\//, '');
+              const chromeIntentUrl = `intent://${rawUrl}#Intent;scheme=${protocol};package=com.android.chrome;end`;
+              window.location.href = chromeIntentUrl;
+            } catch (e) {}
+          }, 500);
+        }
+        return false;
+      }
+
+      // 4. กรณี Android (นอก LINE เช่น In-App Browser อื่นๆ)
+      if (isAndroid) {
+        const rawUrl = currentUrl.replace(/^https?:\/\//, '');
+        const chromeIntentUrl = `intent://${rawUrl}#Intent;scheme=${protocol};package=com.android.chrome;end`;
+        
+        try {
+          window.location.href = chromeIntentUrl;
+        } catch (e) {
+          window.open(currentUrl, "_blank");
+        }
+
+        if (window.Swal) {
+          Swal.fire({
+            icon: "info",
+            title: "กำลังเปิดใน Chrome",
+            html: `
+              <div class="text-xs text-slate-300 text-left space-y-2">
+                <p>ระบบกำลังเรียกเปิดใน <b>Google Chrome</b>...</p>
+                <p class="text-emerald-400 font-semibold">✓ ระบบได้คัดลอกลิงก์ให้เรียบร้อยแล้ว</p>
+                <p class="text-[11px] text-slate-400">หากเครื่องไม่เด้งเปิดอัตโนมัติ สามารถเปิดแอป Chrome แล้วกด <b>วาง (Paste)</b> ลิงก์ได้ทันที</p>
+              </div>
+            `,
+            confirmButtonText: "รับทราบ",
+            confirmButtonColor: "#00f2fe",
+            background: "#0a1120",
+            color: "#fff"
+          });
+        }
+        return false;
+      }
+
+      // 5. กรณี iPhone / iPad (iOS Safari)
+      if (isIOS) {
+        window.open(currentUrl, "_blank");
+        if (window.Swal) {
+          Swal.fire({
+            icon: "info",
+            title: "คัดลอกลิงก์เรียบร้อย",
+            html: `
+              <div class="text-xs text-slate-300 text-left space-y-2">
+                <p class="text-emerald-400 font-semibold">✓ ระบบคัดลอกลิงก์หน้าเว็บนี้ให้แล้ว</p>
+                <p>โปรดเปิดแอป <b>Safari</b> หรือ <b>Chrome</b> บน iPhone แล้วกด <b>วาง (Paste)</b> เพื่อเปิดใช้งานกล้องได้ทันที</p>
+              </div>
+            `,
+            confirmButtonText: "รับทราบ",
+            confirmButtonColor: "#00f2fe",
+            background: "#0a1120",
+            color: "#fff"
+          });
+        }
+        return false;
+      }
+
+      // 6. กรณีทั่วไป / PC Desktop
+      window.open(currentUrl, "_blank");
+      if (window.Swal) {
+        Swal.fire({
+          icon: "success",
+          title: "เปิดในเบราว์เซอร์เรียบร้อย",
+          text: "ระบบได้คัดลอกลิงก์ไปยังคลิปบอร์ดและเปิดหน้าต่างใหม่ให้แล้ว",
+          timer: 3000,
+          showConfirmButton: false,
+          background: "#0a1120",
+          color: "#fff"
+        });
+      }
+      return false;
+    };
+
+    function checkLineInAppBrowser() {
+      const ua = navigator.userAgent || "";
+      const isLine = /Line\//i.test(ua);
+      const isAndroid = /Android/i.test(ua);
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+      if (isLine) {
+        console.warn("LINE In-App Browser detected on", isAndroid ? "Android" : (isIOS ? "iOS" : "Unknown"));
+        const lineExternalUrl = getLineExternalBrowserUrl(window.location.href);
+
+        // หากเปิดผ่าน LINE โดยตรงและยังไม่มี openExternalBrowser=1 ให้พยายามเด้งเปิดเบราว์เซอร์ภายนอกทันที
+        if (!window.location.search.includes("openExternalBrowser=1")) {
+          try {
+            window.location.href = lineExternalUrl;
+          } catch (e) {
+            console.warn("Auto-redirect notice:", e);
+          }
+        }
+
+        // แสดง Banner แจ้งเตือนด้านบนสุด
+        if (!document.getElementById("lineWarningBanner")) {
+          const banner = document.createElement("div");
+          banner.id = "lineWarningBanner";
+          banner.className = "bg-amber-600 text-white p-2.5 text-xs shadow-lg sticky top-0 z-[100] flex items-center justify-between";
+          banner.innerHTML = `
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-triangle-exclamation text-amber-200 text-base"></i>
+              <span><b>เปิดผ่านแอป LINE:</b> กล้องอาจถูกปิดกั้น แนะนำให้เปิดด้วย ${isAndroid ? 'Chrome' : (isIOS ? 'Safari' : 'เบราว์เซอร์')}</span>
+            </div>
+            <a href="${lineExternalUrl}" onclick="openInExternalBrowser(event)" target="_blank"
+               class="px-2.5 py-1 bg-white text-amber-950 font-bold rounded shadow hover:bg-amber-100 transition whitespace-nowrap ml-2 text-[11px] inline-flex items-center space-x-1 cursor-pointer">
+              <i class="fa-brands ${isAndroid ? 'fa-chrome text-blue-600' : (isIOS ? 'fa-safari text-blue-500' : 'fa-compass text-amber-800')}"></i>
+              <span>${isAndroid ? 'เปิดใน Chrome' : (isIOS ? 'เปิดใน Safari' : 'เปิดในเบราว์เซอร์')}</span>
+            </a>
+          `;
+          document.body.prepend(banner);
+        }
+      }
+    }
+
+    function showCameraPermissionGuideModal(err) {
+      const ua = navigator.userAgent || "";
+      const isLine = /Line\//i.test(ua);
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+      const isAndroid = /Android/i.test(ua);
+
+      let detectedPlatform = "ทั่วไป";
+      if (isLine) detectedPlatform = "แอป LINE (In-App Browser)";
+      else if (isIOS) detectedPlatform = "iPhone / iPad (iOS Safari)";
+      else if (isAndroid) detectedPlatform = "มือถือ Android (Google Chrome)";
+
+      const lineExternalUrl = getLineExternalBrowserUrl(window.location.href);
+
+      Swal.fire({
+        icon: "warning",
+        title: "สิทธิ์การเข้าถึงกล้องถูกบล็อก",
+        html: `
+          <div class="text-left text-xs text-slate-200 space-y-3 leading-relaxed mt-1">
+            <div class="bg-amber-950/40 border border-amber-600/50 text-amber-200 p-2.5 rounded-lg text-xs">
+              ⚠️ เบราว์เซอร์จำค่าว่า <b>"บล็อก/ไม่อนุญาต"</b> หรือเปิดผ่านแอปที่ปิดกั้นกล้อง (เช่น LINE)
+              <div class="mt-1 text-[11px] font-semibold text-cyan-400">
+                📱 อุปกรณ์ที่ตรวจพบ: <b>${detectedPlatform}</b>
+              </div>
+            </div>
+
+            <!-- Quick Launch in External Browser Button -->
+            <div class="bg-blue-950/40 border border-blue-500/50 rounded-lg p-2.5 text-center">
+              <a href="${lineExternalUrl}" onclick="openInExternalBrowser(event)"
+                 class="w-full py-2.5 px-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 active:scale-95 text-white font-bold rounded-lg text-xs shadow flex items-center justify-center space-x-1.5 cursor-pointer transition">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                <span>แตะเปิดในเบราว์เซอร์ ${isAndroid ? 'Google Chrome' : (isIOS ? 'Safari' : 'ภายนอก')} ทันที</span>
+              </a>
+              <p class="text-[10px] text-cyan-300 mt-1">ระบบจะเด้งเปิดเบราว์เซอร์หลัก และคัดลอกลิงก์ให้เรียบร้อย</p>
+            </div>
+
+            <!-- Android Chrome Block -->
+            <div class="border rounded-lg p-2.5 ${isAndroid && !isLine ? 'border-cyan-500 bg-cyan-950/30' : 'border-slate-700 bg-slate-900/60'}">
+              <p class="font-bold text-white flex items-center justify-between mb-1">
+                <span><span class="mr-1">🤖</span> <b>มือถือ Android (Google Chrome)</b></span>
+                ${isAndroid && !isLine ? '<span class="text-[10px] bg-cyan-600 text-white px-1.5 py-0.5 rounded font-bold">เครื่องของคุณ</span>' : ''}
+              </p>
+              <div class="space-y-1.5 text-slate-300 pl-1">
+                <p class="font-semibold text-cyan-300 text-[11px]">วิธีที่ 1: ตรวจสอบใน Chrome</p>
+                <ol class="list-decimal list-inside pl-1 space-y-0.5">
+                  <li>แตะไอคอน <b>การตั้งค่าไซต์ ⚙️</b> หรือ <b>แม่กุญแจ 🔒</b> หน้า URL ด้านบน</li>
+                  <li>เลือก <b>"สิทธิ์" (Permissions)</b> &gt; <b>"กล้อง" (Camera)</b> &gt; เปลี่ยนเป็น <b>"อนุญาต"</b></li>
+                </ol>
+                <p class="font-semibold text-rose-400 text-[11px] pt-1">วิธีที่ 2: หากสิทธิ์ในระดับมือถือถูกปิด</p>
+                <ol class="list-decimal list-inside pl-1 space-y-0.5 text-rose-300">
+                  <li>ไปที่ <b>การตั้งค่ามือถือ (Settings) &gt; แอป (Apps) &gt; Chrome</b></li>
+                  <li>แตะ <b>"การอนุญาต" (Permissions) &gt; กล้อง (Camera)</b> &gt; เลือก <b>"อนุญาตเฉพาะขณะใช้แอป"</b></li>
+                </ol>
+              </div>
+            </div>
+
+            <!-- iPhone Safari Block -->
+            <div class="border rounded-lg p-2.5 ${isIOS && !isLine ? 'border-cyan-500 bg-cyan-950/30' : 'border-slate-700 bg-slate-900/60'}">
+              <p class="font-bold text-white flex items-center justify-between mb-1">
+                <span><span class="mr-1">🍏</span> <b>Safari (iPhone / iPad)</b></span>
+                ${isIOS && !isLine ? '<span class="text-[10px] bg-cyan-600 text-white px-1.5 py-0.5 rounded font-bold">เครื่องของคุณ</span>' : ''}
+              </p>
+              <ol class="list-decimal list-inside text-slate-300 pl-1 space-y-1">
+                <li>แตะที่ปุ่ม <b>aA</b> ตรงแถบชื่อเว็บ (ด้านล่างหรือด้านบน)</li>
+                <li>เลือก <b>"การตั้งค่าเว็บไซต์" (Website Settings)</b></li>
+                <li>ตรงหัวข้อ <b>"กล้อง" (Camera)</b> ให้เปลี่ยนเป็น <b>"อนุญาต" (Allow)</b></li>
+                <li>กดปุ่ม <b>"รีเฟรชหน้าเว็บ"</b> ด้านล่างนี้</li>
+              </ol>
+            </div>
+
+            <!-- LINE In-App Browser Block -->
+            <div class="border rounded-lg p-2.5 ${isLine ? 'border-emerald-500 bg-emerald-950/40' : 'border-slate-700 bg-slate-900/60'}">
+              <p class="font-bold text-white flex items-center justify-between mb-1">
+                <span><span class="mr-1">💬</span> <b>หากเปิดผ่านแอป LINE</b></span>
+                ${isLine ? '<span class="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">กำลังเปิดใน LINE</span>' : ''}
+              </p>
+              <p class="text-slate-300 pl-1 mb-2">
+                ระบบความปลอดภัยของ LINE มักบล็อกกล้อง แตะปุ่มด้านล่างเพื่อเปิดในเบราว์เซอร์หลักของเครื่อง:
+              </p>
+              <a href="${lineExternalUrl}" onclick="openInExternalBrowser(event)"
+                 class="inline-flex items-center justify-center w-full py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold rounded-lg text-xs shadow transition cursor-pointer">
+                <i class="fa-solid fa-arrow-up-right-from-square mr-1.5"></i> แตะเพื่อเปิดใน ${isAndroid ? 'Google Chrome' : (isIOS ? 'Safari' : 'เบราว์เซอร์')} ทันที
+              </a>
+              <p class="text-slate-400 text-[10px] text-center mt-1.5">หรือแตะจุด 3 จุด (...) ที่มุมจอ &gt; เลือก "เปิดด้วยเบราว์เซอร์เริ่มต้น / Safari / Chrome"</p>
+            </div>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: "🔄 รีเฟรชหน้าเว็บทันที",
+        cancelButtonText: "เข้าใจแล้ว ปิดหน้าต่าง",
+        confirmButtonColor: "#00f2fe",
+        cancelButtonColor: "#334155",
+        background: "#0a1120",
+        color: "#fff"
+      }).then((res) => {
+        if (res.isConfirmed) {
+          window.location.reload();
+        }
+      });
+    }
+
     async function openCameraModal() {
       const modal = document.getElementById('cameraInspectionModal');
       const video = document.getElementById('inspectionVideo');
@@ -1417,6 +1702,10 @@
       modal.classList.remove('hidden');
 
       try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          throw new Error('เบราว์เซอร์หรือแอปนี้ไม่รองรับการเปิดกล้องโดยตรง (WebRTC getUserMedia) กรุณาเปิดด้วย Google Chrome หรือ Safari');
+        }
+
         if (activeCameraStream) {
           activeCameraStream.getTracks().forEach(t => t.stop());
           activeCameraStream = null;
@@ -1457,13 +1746,7 @@
         await video.play().catch(e => console.warn('video.play notice:', e));
       } catch (err) {
         console.error('Camera access error:', err);
-        Swal.fire({
-          icon: 'warning',
-          title: 'ไม่สามารถเปิดกล้องได้',
-          text: 'กรุณาอนุญาตสิทธิ์การใช้งานกล้องถ่ายรูปในเบราว์เซอร์ เพื่อความปลอดภัยในการตรวจรถ (รองรับทั้ง Android และ iOS)',
-          background: '#0a1120',
-          color: '#fff'
-        });
+        showCameraPermissionGuideModal(err);
       }
     }
 
@@ -2398,10 +2681,18 @@
 
     // Initialize on window load
     window.onload = function() {
+      checkLineInAppBrowser();
       init3DScene();
       checkSavedDriver();
       initInspectionDayMode();
     };
+
+    // Early check for LINE In-App Browser to redirect before heavy assets load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkLineInAppBrowser);
+    } else {
+      checkLineInAppBrowser();
+    }
   </script>
 </body>
 </html>
