@@ -56,6 +56,18 @@ function doGet(e) {
       return generateMonthlyTruckInspectionPdf(plate, monthYear, email);
     }
 
+    // ฟังก์ชันตั้งค่า Locale ของ Google Sheet ให้เป็นประเทศไทย (th_TH) ป้องกันวันที่สลับวัน/เดือน
+    if (e.parameter.action === "fix_locale" || e.parameter.action === "setup_th_locale") {
+      try {
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        ss.setSpreadsheetLocale('th_TH');
+        ss.setSpreadsheetTimeZone('Asia/Bangkok');
+        return responseJSON({ status: "success", message: "ตั้งค่า Spreadsheet Locale เป็น th_TH (ประเทศไทย) เรียบร้อยแล้ว" });
+      } catch (err) {
+        return responseJSON({ status: "error", message: err.toString() });
+      }
+    }
+
     // ฟังก์ชันตรวจสอบแถวข้อมูลใน Truck_Inspection_Logs สำหรับดีบัก
     if (e.parameter.action === "debug_recent_logs") {
       try {
@@ -66,7 +78,7 @@ function doGet(e) {
         const startRow = Math.max(2, lastRow - 9);
         const numRows = lastRow - startRow + 1;
         if (numRows <= 0) return responseJSON({ status: "success", rows: [] });
-        const rows = logSheet.getRange(startRow, 1, numRows, 10).getValues();
+        const rows = logSheet.getRange(startRow, 1, numRows, 10).getDisplayValues();
         const result = rows.map((r, idx) => ({
           row: startRow + idx,
           rawTimestamp: r[0],
@@ -95,14 +107,9 @@ function doGet(e) {
         const lastRow = logSheet.getLastRow();
         if (lastRow <= 1) return responseJSON({ status: "success", total: 0, logs: [] });
         const lastCol = Math.max(logSheet.getLastColumn(), 19);
-        const rows = logSheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+        const rows = logSheet.getRange(2, 1, lastRow - 1, lastCol).getDisplayValues();
         const logs = rows.map((r, idx) => {
-          let ts = r[0];
-          if (ts instanceof Date) {
-            ts = Utilities.formatDate(ts, "Asia/Bangkok", "dd/MM/yyyy HH:mm:ss");
-          } else {
-            ts = (ts || "").toString().trim();
-          }
+          let ts = (r[0] || "").toString().trim();
           const dateStr = ts.split(' ')[0] || '';
           const timeStr = ts.split(' ')[1] || '';
           return {
@@ -741,36 +748,26 @@ function parseInspectionDateInfo(rawVal) {
   let m = null;
   let y = null;
 
-  if (rawVal instanceof Date) {
-    if (isNaN(rawVal.getTime())) return null;
-    const dStr = Utilities.formatDate(rawVal, "Asia/Bangkok", "d/M/yyyy");
-    const p = dStr.split('/');
-    d = parseInt(p[0], 10);
-    m = parseInt(p[1], 10);
-    y = parseInt(p[2], 10);
+  // ให้ความสำคัญกับข้อความ String ก่อนเสมอ เพื่อป้องกัน Google Apps Script / Sheets สลับวันและเดือน (dd/MM vs MM/dd)
+  const str = String(rawVal).trim();
+  const dmy = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (dmy) {
+    d = parseInt(dmy[1], 10);
+    m = parseInt(dmy[2], 10);
+    y = parseInt(dmy[3], 10);
   } else {
-    const str = String(rawVal).trim();
-    const dmy = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-    if (dmy) {
-      d = parseInt(dmy[1], 10);
-      m = parseInt(dmy[2], 10);
-      y = parseInt(dmy[3], 10);
-    } else {
-      const ymd = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-      if (ymd) {
-        y = parseInt(ymd[1], 10);
-        m = parseInt(ymd[2], 10);
-        d = parseInt(ymd[3], 10);
-      } else {
-        const dt = new Date(str);
-        if (!isNaN(dt.getTime())) {
-          const dStr = Utilities.formatDate(dt, "Asia/Bangkok", "d/M/yyyy");
-          const p = dStr.split('/');
-          d = parseInt(p[0], 10);
-          m = parseInt(p[1], 10);
-          y = parseInt(p[2], 10);
-        }
-      }
+    const ymd = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+    if (ymd) {
+      y = parseInt(ymd[1], 10);
+      m = parseInt(ymd[2], 10);
+      d = parseInt(ymd[3], 10);
+    } else if (rawVal instanceof Date) {
+      if (isNaN(rawVal.getTime())) return null;
+      const dStr = Utilities.formatDate(rawVal, "Asia/Bangkok", "d/M/yyyy");
+      const p = dStr.split('/');
+      d = parseInt(p[0], 10);
+      m = parseInt(p[1], 10);
+      y = parseInt(p[2], 10);
     }
   }
 
@@ -798,7 +795,8 @@ function buildMonthlyReportHtml(targetPlate, targetMonthYear, ssInstance, option
   const logSheet = ss.getSheetByName("Truck_Inspection_Logs");
   if (!logSheet) return null;
 
-  const logData = logSheet.getDataRange().getValues();
+  // ใช้ getDisplayValues เพื่อให้ได้ข้อความ String วันที่ตรงตามจริง (DD/MM/YYYY) ไม่ถูกแปลงสลับวัน/เดือนโดย US Locale
+  const logData = logSheet.getDataRange().getDisplayValues();
 
   // แปลงเดือนและปีเป้าหมาย (เช่น "10/2026" หรือ "10/2569" หรือ "10")
   let targetMonth = null;
