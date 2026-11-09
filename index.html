@@ -1348,23 +1348,26 @@
               </div>
 
               <!-- Month Navigation -->
-              <div class="flex items-center gap-2">
-                <button type="button" onclick="changeCalendarMonth(-1)" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center transition">
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="changeCalendarMonth(-1)" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center transition" title="เดือนก่อนหน้า">
                   <i class="fa-solid fa-chevron-left text-xs"></i>
                 </button>
-                <div class="px-3 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 text-center">
+                <div class="px-3 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 text-center min-w-[210px]">
                   <span id="calendarMonthLabel" class="text-xs md:text-sm font-extrabold text-blue-900 dark:text-blue-200">
-                    ตุลาคม 2569 (October 2026)
+                    พฤศจิกายน 2569 (November 2026)
                   </span>
                 </div>
-                <button type="button" onclick="changeCalendarMonth(1)" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center transition">
+                <button type="button" onclick="changeCalendarMonth(1)" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center transition" title="เดือนถัดไป">
                   <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+                <button type="button" onclick="goToCurrentCalendarMonth()" class="px-2 py-1 rounded-lg bg-blue-100 dark:bg-blue-900/50 hover:bg-blue-200 text-blue-700 dark:text-blue-300 text-[11px] font-bold border border-blue-300 dark:border-blue-700 transition shadow-sm" title="กลับมาเดือนปัจจุบัน">
+                  เดือนปัจจุบัน
                 </button>
               </div>
 
               <!-- Monthly Summary Report Action -->
               <div>
-                <button type="button" onclick="openMonthlyReportModal()"
+                <button type="button" onclick="openMonthlyReportModal(document.getElementById('calendarPlateFilter') ? document.getElementById('calendarPlateFilter').value : null, (appState.calendarMonth ? `${String(appState.calendarMonth).padStart(2, '0')}/${appState.calendarYear}` : null))"
                         class="px-3.5 py-2 bg-gradient-to-r from-blue-700 to-indigo-600 hover:from-blue-800 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-2 transition transform active:scale-95">
                   <i class="fa-solid fa-file-invoice"></i>
                   <span>ดูรายงานสรุปประจำเดือน (F-CAM-032_r3)</span>
@@ -3604,7 +3607,7 @@
               </span>
             </div>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              สรุปผลการตรวจสภาพรถบรรทุก 15 รายการรอบเดือน ตุลาคม 2569 แยกเป็นคัน
+              สรุปผลการตรวจสภาพรถบรรทุก 15 รายการรอบเดือน <span id="monthlyModalSubtitleMonth" class="text-indigo-600 dark:text-indigo-400 font-bold">พฤศจิกายน 2569</span> แยกเป็นคัน
             </p>
           </div>
         </div>
@@ -3616,22 +3619,24 @@
       <!-- Vehicle & Month Summary Card -->
       <div class="p-3.5 my-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
-          <span class="text-slate-500 text-[11px] block">ทะเบียนรถ (เปลี่ยนคัน):</span>
-          <select id="monthlyModalPlateSelect" onchange="openMonthlyReportModal(this.value)"
+          <span class="text-slate-500 text-[11px] block font-medium">ทะเบียนรถ (เปลี่ยนคัน):</span>
+          <select id="monthlyModalPlateSelect" onchange="openMonthlyReportModal(this.value, document.getElementById('monthlyModalMonthSelect') ? document.getElementById('monthlyModalMonthSelect').value : null)"
                   class="mt-0.5 w-full bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-700 rounded-lg py-1 px-1.5 text-xs font-bold text-blue-700 dark:text-blue-400 focus:outline-none focus:ring-1 focus:ring-indigo-500">
           </select>
           <strong id="monthlyModalPlate" class="hidden">-</strong>
         </div>
         <div>
-          <span class="text-slate-500 text-[11px] block">พนักงานขับรถ:</span>
+          <span class="text-slate-500 text-[11px] block font-medium">พนักงานขับรถ:</span>
           <strong id="monthlyModalDriver" class="text-slate-800 dark:text-slate-200 font-bold block truncate">-</strong>
         </div>
         <div>
-          <span class="text-slate-500 text-[11px] block">รอบประจำเดือน:</span>
-          <span class="text-slate-700 dark:text-slate-300 font-bold block">ตุลาคม 2569</span>
+          <span class="text-slate-500 text-[11px] block font-medium">รอบประจำเดือน (เปลี่ยนเดือน):</span>
+          <select id="monthlyModalMonthSelect" onchange="openMonthlyReportModal(document.getElementById('monthlyModalPlateSelect').value, this.value)"
+                  class="mt-0.5 w-full bg-white dark:bg-slate-900 border border-blue-300 dark:border-blue-700 rounded-lg py-1 px-1.5 text-xs font-bold text-blue-700 dark:text-blue-400 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+          </select>
         </div>
         <div>
-          <span class="text-slate-500 text-[11px] block">สรุปการตรวจสภาพ (Actual):</span>
+          <span class="text-slate-500 text-[11px] block font-medium">สรุปการตรวจสภาพ (Actual):</span>
           <span id="monthlyModalStatusBadge" class="text-emerald-600 font-extrabold block">-</span>
         </div>
       </div>
@@ -6627,25 +6632,27 @@
         const hasPdf = log.pdfUrl && log.pdfUrl !== '-' && !log.pdfUrl.startsWith('PDF Gen Error');
         const driveLink = hasPdf ? log.pdfUrl : (log.imgFrontVehicle || log.imgDashboard || '#');
 
-        return `
-          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-100 dark:border-slate-800 text-xs">
-            <td class="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">${escapeHtml(log.timestamp)}</td>
-            <td class="py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">${escapeHtml(log.vehiclePlate)}</td>
-            <td class="py-2.5 px-3 text-slate-700 dark:text-slate-300 font-medium">${escapeHtml(log.vehicleType || 'รถบรรทุก 6 ล้อ')}</td>
-            <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200">${escapeHtml(log.driverName)}</td>
-            <td class="py-2.5 px-3 font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">${escapeHtml(log.mileage || '-')}</td>
-            <td class="py-2.5 px-3 text-center whitespace-nowrap">${statusBadge}</td>
-            <td class="py-2.5 px-3 text-center whitespace-nowrap">
-              <div class="inline-flex items-center gap-1.5">
-                <button type="button" onclick="openTruckReportModal(${index})"
-                        class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition active:scale-95">
-                  <i class="fa-solid fa-file-pdf mr-1 text-red-200"></i> ดูรายงานวัน
-                </button>
-                <button type="button" onclick="openMonthlyReportModal('${escapeHtml(log.vehiclePlate)}')"
-                        class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 shadow-sm transition active:scale-95"
-                        title="ดูรายงานสรุปประจำเดือนคันนี้ (F-CAM-032_r3)">
-                  <i class="fa-solid fa-calendar-check mr-1"></i> รายเดือน
-                </button>
+                const logDmy = parseInspectionDateInfo(log.date || log.timestamp);
+                const logMonthYearParam = logDmy ? `${String(logDmy.month).padStart(2, '0')}/${logDmy.year}` : '';
+                return `
+                  <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition border-b border-slate-100 dark:border-slate-800 text-xs">
+                    <td class="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">${escapeHtml(log.timestamp)}</td>
+                    <td class="py-2.5 px-3 font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">${escapeHtml(log.vehiclePlate)}</td>
+                    <td class="py-2.5 px-3 text-slate-700 dark:text-slate-300 font-medium">${escapeHtml(log.vehicleType || 'รถบรรทุก 6 ล้อ')}</td>
+                    <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200">${escapeHtml(log.driverName)}</td>
+                    <td class="py-2.5 px-3 font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">${escapeHtml(log.mileage || '-')}</td>
+                    <td class="py-2.5 px-3 text-center whitespace-nowrap">${statusBadge}</td>
+                    <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                      <div class="inline-flex items-center gap-1.5">
+                        <button type="button" onclick="openTruckReportModal(${index})"
+                                class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition active:scale-95">
+                          <i class="fa-solid fa-file-pdf mr-1 text-red-200"></i> ดูรายงานวัน
+                        </button>
+                        <button type="button" onclick="openMonthlyReportModal('${escapeHtml(log.vehiclePlate)}', '${logMonthYearParam}')"
+                                class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 shadow-sm transition active:scale-95"
+                                title="ดูรายงานสรุปประจำเดือนคันนี้ (F-CAM-032_r3)">
+                          <i class="fa-solid fa-calendar-check mr-1"></i> รายเดือน
+                        </button>
                 ${hasPdf ? `
                   <a href="${driveLink}" target="_blank" title="เปิดไฟล์ PDF ใน Google Drive โดยตรง"
                      class="p-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-amber-600 hover:text-white text-amber-600 border border-slate-200 dark:border-slate-700 transition">
@@ -6700,28 +6707,140 @@
       }
     }
 
-    function changeCalendarMonth(offset) {
-      // October 2026 is current active month
-      Swal.fire({
-        icon: 'info',
-        title: 'เดือนตุลาคม 2569 (Active)',
-        text: 'ปัจจุบันแสดงข้อมูลผลการตรวจของเดือนตุลาคม 2569 ข้อมูลครบถ้วนสมบูรณ์',
-        timer: 1500,
-        showConfirmButton: false
+    const THAI_MONTH_NAMES = [
+      '', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+    const ENG_MONTH_NAMES = [
+      '', 'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    function getAvailableInspectionMonths() {
+      const monthMap = {};
+      const addMonth = (raw) => {
+        const dmy = parseInspectionDateInfo(raw);
+        if (dmy && dmy.month && dmy.year) {
+          const key = `${String(dmy.month).padStart(2, '0')}/${dmy.year}`;
+          monthMap[key] = { month: dmy.month, year: dmy.year };
+        }
+      };
+
+      // Always ensure current month and last month are available
+      const now = new Date();
+      const curM = now.getMonth() + 1;
+      const curY = now.getFullYear();
+      addMonth(`01/${curM}/${curY}`);
+
+      const prevDate = new Date(curY, curM - 2, 1);
+      addMonth(`01/${prevDate.getMonth() + 1}/${prevDate.getFullYear()}`);
+
+      (appState.truckLogs || []).forEach(l => addMonth(l.date || l.timestamp));
+      (appState.alcoholLogs || []).forEach(l => addMonth(l.date || l.timestamp));
+
+      // Sort descending by year then month (newest first)
+      const sortedKeys = Object.keys(monthMap).sort((a, b) => {
+        const [ma, ya] = a.split('/').map(Number);
+        const [mb, yb] = b.split('/').map(Number);
+        if (ya !== yb) return yb - ya;
+        return mb - ma;
       });
+
+      return sortedKeys.map(k => {
+        const item = monthMap[k];
+        const bYear = item.year + 543;
+        const name = `${THAI_MONTH_NAMES[item.month]} ${bYear} (${k})`;
+        return { key: k, month: item.month, year: item.year, label: name };
+      });
+    }
+
+    function changeCalendarMonth(offset) {
+      if (!appState.calendarMonth || !appState.calendarYear) {
+        const now = new Date();
+        appState.calendarMonth = now.getMonth() + 1;
+        appState.calendarYear = now.getFullYear();
+      }
+      appState.calendarMonth += offset;
+      if (appState.calendarMonth > 12) {
+        appState.calendarMonth = 1;
+        appState.calendarYear += 1;
+      } else if (appState.calendarMonth < 1) {
+        appState.calendarMonth = 12;
+        appState.calendarYear -= 1;
+      }
+      renderInspectionCalendar();
+    }
+
+    function goToCurrentCalendarMonth() {
+      const now = new Date();
+      appState.calendarMonth = now.getMonth() + 1;
+      appState.calendarYear = now.getFullYear();
+      renderInspectionCalendar();
     }
 
     function renderInspectionCalendar() {
       const grid = document.getElementById('calendarDaysGrid');
       const statsStrip = document.getElementById('calendarVehicleStatsStrip');
       const select = document.getElementById('calendarPlateFilter');
+      const monthLabel = document.getElementById('calendarMonthLabel');
       if (!grid || !select) return;
 
+      const now = new Date();
+      if (!appState.calendarMonth) appState.calendarMonth = now.getMonth() + 1;
+      if (!appState.calendarYear) appState.calendarYear = now.getFullYear();
+
+      const curMonth = appState.calendarMonth;
+      const curYear = appState.calendarYear;
+      const curBuddhistYear = curYear + 543;
+
+      if (monthLabel) {
+        monthLabel.textContent = `${THAI_MONTH_NAMES[curMonth]} ${curBuddhistYear} (${ENG_MONTH_NAMES[curMonth]} ${curYear})`;
+      }
+
       const selectedPlate = select.value || "70-8899 กทม.";
-      const driver = appState.drivers.find(d => d.vehiclePlate === selectedPlate) || {
+      const cleanSelectedPlate = String(selectedPlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+      const driver = appState.drivers.find(d => {
+        const dp = String(d && d.vehiclePlate !== undefined && d.vehiclePlate !== null ? d.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+        return dp && (dp === cleanSelectedPlate || cleanSelectedPlate.includes(dp) || dp.includes(cleanSelectedPlate));
+      }) || {
         driverName: "นายทวีศักดิ์ คำปก (Mr.Taweesak)",
         vehiclePlate: selectedPlate
       };
+
+      // Extract logs for selected plate & this month
+      const monthDaysMap = {};
+      let totalMileageInMonth = '-';
+      (appState.truckLogs || []).forEach(l => {
+        const lp = String(l && l.vehiclePlate !== undefined && l.vehiclePlate !== null ? l.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+        if (!lp || !(lp === cleanSelectedPlate || cleanSelectedPlate.includes(lp) || lp.includes(cleanSelectedPlate))) return;
+
+        const dmy = parseInspectionDateInfo(l.date || l.timestamp);
+        if (dmy && dmy.month === curMonth && dmy.year === curYear) {
+          if (!monthDaysMap[dmy.day]) {
+            monthDaysMap[dmy.day] = { truck: l };
+          } else {
+            monthDaysMap[dmy.day].truck = l;
+          }
+          if (l.mileage && l.mileage !== '-') totalMileageInMonth = l.mileage;
+        }
+      });
+
+      (appState.alcoholLogs || []).forEach(l => {
+        const lp = String(l && l.vehiclePlate !== undefined && l.vehiclePlate !== null ? l.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
+        if (!lp || !(lp === cleanSelectedPlate || cleanSelectedPlate.includes(lp) || lp.includes(cleanSelectedPlate))) return;
+
+        const dmy = parseInspectionDateInfo(l.date || l.timestamp);
+        if (dmy && dmy.month === curMonth && dmy.year === curYear) {
+          if (!monthDaysMap[dmy.day]) {
+            monthDaysMap[dmy.day] = { alcohol: l };
+          } else {
+            monthDaysMap[dmy.day].alcohol = l;
+          }
+        }
+      });
+
+      const inspectedDaysCount = Object.keys(monthDaysMap).filter(d => monthDaysMap[d].truck).length;
+      const alcoholTestsCount = Object.keys(monthDaysMap).filter(d => monthDaysMap[d].alcohol).length;
 
       // 1. Render Stats Strip
       if (statsStrip) {
@@ -6732,69 +6851,44 @@
             <span class="text-[11px] text-slate-600 dark:text-slate-400 truncate block">${escapeHtml(driver.driverName)}</span>
           </div>
           <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
-            <span class="text-slate-500 dark:text-slate-400 block text-[11px]">ผลตรวจแอลกอฮอล์:</span>
-            <strong class="text-emerald-700 dark:text-emerald-300 font-bold block">0.00 mg% (100% ผ่าน)</strong>
-            <span class="text-[11px] text-emerald-600 dark:text-emerald-400 block">ปลอดภัยระดับสูงสุด</span>
+            <span class="text-slate-500 dark:text-slate-400 block text-[11px]">ผลตรวจแอลกอฮอล์ (${THAI_MONTH_NAMES[curMonth]}):</span>
+            <strong class="text-emerald-700 dark:text-emerald-300 font-bold block">${alcoholTestsCount > 0 ? `ตรวจแล้ว ${alcoholTestsCount} ครั้ง (ผ่าน 100%)` : 'ยังไม่มีผลตรวจในเดือนนี้'}</strong>
+            <span class="text-[11px] text-emerald-600 dark:text-emerald-400 block">${alcoholTestsCount > 0 ? 'ปลอดภัย 0.00 mg%' : 'รอการบันทึกตรวจวัด'}</span>
           </div>
           <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800">
-            <span class="text-slate-500 dark:text-slate-400 block text-[11px]">ตรวจสภาพรถ (F-CAM-032_r3):</span>
-            <strong class="text-amber-700 dark:text-amber-300 font-bold block">ผ่านเกณฑ์ 100%</strong>
-            <span class="text-[11px] text-amber-600 dark:text-amber-400 block">15 รายการสมบูรณ์ครบ</span>
+            <span class="text-slate-500 dark:text-slate-400 block text-[11px]">ตรวจสภาพรถ F-CAM (${THAI_MONTH_NAMES[curMonth]}):</span>
+            <strong class="text-amber-700 dark:text-amber-300 font-bold block">${inspectedDaysCount > 0 ? `ตรวจแล้ว ${inspectedDaysCount} วัน (ปกติครบ)` : 'ยังไม่มีบันทึกในเดือนนี้'}</strong>
+            <span class="text-[11px] text-amber-600 dark:text-amber-400 block">${inspectedDaysCount > 0 ? 'ผ่านเกณฑ์ความปลอดภัย SCG' : 'รอการตรวจประจำวัน'}</span>
           </div>
           <div class="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
             <span class="text-slate-500 dark:text-slate-400 block text-[11px]">เลขไมล์สะสม & สถานะ:</span>
-            <strong class="text-indigo-900 dark:text-indigo-200 font-bold block">128,620 กม.</strong>
+            <strong class="text-indigo-900 dark:text-indigo-200 font-bold block">${totalMileageInMonth !== '-' ? totalMileageInMonth : '128,620 กม.'}</strong>
             <span class="text-[11px] text-indigo-600 dark:text-indigo-400 block">พร้อมปฏิบัติงานตลอด 24 ชม.</span>
           </div>
         `;
       }
 
-      // 2. Build 31-Day Grid for October 2026
-      // October 1, 2026 was Thursday (Sun=0, Mon=1, Tue=2, Wed=3, Thu=4) -> 4 blank cells
+      // 2. Build Day Grid for selected Month & Year
+      // First day of month (0 = Sun, 1 = Mon, ..., 6 = Sat)
+      const firstDayIndex = new Date(curYear, curMonth - 1, 1).getDay();
       let cellsHtml = '';
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < firstDayIndex; i++) {
         cellsHtml += `<div class="p-2 rounded-xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800/40 min-h-[90px] opacity-40"></div>`;
       }
 
-      const todayNow = new Date();
-      const currentTodayDay = todayNow.getDate();
+      const totalDaysInMonth = new Date(curYear, curMonth, 0).getDate();
+      const currentTodayDay = now.getDate();
+      const isCurrentMonth = (curMonth === now.getMonth() + 1 && curYear === now.getFullYear());
 
-      for (let day = 1; day <= 31; day++) {
+      for (let day = 1; day <= totalDaysInMonth; day++) {
         const dayStr = day < 10 ? `0${day}` : `${day}`;
-        const datePattern = `${dayStr}/10/2026`;
-        const isToday = (day === currentTodayDay);
+        const monthStr = curMonth < 10 ? `0${curMonth}` : `${curMonth}`;
+        const datePattern = `${dayStr}/${monthStr}/${curYear}`;
+        const isToday = isCurrentMonth && (day === currentTodayDay);
 
-        const cleanSelectedPlate = String(selectedPlate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
-
-        // Find logs for this plate and day
-        const alcLog = appState.alcoholLogs.find(l => {
-          const lp = String(l && l.vehiclePlate !== undefined && l.vehiclePlate !== null ? l.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
-          const plateMatch = lp && (lp === cleanSelectedPlate || cleanSelectedPlate.includes(lp) || lp.includes(cleanSelectedPlate));
-          const dateMatch = (l.date === datePattern || String(l.timestamp || '').includes(datePattern));
-          return plateMatch && dateMatch;
-        }) || (day <= currentTodayDay ? {
-          timestamp: `${dayStr}/10/2026 08:15:00`,
-          driverName: driver.driverName,
-          vehiclePlate: selectedPlate,
-          alcoholValue: 0.00,
-          status: "ผ่าน",
-          bpSys: 118,
-          bpDia: 78,
-          bpPulse: 72
-        } : null);
-
-        const trkLog = appState.truckLogs.find(l => {
-          const lp = String(l && l.vehiclePlate !== undefined && l.vehiclePlate !== null ? l.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
-          const plateMatch = lp && (lp === cleanSelectedPlate || cleanSelectedPlate.includes(lp) || lp.includes(cleanSelectedPlate));
-          const dateMatch = (l.date === datePattern || String(l.timestamp || '').includes(datePattern));
-          return plateMatch && dateMatch;
-        }) || (day <= currentTodayDay ? {
-          timestamp: `${dayStr}/10/2026 08:20:00`,
-          driverName: driver.driverName,
-          vehiclePlate: selectedPlate,
-          mileage: `${128000 + (day * 45)} กม.`,
-          status: "ผ่านเกณฑ์ 100%"
-        } : null);
+        const dayEntry = monthDaysMap[day];
+        let trkLog = dayEntry ? dayEntry.truck : null;
+        let alcLog = dayEntry ? dayEntry.alcohol : null;
 
         const dayBorderClass = isToday 
           ? 'border-2 border-blue-500 bg-blue-50/40 dark:bg-blue-950/30 shadow-md ring-2 ring-blue-500/20' 
@@ -6811,26 +6905,26 @@
 
             <div class="space-y-1 my-1">
               ${alcLog ? `
-                <button type="button" onclick="openAlcoholEvidenceForDay('${escapeHtml(selectedPlate)}', '${dayStr}/10/2026')"
+                <button type="button" onclick="openAlcoholEvidenceForDay('${escapeHtml(selectedPlate)}', '${datePattern}')"
                         title="คลิกดูใบรับรองแอลกอฮอล์"
                         class="w-full text-left px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-800 dark:bg-emerald-950/80 dark:hover:bg-emerald-900 dark:text-emerald-300 flex items-center justify-between transition">
-                  <span class="truncate">🍺 0.00 mg%</span>
+                  <span class="truncate">🍺 ${alcLog.alcoholValue !== undefined ? Number(alcLog.alcoholValue).toFixed(2) : '0.00'} mg%</span>
                   <span class="text-[9px]">✔</span>
                 </button>
               ` : ''}
 
               ${trkLog ? `
-                <button type="button" onclick="openTruckReportForDay('${escapeHtml(selectedPlate)}', '${dayStr}/10/2026')"
+                <button type="button" onclick="openTruckReportForDay('${escapeHtml(selectedPlate)}', '${datePattern}')"
                         title="คลิกดูรายงานตรวจรถ 15 รายการ"
                         class="w-full text-left px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 dark:bg-amber-950/80 dark:hover:bg-amber-900 dark:text-amber-300 flex items-center justify-between transition">
-                  <span class="truncate">🚛 ตรวจรถ 100%</span>
+                  <span class="truncate">🚛 ตรวจรถ (${trkLog.status ? trkLog.status.substring(0, 8) : 'ผ่าน'})</span>
                   <span class="text-[9px]">✔</span>
                 </button>
               ` : ''}
 
-              ${alcLog ? `
+              ${alcLog && (alcLog.bpSys || alcLog.bpDia) ? `
                 <div class="text-[9px] text-blue-600 dark:text-blue-400 font-semibold px-1 truncate">
-                  💓 BP: ${alcLog.bpSys}/${alcLog.bpDia}
+                  💓 BP: ${alcLog.bpSys || '-'}/${alcLog.bpDia || '-'}
                 </div>
               ` : ''}
 
@@ -7985,18 +8079,30 @@
       }
     }
 
-    async function loadMonthlyPdfForPlate(plate, forceRegen = false) {
+    async function loadMonthlyPdfForPlate(plate, forceRegen = false, monthYearParam = null) {
       window.currentMonthlyPlate = plate;
+      const targetMonthYear = monthYearParam || window.currentMonthlyYearMonth || (appState.calendarMonth ? `${String(appState.calendarMonth).padStart(2, '0')}/${appState.calendarYear}` : '11/2026');
+      window.currentMonthlyYearMonth = targetMonthYear;
+
+      const [tMonthStr, tYearStr] = targetMonthYear.split('/');
+      const targetMonth = parseInt(tMonthStr, 10);
+      const targetYear = parseInt(tYearStr, 10);
+
       const cleanPlate = String(plate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim();
-      const expectedFileName = `TTMK_Monthly_102026_${cleanPlate || '25912'}.pdf`;
+      const cleanMonth = targetMonthYear.replace(/[^0-9]/g, '');
+      const expectedFileName = `TTMK_Monthly_${cleanMonth}_${cleanPlate || '25912'}.pdf`;
       const titleEl = document.getElementById('monthlyModalPdfTitle');
 
-      // 1. Check if any truckLog for this plate already has monthlyPdfUrl from Drive (if not forceRegen)
+      // 1. Check if any truckLog for this plate and this specific month/year already has monthlyPdfUrl from Drive (if not forceRegen)
       if (!forceRegen && appState.truckLogs && appState.truckLogs.length > 0) {
         const foundLog = appState.truckLogs.find(l => {
           const lp = String(l && l.vehiclePlate !== undefined && l.vehiclePlate !== null ? l.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
           const targetP = cleanPlate.toLowerCase();
-          return (lp === targetP || lp.includes(targetP) || targetP.includes(lp)) && l.monthlyPdfUrl && String(l.monthlyPdfUrl).includes('drive.google.com');
+          const plateMatch = (lp === targetP || lp.includes(targetP) || targetP.includes(lp));
+          if (!plateMatch || !l.monthlyPdfUrl || !String(l.monthlyPdfUrl).includes('drive.google.com')) return false;
+
+          const dmy = parseInspectionDateInfo(l.date || l.timestamp);
+          return dmy && dmy.month === targetMonth && dmy.year === targetYear;
         });
         if (foundLog && foundLog.monthlyPdfUrl) {
           setMonthlyPdfLinks(foundLog.monthlyPdfUrl, expectedFileName);
@@ -8010,7 +8116,7 @@
       }
 
       try {
-        const gasUrl = `${CONFIG.GAS_TRUCK_URL}?action=generate_monthly_pdf&plate=${encodeURIComponent(plate)}&month=10/2026${forceRegen ? '&regenerate=true' : ''}`;
+        const gasUrl = `${CONFIG.GAS_TRUCK_URL}?action=generate_monthly_pdf&plate=${encodeURIComponent(plate)}&month=${encodeURIComponent(targetMonthYear)}${forceRegen ? '&regenerate=true' : ''}`;
         const resp = await fetch(gasUrl);
         if (resp.ok) {
           const data = await resp.json();
@@ -8035,12 +8141,18 @@
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังประมวลผล Actual...`;
       }
 
+      const targetMonthYear = window.currentMonthlyYearMonth || (appState.calendarMonth ? `${String(appState.calendarMonth).padStart(2, '0')}/${appState.calendarYear}` : '11/2026');
+
       try {
-        await loadMonthlyPdfForPlate(window.currentMonthlyPlate || "25912", true);
+        await loadMonthlyPdfForPlate(window.currentMonthlyPlate || "25912", true, targetMonthYear);
+        const [mStr, yStr] = targetMonthYear.split('/');
+        const mName = THAI_MONTH_NAMES[parseInt(mStr, 10)] || mStr;
+        const bYear = parseInt(yStr, 10) + 543;
+
         Swal.fire({
           icon: 'success',
           title: 'อัปเดตไฟล์รายเดือนสำเร็จ',
-          text: 'ประมวลผลข้อมูลการตรวจ Actual ประจำเดือนตุลาคม 2569 และสร้างไฟล์ PDF ฉบับล่าสุดใน Google Drive เรียบร้อยแล้ว',
+          text: `ประมวลผลข้อมูลการตรวจ Actual ประจำเดือน${mName} ${bYear} และสร้างไฟล์ PDF ฉบับล่าสุดใน Google Drive เรียบร้อยแล้ว`,
           timer: 2200,
           showConfirmButton: false
         });
@@ -8058,7 +8170,7 @@
       }
     }
 
-    function openMonthlyReportModal(plateParam) {
+    function openMonthlyReportModal(plateParam, monthYearParam) {
       let plate = plateParam;
       if (!plate) {
         const select = document.getElementById('calendarPlateFilter');
@@ -8066,6 +8178,31 @@
       }
       if (!plate || plate === '-') plate = "25912";
       window.currentMonthlyPlate = plate;
+
+      // Determine Target Month & Year
+      let targetMonthYear = monthYearParam;
+      if (!targetMonthYear) {
+        const monthSelect = document.getElementById('monthlyModalMonthSelect');
+        if (monthSelect && monthSelect.value) {
+          targetMonthYear = monthSelect.value;
+        } else if (appState.calendarMonth && appState.calendarYear) {
+          targetMonthYear = `${String(appState.calendarMonth).padStart(2, '0')}/${appState.calendarYear}`;
+        } else {
+          const now = new Date();
+          targetMonthYear = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+        }
+      }
+      window.currentMonthlyYearMonth = targetMonthYear;
+
+      const [tMonthStr, tYearStr] = targetMonthYear.split('/');
+      const targetMonth = parseInt(tMonthStr, 10);
+      const targetYear = parseInt(tYearStr, 10);
+      const targetBuddhistYear = targetYear + 543;
+      const targetMonthName = THAI_MONTH_NAMES[targetMonth] || tMonthStr;
+
+      // Update Modal Subtitles and Labels
+      const subMonth = document.getElementById('monthlyModalSubtitleMonth');
+      if (subMonth) subMonth.textContent = `${targetMonthName} ${targetBuddhistYear}`;
 
       const cleanPlate = String(plate || '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
       const drv = appState.drivers.find(d => {
@@ -8092,7 +8229,15 @@
         plateSelect.value = plate;
       }
 
-      // Extract actual inspection logs for this vehicle in October 2026
+      // Populate & sync Month select inside modal
+      const monthSelect = document.getElementById('monthlyModalMonthSelect');
+      if (monthSelect) {
+        const availableMonths = getAvailableInspectionMonths();
+        monthSelect.innerHTML = availableMonths.map(m => `<option value="${m.key}" ${m.key === targetMonthYear ? 'selected' : ''}>${escapeHtml(m.label)}</option>`).join('');
+        monthSelect.value = targetMonthYear;
+      }
+
+      // Extract actual inspection logs for this vehicle in TARGET Month & Year
       const monthlyDaysMap = {};
       (appState.truckLogs || []).forEach(log => {
         const rowPlate = String(log && log.vehiclePlate !== undefined && log.vehiclePlate !== null ? log.vehiclePlate : '').replace(/[^a-zA-Z0-9ก-๙]/g, '').trim().toLowerCase();
@@ -8100,7 +8245,7 @@
         if (!isMatch) return;
 
         const dmy = parseInspectionDateInfo(log.date || log.timestamp);
-        if (dmy && dmy.month === 10 && (dmy.year === 2026 || dmy.year === 2569)) {
+        if (dmy && dmy.month === targetMonth && dmy.year === targetYear) {
           if (!monthlyDaysMap[dmy.day]) {
             monthlyDaysMap[dmy.day] = log;
           }
@@ -8182,6 +8327,8 @@
         }
       ];
 
+      const daysInTargetMonth = new Date(targetYear, targetMonth, 0).getDate();
+
       const tbody = document.getElementById('monthlyMatrixTableBody');
       if (tbody) {
         let rowsHtml = '';
@@ -8197,7 +8344,16 @@
           sec.items.forEach(it => {
             let daysTds = '';
             for (let d = 1; d <= 31; d++) {
+              if (d > daysInTargetMonth) {
+                daysTds += `<td class="py-1 px-1 text-center text-slate-300/40 dark:text-slate-700 bg-slate-50/50 dark:bg-slate-900/40 border-r border-slate-100 dark:border-slate-800 font-mono text-[9px]">-</td>`;
+                continue;
+              }
+
               const dayInsp = monthlyDaysMap[d];
+              const dayStr = d < 10 ? '0' + d : d;
+              const monthStr = targetMonth < 10 ? '0' + targetMonth : targetMonth;
+              const dateParam = `${dayStr}/${monthStr}/${targetYear}`;
+
               if (dayInsp) {
                 let isDefect = false;
                 if (dayInsp.checklist) {
@@ -8215,12 +8371,12 @@
                 }
 
                 if (isDefect) {
-                  daysTds += `<td class="py-1 px-1 text-center font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 border-r border-slate-100 dark:border-slate-800 cursor-pointer" title="วันที่ ${d}/10/2026: พบข้อบกพร่อง (ผู้ตรวจ: ${escapeHtml(dayInsp.driverName)}) - คลิกเปิดรายงานวัน" onclick="openTruckReportForDay('${escapeHtml(plate)}', '${d < 10 ? '0'+d : d}/10/2026')">✗</td>`;
+                  daysTds += `<td class="py-1 px-1 text-center font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 border-r border-slate-100 dark:border-slate-800 cursor-pointer" title="วันที่ ${dateParam}: พบข้อบกพร่อง (ผู้ตรวจ: ${escapeHtml(dayInsp.driverName)}) - คลิกเปิดรายงานวัน" onclick="openTruckReportForDay('${escapeHtml(plate)}', '${dateParam}')">✗</td>`;
                 } else {
-                  daysTds += `<td class="py-1 px-1 text-center font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-r border-slate-100 dark:border-slate-800 cursor-pointer" title="วันที่ ${d}/10/2026: ผ่านเกณฑ์ปกติ (ผู้ตรวจ: ${escapeHtml(dayInsp.driverName)}) - คลิกเปิดรายงานวัน" onclick="openTruckReportForDay('${escapeHtml(plate)}', '${d < 10 ? '0'+d : d}/10/2026')">✔</td>`;
+                  daysTds += `<td class="py-1 px-1 text-center font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-r border-slate-100 dark:border-slate-800 cursor-pointer" title="วันที่ ${dateParam}: ผ่านเกณฑ์ปกติ (ผู้ตรวจ: ${escapeHtml(dayInsp.driverName)}) - คลิกเปิดรายงานวัน" onclick="openTruckReportForDay('${escapeHtml(plate)}', '${dateParam}')">✔</td>`;
                 }
               } else {
-                daysTds += `<td class="py-1 px-1 text-center text-slate-300 dark:text-slate-600 border-r border-slate-100 dark:border-slate-800" title="วันที่ ${d}/10/2026: ไม่มีการตรวจ">-</td>`;
+                daysTds += `<td class="py-1 px-1 text-center text-slate-300 dark:text-slate-600 border-r border-slate-100 dark:border-slate-800" title="วันที่ ${dateParam}: ไม่มีการตรวจ">-</td>`;
               }
             }
 
@@ -8235,8 +8391,8 @@
         tbody.innerHTML = rowsHtml;
       }
 
-      // Pre-load PDF for this plate in background
-      loadMonthlyPdfForPlate(plate, false);
+      // Pre-load PDF for this plate & target month in background
+      loadMonthlyPdfForPlate(plate, false, targetMonthYear);
 
       switchMonthlyTab('matrix');
       document.getElementById('monthlyReportModal').classList.remove('hidden');
